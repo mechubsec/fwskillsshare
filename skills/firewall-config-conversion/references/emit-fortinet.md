@@ -1,13 +1,33 @@
 # Emit Fortinet FortiOS Configuration
 
+## Contents
+
+- [address_objects](#address_objects)
+- [address_groups](#address_groups)
+- [service_objects (custom services)](#service_objects-custom-services)
+- [service_groups (service groups)](#service_groups-service-groups)
+- [zones](#zones)
+- [security_policies](#security_policies)
+- [nat_rules](#nat_rules)
+- [interfaces](#interfaces)
+- [static routes, OSPF, BGP](#static-routes-ospf-bgp)
+- [system (global / dns / ntp), admin_users, DHCP](#system-global--dns--ntp-admin_users-dhcp)
+- [ha_config](#ha_config)
+- [vpn_tunnels (IKE / IPsec)](#vpn_tunnels-ike--ipsec)
+- [screens (DoS policy)](#screens-dos-policy)
+- [schedules](#schedules)
+- [management-plane access (`zones[].host_inbound` / `system.mgmt_services`)](#management-plane-access-zoneshost_inbound--systemmgmt_services)
+- [Emit checklist (FortiGate target)](#emit-checklist-fortigate-target)
+
 Target-emitter reference for the `firewall-config-conversion` skill. Loaded when the
 conversion **target = FortiGate (FortiOS)**. For every emittable section of the
 intermediate schema this file shows the native FortiOS `config / edit / set / next / end`
 syntax to render, the fidelity classification (`converted` /
 `converted-with-caveats` / `manual-not-converted`), and the inline `# CAVEAT:` to emit
 when the translation is lossy. Cross-vendor lossiness is sourced from
-`references/feature-mapping.md`; FortiOS syntax discipline follows
-`skills/parsing-fortinet-configs/references/config-format.md`.
+`references/feature-mapping.md`; FortiOS syntax discipline follows the
+`parsing-fortinet-configs` skill's config-format reference (every `edit` needs a `next`,
+every `config` an `end`, dotted-decimal subnet masks not CIDR).
 
 > **CRITICAL FortiOS RULES**
 >

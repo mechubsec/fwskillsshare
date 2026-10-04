@@ -1,12 +1,32 @@
 # Emit Juniper SRX `set` Configuration
 
+## Contents
+
+- [address_objects](#address_objects)
+- [address_groups](#address_groups)
+- [service_objects (applications)](#service_objects-applications)
+- [service_groups (application-sets)](#service_groups-application-sets)
+- [zones](#zones)
+- [security_policies](#security_policies)
+- [nat_rules](#nat_rules)
+- [interfaces](#interfaces)
+- [static routes, routing-instances/VRF, OSPF, BGP](#static-routes-routing-instancesvrf-ospf-bgp)
+- [system (host-name/dns/ntp/services), admin_users, DHCP](#system-host-namednsntpservices-admin_users-dhcp)
+- [ha_config (chassis cluster)](#ha_config-chassis-cluster)
+- [vpn_tunnels (IKE / IPsec)](#vpn_tunnels-ike--ipsec)
+- [screens (security screen ids-option + zone binding)](#screens-security-screen-ids-option--zone-binding)
+- [schedules (schedulers)](#schedules-schedulers)
+- [management-plane access (`zones[].host_inbound` / `system.mgmt_services`)](#management-plane-access-zoneshost_inbound--systemmgmt_services)
+- [Emit checklist (SRX target)](#emit-checklist-srx-target)
+
 Target-emitter reference for the `firewall-config-conversion` skill. Loaded when the
 conversion **target = SRX (Junos)**. For every emittable section of the intermediate
 schema this file shows the native Junos `set` syntax to render, the fidelity
 classification (`converted` / `converted-with-caveats` / `manual-not-converted`), and the
 inline `# CAVEAT:` to emit when the translation is lossy. Cross-vendor lossiness is sourced
-from `references/feature-mapping.md`; SRX syntax discipline follows
-`skills/parsing-srx-configs/references/config-format.md`.
+from `references/feature-mapping.md`; SRX syntax discipline follows the
+`parsing-srx-configs` skill's config-format reference (one leaf per `set` line, quoted values
+for names with spaces, `deactivate` for disabled config).
 
 > **CRITICAL SRX SYNTAX RULE — one leaf per `set` line.** Junos `set` commands set exactly
 > one leaf. Never combine sibling leaves on a line. `match source-address`,

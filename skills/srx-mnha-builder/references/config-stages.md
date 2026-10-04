@@ -1,5 +1,16 @@
 # MNHA Configuration Stage Reference
 
+## Contents
+
+- [Introduction](#introduction)
+- [Placeholder Mapping](#placeholder-mapping)
+- [Stage 1: Underlay (ICL + Data Segments)](#stage-1-underlay-icl--data-segments)
+- [Stage 2: HA Stanza](#stage-2-ha-stanza)
+- [Stage 3: eBGP + Signal-Route Export](#stage-3-ebgp--signal-route-export)
+- [Undo Files](#undo-files)
+- [Pre-Push Checklist](#pre-push-checklist)
+- [Config Model Resolution Logic](#config-model-resolution-logic)
+
 ## Introduction
 
 After filling the pair sheet, the agent writes each node's stage files by substituting `<PLACEHOLDER>` values from the pair sheet and baseline facts into the blocks below. Each staged set file must contain no Jinja syntax or unfilled placeholders when pushed to devices.

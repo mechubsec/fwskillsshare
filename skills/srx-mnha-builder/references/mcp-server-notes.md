@@ -1,5 +1,12 @@
 # Junos MCP server comparison and capability mapping
 
+## Contents
+
+- [Identify the server](#identify-the-server)
+- [Capability mapping](#capability-mapping)
+- [Juniper junos-mcp-server](#juniper-junos-mcp-server)
+- [rust-junosmcp](#rust-junosmcp)
+
 This workflow uses a Junos MCP server and is compatible with **both** Juniper's
 junos-mcp-server and rust-junosmcp. Each step names the capability it
 needs ("dry run the stage", "push with commit confirmed"), and this file maps those

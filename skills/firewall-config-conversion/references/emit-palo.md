@@ -1,19 +1,39 @@
 # Emit Palo Alto PAN-OS `set` Configuration
 
+## Contents
+
+- [address_objects](#address_objects)
+- [address_groups](#address_groups)
+- [service_objects](#service_objects)
+- [service_groups / application_groups](#service_groups--application_groups)
+- [zones](#zones)
+- [security_policies](#security_policies)
+- [nat_rules](#nat_rules)
+- [interfaces](#interfaces)
+- [virtual-router (static routes, OSPF, BGP)](#virtual-router-static-routes-ospf-bgp)
+- [system (deviceconfig), admin_users, DHCP](#system-deviceconfig-admin_users-dhcp)
+- [ha_config (HA note)](#ha_config-ha-note)
+- [vpn_tunnels (IKE / IPsec crypto profiles)](#vpn_tunnels-ike--ipsec-crypto-profiles)
+- [screens (zone-protection profile)](#screens-zone-protection-profile)
+- [schedules](#schedules)
+- [security_services (profiles / security-profile-group + interface mgmt)](#security_services-profiles--security-profile-group--interface-mgmt)
+- [Emit checklist (PAN-OS target)](#emit-checklist-pan-os-target)
+
 Target-emitter reference for the `firewall-config-conversion` skill. Loaded when the
 conversion **target = Palo Alto (PAN-OS)**. For every emittable section of the intermediate
 schema this file shows the native PAN-OS **config-mode `set`** syntax to render (CLI `set`
 form, **not** XML), the fidelity classification (`converted` /
 `converted-with-caveats` / `manual-not-converted`), and the inline `# CAVEAT:` to emit when
 the translation is lossy. Cross-vendor lossiness is sourced from
-`references/feature-mapping.md`; PAN-OS object/idiom shape follows
-`skills/parsing-palo-configs/references/config-format.md`.
+`references/feature-mapping.md`; PAN-OS syntax discipline follows the
+`parsing-palo-configs` skill's config-format reference (XML-to-CLI mapping: named objects use
+`set address <name>`, multi-value members go in square brackets, e.g.
+`set address-group WEB-SERVERS static [ WEB-01 WEB-02 ]`).
 
 > **Config-mode `set` syntax, not XML.** Everything below is the CLI form you type after
-> `configure` — e.g. `set address WEB-01 ip-netmask 10.20.30.10/32`. It maps 1:1 to the XML
-> in `parsing-palo-configs/references/config-format.md` but is what the emitter renders. By
-> default objects land in `vsys1`; if the schema carries `_vsys`, prefix the path with
-> `set vsys <name> …` (or `set shared …` for shared objects).
+> `configure` — e.g. `set address WEB-01 ip-netmask 10.20.30.10/32`. By default objects land
+> in `vsys1`; if the schema carries `_vsys`, prefix the path with `set vsys <name> …` (or
+> `set shared …` for shared objects).
 >
 > **Secrets are NEVER emitted.** PSKs, certificates, and admin passwords are rendered as
 > `<PSK-PLACEHOLDER>` / `<KEY-PLACEHOLDER>` / `<PASSWORD-PLACEHOLDER>` plus a

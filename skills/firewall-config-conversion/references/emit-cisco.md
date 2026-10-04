@@ -1,12 +1,32 @@
 # Emit Cisco ASA/FTD Configuration
 
+## Contents
+
+- [address_objects](#address_objects)
+- [address_groups](#address_groups)
+- [service_objects](#service_objects)
+- [service_groups](#service_groups)
+- [zones](#zones)
+- [security_policies](#security_policies)
+- [nat_rules](#nat_rules)
+- [interfaces](#interfaces)
+- [static routes, OSPF, BGP](#static-routes-ospf-bgp)
+- [system, admin_users, DHCP](#system-admin_users-dhcp)
+- [ha_config](#ha_config)
+- [vpn_tunnels (IKE / IPsec)](#vpn_tunnels-ike--ipsec)
+- [screens (threat-protection)](#screens-threat-protection)
+- [schedules](#schedules)
+- [security-profile attachments & management-plane access](#security-profile-attachments--management-plane-access)
+- [Emit checklist (Cisco ASA/FTD target)](#emit-checklist-cisco-asaftd-target)
+
 Target-emitter reference for the `firewall-config-conversion` skill. Loaded when the
 conversion **target = Cisco ASA/FTD**. For every emittable section of the intermediate
 schema this file shows the native ASA CLI to render, the fidelity classification
 (`converted` / `converted-with-caveats` / `manual-not-converted`), and the inline
 `# CAVEAT:` to emit when the translation is lossy. Cross-vendor lossiness is sourced from
-`references/feature-mapping.md`; ASA syntax discipline follows
-`skills/parsing-cisco-configs/references/config-format.md`.
+`references/feature-mapping.md`; ASA syntax discipline follows the `parsing-cisco-configs`
+skill's config-format reference (line-oriented format, top-level commands at column 0,
+sub-commands indented one space, dotted-decimal subnet masks not wildcard or CIDR).
 
 > **CRITICAL ASA/FTD RULES**
 >

@@ -16,6 +16,25 @@ metadata:
 
 # SRX MNHA Pair Builder
 
+## Contents
+
+- [Runtime intake](#runtime-intake)
+- [Step 0 - Targets and facts](#step-0---targets-and-facts)
+- [Step 1 - Baseline and safety net](#step-1---baseline-and-safety-net)
+- [Step 2 - Select the deployment mode](#step-2---select-the-deployment-mode)
+- [Step 3 - Pair sheet](#step-3---pair-sheet)
+- [Step 4 - Write and check stage files (nothing touches devices)](#step-4---write-and-check-stage-files-nothing-touches-devices)
+- [Step 5 - Dry run on devices](#step-5---dry-run-on-devices)
+- [Step 6 - Approval gate #1](#step-6---approval-gate-1)
+- [Step 7 - Stage 1: underlay](#step-7---stage-1-underlay)
+- [Step 8 - Stage 2: HA stanza](#step-8---stage-2-ha-stanza)
+- [Step 9 - Reboot handoff (approval gate #2)](#step-9---reboot-handoff-approval-gate-2)
+- [Step 10 - Verify formation](#step-10---verify-formation)
+- [Step 11 - Stage 3: eBGP (routing and hybrid; approval gate #3)](#step-11---stage-3-ebgp-routing-and-hybrid-approval-gate-3)
+- [Step 12 - Failover test (approval gate #4, recommended)](#step-12---failover-test-approval-gate-4-recommended)
+- [Step 13 - As-built report](#step-13---as-built-report)
+- [Guardrails](#guardrails)
+
 This skill turns two standalone SRX nodes into an MNHA pair through a Junos MCP server
 and never pushes anything without explicit approval. Design knowledge (modes, SRGs,
 pitfalls) lives in the `srx-mnha` skill. This skill is about **choosing the mode and
@@ -44,13 +63,23 @@ Before starting the workflow, inspect the request, supplied artifacts, and avail
 
 ## Step 0 - Targets and facts
 
+**MCP server requirement:** Every tool named in this skill (`get_router_list`,
+`gather_device_facts`, `execute_junos_command`, `commit_check_config`, ...) belongs to the
+connected Junos MCP server (rust-junosmcp or Juniper junos-mcp-server). Call it under that
+server's qualified name in your client (for example `<server-name>:gather_device_facts`,
+or `mcp__<server-name>__gather_device_facts` in Claude Code). If no Junos MCP server is
+available, fall back to manual CLI commands (`show chassis cluster status`,
+`show chassis high-availability information`, etc.) and ask the user to paste the output.
+Tool mappings and server-specific behavior are in `references/mcp-server-notes.md`.
+
 1. Call `get_router_list` and confirm both device names exist exactly as the user gave
    them.
 2. Run `gather_device_facts` on each node. **Stop** if the models or `version` differ.
-3. Run `show chassis cluster status` on each node. **Stop** if either node is clustered.
-4. Run `show chassis high-availability information` on each node. Expect *mode not
-   configured*. If a node shows an MNHA configuration, it isn't a new node: stop and
-   hand back to the user to clean it and reboot.
+3. Run `execute_junos_command` with `show chassis cluster status` on each node. **Stop**
+   if either node is clustered.
+4. Run `execute_junos_command` with `show chassis high-availability information` on each
+   node. Expect *mode not configured*. If a node shows an MNHA configuration, it isn't a
+   new node: stop and hand back to the user to clean it and reboot.
 5. Ask the user to confirm they have **console / out-of-band access to both nodes**.
    This is a hard prerequisite for both servers, because a bad commit can cut management
    access; commit confirmed (where the server has it) is a backstop, not a substitute.
@@ -163,11 +192,12 @@ Output per node:
 ## Step 5 - Dry run on devices
 
 For every node, dry run stage 1 alone and stages 1+2+3 concatenated (later stages reference
-earlier ones). Use the commit-check/dry-run tool from `references/mcp-server-notes.md`:
-- rust-junosmcp: prefer `commit_check_config` with `device`, `config_text` (the rendered
-  stage), and `config_format: "set"`; if not available, `render_and_apply_j2_template` with
-  `apply_config: true, dry_run: true`
-- Juniper junos-mcp-server: `render_and_apply_j2_template` with `apply_config: true,
+earlier ones). Use the commit-check/dry-run tool (see `references/mcp-server-notes.md` for
+server-specific mappings):
+- **rust-junosmcp:** prefer `commit_check_config` with `device`, `config_text` (the
+  rendered stage), and `config_format: "set"`; if not available, `render_and_apply_j2_template`
+  with `apply_config: true, dry_run: true`
+- **Juniper junos-mcp-server:** `render_and_apply_j2_template` with `apply_config: true,
   dry_run: true`
 
 Template parameters (when using the J2 tool):
@@ -186,15 +216,16 @@ an undo would remove.
 
 ## Step 7 - Stage 1: underlay
 
-1. Push `stage1.set` on Node0, then on Node1. Use the push tool from
-   `references/mcp-server-notes.md`:
-   - rust-junosmcp: `create_junos_change_set` (preview/diff) → `approve_junos_change_set` →
-     `apply_junos_change_set` with `confirm_timeout_mins: 10` → verify → `confirm_junos_change_set`.
-     Direct-commit tools (`load_and_commit_config`) are refused unless the operator enabled
-     `--allow-direct-commit`; if so, use `load_and_commit_config` with `confirm_timeout_mins: 10`,
-     then a plain follow-up commit. The user's chat approval at each gate is required;
-     server-side approval (or lab-mode auto-approval) is not user approval.
-   - Juniper junos-mcp-server: `render_and_apply_j2_template` with `apply_config: true,
+1. Push `stage1.set` on Node0, then on Node1. Use the push tool (see
+   `references/mcp-server-notes.md` for server-specific mappings):
+   - **rust-junosmcp:** `create_junos_change_set` (preview/diff) → `approve_junos_change_set`
+     → `apply_junos_change_set` with `confirm_timeout_mins: 10` → verify →
+     `confirm_junos_change_set`. Direct-commit tools (`load_and_commit_config`) are refused
+     unless the operator enabled `--allow-direct-commit`; if so, use `load_and_commit_config`
+     with `confirm_timeout_mins: 10`, then a plain follow-up commit. The user's chat
+     approval at each gate is required; server-side approval (or lab-mode auto-approval) is
+     not user approval.
+   - **Juniper junos-mcp-server:** `render_and_apply_j2_template` with `apply_config: true,
      dry_run: false` (runs commit check before committing; no commit confirmed)
 2. Verify per `references/verification.md` → "After Stage 1":
    - ICL ping, including the 1400-byte DF ping
@@ -227,8 +258,9 @@ This skill never reboots a device; the user performs the reboot.
 
 ## Step 10 - Verify formation
 
-Run the "After Stage 2 + reboot" checks on both nodes with
-`execute_junos_command_batch`. For switching and hybrid modes, also run the VIP checks.
+Run the "After Stage 2 + reboot" checks on both nodes with the batch execution tool
+(`execute_junos_command_batch` on rust-junosmcp, or individual `execute_junos_command`
+calls on Juniper junos-mcp-server). For switching and hybrid modes, also run the VIP checks.
 
 - **Pass:** both ONLINE, Conn State UP, Cold Sync COMPLETE, and exactly one SRG1 ACTIVE,
   the higher-priority node.

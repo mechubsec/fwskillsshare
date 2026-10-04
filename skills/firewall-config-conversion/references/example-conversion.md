@@ -1,5 +1,11 @@
 # Worked Example: Cisco ASA → Juniper SRX
 
+## Contents
+
+- [Conversion DRAFT](#conversion-draft)
+- [Fidelity report (cisco_asa -> srx)](#fidelity-report-cisco_asa---srx)
+- [Notes on the ASA → SRX judgment calls](#notes-on-the-asa--srx-judgment-calls)
+
 A complete, worked conversion produced by the `firewall-config-conversion` skill. It
 demonstrates the end-to-end workflow against a real parsed fixture and the per-section
 fidelity report.

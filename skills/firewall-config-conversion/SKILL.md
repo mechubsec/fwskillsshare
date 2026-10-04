@@ -15,6 +15,18 @@ metadata:
 
 # Firewall Config Conversion
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Input Handling](#input-handling)
+- [Conversion Workflow](#conversion-workflow)
+- [Output & Fidelity Report](#output--fidelity-report)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to convert a firewall or NGFW configuration from one vendor to another by pivoting through the `parsing-*` intermediate JSON schema. Any source vendor that has a parser (Cisco ASA/FTD, FortiGate, Palo Alto PAN-OS, Juniper SRX) can be converted to any of the four supported targets, because every conversion reads the same normalized schema — `address_objects`, `address_groups`, `service_objects`, `service_groups`, `security_policies`, `nat_rules`, `zones`, `interfaces`, `static_routes` / `virtual_routers` / routing, `vpn_tunnels`, `ha_config`, and `system` (abbreviated — see the canonical `intermediate-schema.md` in the `parsing-srx-configs` skill for the full top-level structure) — and re-emits it in the target's native CLI. This schema-pivot design means there is one emitter per target rather than one translator per source/target pair.

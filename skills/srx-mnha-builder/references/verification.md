@@ -1,5 +1,15 @@
 # Verification: pass criteria and diagnostic tree
 
+## Contents
+
+- [After Stage 1 (underlay)](#after-stage-1-underlay)
+- [After Stage 2 + reboot (HA formation)](#after-stage-2--reboot-ha-formation)
+- [VIP checks (switching / hybrid)](#vip-checks-switching--hybrid)
+- [After Stage 3 (routing)](#after-stage-3-routing)
+- [Role-consistency invariant (hybrid / routing) - check after Stage 3 and after every failover](#role-consistency-invariant-hybrid--routing---check-after-stage-3-and-after-every-failover)
+- [Node-sourced tests: expected asymmetric failures (hybrid / routing)](#node-sourced-tests-expected-asymmetric-failures-hybrid--routing)
+- [Failover test (approval gate)](#failover-test-approval-gate)
+
 Run each check on both nodes. Use the batch-command tool from `references/mcp-server-notes.md`:
 - rust-junosmcp: `execute_junos_command_batch` (parallel server-side)
 - Juniper junos-mcp-server: run `execute_junos_command` twice (sequential or parallel client-side)

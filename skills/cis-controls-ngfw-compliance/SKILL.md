@@ -24,11 +24,21 @@ metadata:
 
 # CIS Controls NGFW Compliance Research
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Baseline Interpretation](#baseline-interpretation)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [NGFW Feature Expectations](#ngfw-feature-expectations)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
-Use this skill to answer questions like “how should my firewall support CIS Controls v8?” or “is this NGFW design aligned with CIS Critical Security Controls?” The core answer is: an NGFW is not “CIS compliant” by itself. CIS Controls alignment is assessed across the organization’s implemented safeguards, processes, assets, people, evidence, and operating practices. A firewall estate can be a major technical control and evidence source, but it must be configured, monitored, reviewed, maintained, and tied to the organization’s CIS implementation group, risk, and operational context.
-
-The CIS Controls are prioritized cyber defense practices. They are useful as a practical baseline even when the organization is not pursuing a formal regulatory certification. For firewall work, most directly relevant are Controls 3-8, 10-13, 15, 17, and 18 (see references/control-mapping.md). CIS Controls v8.1 (June 2024) is an iterative refresh of v8 that preserves the Control/Safeguard numbering while adding a Governance security function aligned to NIST CSF 2.0; confirm which version the organization uses.
+Use this skill to answer questions like “how should my firewall support CIS Controls v8?” or “is this NGFW design aligned with CIS Critical Security Controls?” This skill maps firewall technical controls and evidence to CIS Controls v8 / v8.1 safeguards (primarily Controls 3-8, 10-13, 15, 17, and 18; see references/control-mapping.md) but cannot attest to the organization’s broader processes, asset management, IAM, monitoring, incident response, or operational practices. CIS Controls v8.1 (June 2024) preserves the Control/Safeguard numbering while adding a Governance security function aligned to NIST CSF 2.0; confirm which version the organization uses.
 
 Treat this as security-control assessment guidance, not legal advice and not a certification claim. When producing final language, cite CIS Control and Safeguard IDs where known, label assumptions, and distinguish “supports CIS Controls” from “fully implemented across the enterprise.”
 

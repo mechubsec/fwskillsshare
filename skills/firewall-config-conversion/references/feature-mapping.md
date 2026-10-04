@@ -1,5 +1,11 @@
 # Cross-Vendor Feature Mapping & Non-Isomorphic Catalog
 
+## Contents
+
+- [Part 1 — Canonical application → target name](#part-1--canonical-application--target-name)
+- [Part 2 — Per-section non-isomorphic catalog](#part-2--per-section-non-isomorphic-catalog)
+- [Quick classification cheat-sheet](#quick-classification-cheat-sheet)
+
 Canonical-to-target knowledge base for the `firewall-config-conversion` skill. The
 emitters (`emit-srx.md`, `emit-palo.md`, `emit-fortinet.md`, `emit-cisco.md`) cite this
 file to choose the right target idiom and to attach the correct `# CAVEAT:` and fidelity
