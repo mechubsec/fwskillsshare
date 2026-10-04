@@ -1,5 +1,19 @@
 # How-To: Deploy Security Director On-Prem 26.x on Proxmox VE
 
+## Contents
+
+- [1. Architecture in one paragraph](#1-architecture-in-one-paragraph)
+- [2. Prerequisites](#2-prerequisites)
+- [3. Mandatory predeployment connectivity STOP gate](#3-mandatory-predeployment-connectivity-stop-gate)
+- [4. Extract artifacts (`--no-run`)](#4-extract-artifacts---no-run)
+- [5. Build the Proxmox VM](#5-build-the-proxmox-vm)
+- [6. First boot + verify](#6-first-boot--verify)
+- [7. Onboard Junos/SRX devices](#7-onboard-junossrx-devices)
+- [8. The log path (the hard part)](#8-the-log-path-the-hard-part)
+- [9. Gotchas (all hit in a real build)](#9-gotchas-all-hit-in-a-real-build)
+- [10. Operations](#10-operations)
+- [11. Rollback](#11-rollback)
+
 > **Product note — read first.** This guide is for **Security Director On-Prem
 > 25/26**, Juniper's **new ATOM-based appliance** that runs on single-node RKE2
 > Kubernetes. It is **NOT Junos Space Security Director** and shares nothing with
