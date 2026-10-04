@@ -24,6 +24,18 @@ metadata:
 
 # ISO 27001 NGFW Compliance Research
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Baseline Interpretation](#baseline-interpretation)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [NGFW Feature Expectations](#ngfw-feature-expectations)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to answer questions like “how does our firewall support ISO 27001?” or “what NGFW evidence should we collect for an ISO/IEC 27001:2022 audit?” The core answer is: ISO 27001 certification applies to the organization’s Information Security Management System (ISMS) and its defined scope. A firewall or NGFW is not “ISO 27001 compliant” by itself. It is a technical and operational control that can help implement and evidence selected Annex A controls when the ISMS has selected those controls through risk assessment, the Statement of Applicability (SoA), policies, procedures, ownership, monitoring, review, and continual improvement.

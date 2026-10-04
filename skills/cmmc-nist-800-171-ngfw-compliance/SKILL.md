@@ -28,6 +28,18 @@ metadata:
 
 # CMMC / NIST 800-171 NGFW Compliance Research
 
+## Contents
+
+- [Overview](#overview)
+- [Runtime intake](#runtime-intake)
+- [Scope and routing](#scope-and-routing)
+- [Baseline Interpretation](#baseline-interpretation)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [NGFW Feature Expectations](#ngfw-feature-expectations)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to answer questions like “what does an NGFW need to do for CMMC Level 2?” or “is this firewall design sufficient for NIST 800-171 boundary protection around CUI?” The core answer is: a next-generation firewall is not CMMC compliant by itself. CMMC and NIST SP 800-171 are assessed against the contractor environment, the systems that store, process, or transmit Controlled Unclassified Information (CUI), and the policies, procedures, people, evidence, and technical controls used to protect that CUI.

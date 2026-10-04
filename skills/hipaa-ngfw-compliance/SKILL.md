@@ -24,6 +24,18 @@ metadata:
 
 # HIPAA NGFW Compliance Research
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Baseline Interpretation](#baseline-interpretation)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [NGFW Feature Expectations](#ngfw-feature-expectations)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to answer questions like “what does an NGFW need to do to be HIPAA compliant?” or “is this firewall design sufficient for HIPAA Security Rule expectations?” The core answer is: a next-generation firewall is not HIPAA compliant by itself. HIPAA Security Rule compliance is assessed for the covered entity or business associate, the electronic protected health information (ePHI) it creates, receives, maintains, or transmits, and the administrative, physical, and technical safeguards used to protect that ePHI.

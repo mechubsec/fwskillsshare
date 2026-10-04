@@ -24,6 +24,18 @@ metadata:
 
 # SOC 2 NGFW Compliance Research
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Baseline Interpretation](#baseline-interpretation)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [NGFW Feature Expectations](#ngfw-feature-expectations)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to answer questions like “what firewall evidence do we need for SOC 2?” or “how should our NGFW controls map to Trust Services Criteria?” The core answer is: SOC 2 reports cover controls over a defined system, criteria, and period of time. A firewall or NGFW is not “SOC 2 compliant” by itself. It can support the service organization’s controls for logical access, system operations, change management, risk mitigation, monitoring, incident response, availability, confidentiality, and privacy-supporting restrictions when it is configured, monitored, reviewed, and evidenced consistently.

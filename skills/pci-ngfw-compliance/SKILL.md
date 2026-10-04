@@ -24,6 +24,18 @@ metadata:
 
 # PCI NGFW Compliance Research
 
+## Contents
+
+- [Overview](#overview)
+- [Runtime intake](#runtime-intake)
+- [Scope and routing](#scope-and-routing)
+- [Baseline Interpretation](#baseline-interpretation)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [NGFW Feature Expectations](#ngfw-feature-expectations)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to answer questions like “what does an NGFW need to do to be PCI compliant?” or “is this firewall design sufficient for PCI DSS?” The core answer is: a next-generation firewall is not PCI compliant by itself. PCI DSS compliance is assessed for the entity, the cardholder data environment (CDE), connected-to/security-impacting systems, processes, people, evidence, and compensating or customized controls. An NGFW can be a major network security control (NSC), but it must be configured, maintained, monitored, reviewed, and evidenced as part of the whole PCI DSS program.

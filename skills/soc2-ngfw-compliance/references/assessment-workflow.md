@@ -1,5 +1,10 @@
 # SOC 2 NGFW Compliance Research — Assessment Workflow & Evidence
 
+## Contents
+
+- [Assessment Workflow](#assessment-workflow)
+- [Evidence Request Checklist](#evidence-request-checklist)
+
 > Reference material for the `soc2-ngfw-compliance` skill, moved out of SKILL.md for token-efficient progressive disclosure. Load this when running an assessment, adding config evidence markers, or requesting evidence.
 
 ## Assessment Workflow

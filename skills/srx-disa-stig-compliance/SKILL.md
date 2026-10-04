@@ -28,6 +28,21 @@ metadata:
 
 # SRX DISA STIG Compliance
 
+## Contents
+
+- [Purpose and nonclaim](#purpose-and-nonclaim)
+- [Runtime intake](#runtime-intake)
+- [Source lock](#source-lock)
+- [Scope intake](#scope-intake)
+- [Profile routing](#profile-routing)
+- [Evidence contract](#evidence-contract)
+- [Status contract](#status-contract)
+- [Assessment workflow](#assessment-workflow)
+- [Compatibility and remediation boundary](#compatibility-and-remediation-boundary)
+- [Output contract](#output-contract)
+- [Common failure modes](#common-failure-modes)
+- [Pre-Return Self-Check](#pre-return-self-check)
+
 ## Purpose and nonclaim
 
 Use this skill to assess Juniper SRX evidence against the pinned DISA Y25M01
