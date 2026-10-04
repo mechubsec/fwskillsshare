@@ -1,7 +1,7 @@
 ---
 name: srx-chassis-cluster-proxmox
 description: Build and validate a Juniper SRX or vSRX chassis cluster whose two nodes are Proxmox VE guests. Use when planning bridges and VLANs for the control and fabric links, mapping virtual NICs to Junos interface names, bootstrapping cluster-id, configuring fab interfaces, reth interfaces and redundancy groups, or diagnosing a cluster that forms but passes no traffic. Not for Multi-Node High Availability.
-version: 1.2.0
+version: 1.2.1
 author:
   - fastrevmd-lab
   - Claude

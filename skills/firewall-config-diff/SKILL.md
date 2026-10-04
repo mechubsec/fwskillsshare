@@ -1,7 +1,7 @@
 ---
 name: firewall-config-diff
 description: Compare two parsed firewall configurations by semantic intent rather than text. Use when checking drift, HA parity, pre/post-change results, migration fidelity, or round-trip conversion. Parse raw configs first; use a text diff for literal line changes.
-version: 1.0.3
+version: 1.0.4
 author:
   - fastrevmd-lab
   - Claude

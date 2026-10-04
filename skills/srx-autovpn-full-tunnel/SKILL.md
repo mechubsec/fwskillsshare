@@ -1,7 +1,7 @@
 ---
 name: srx-autovpn-full-tunnel
 description: Design, configure, audit, and troubleshoot Juniper SRX AutoVPN full-tunnel hub backhaul. Use when handling group-ike-id gateways, traffic selectors, ARI, shared st0, anti-recursion routes, source NAT, VPN hairpinning, NAT-T, or Junos 24.4R1+ PSK and 0.0.0.0/0 commit errors. Use ADVPN for direct spoke shortcuts.
-version: 1.1.2
+version: 1.1.3
 author:
   - fastrevmd-lab
   - Claude

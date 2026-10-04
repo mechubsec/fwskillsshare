@@ -1,7 +1,7 @@
 ---
 name: sd-onprem-proxmox-deploy
 description: Deploy and validate Juniper Security Director On-Prem 25/26 as a Proxmox VE KVM guest. Use when planning, installing, rebuilding, validating network connectivity or first-boot seed data, and onboarding SRX/Junos devices. Not for Junos Space Security Director or Security Director Cloud.
-version: 1.2.0
+version: 1.2.1
 author:
   - fastrevmd-lab
   - Claude

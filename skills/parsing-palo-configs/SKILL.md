@@ -1,7 +1,7 @@
 ---
 name: parsing-palo-configs
 description: Parse PAN-OS and Panorama XML or set-format exports into the shared firewall schema. Use when input contains vsys, device-group, security rulebase, address-group, application-default, security-profile-group, set deviceconfig, or XML entry/member elements, including audit, conversion, diff, summary, and explanation tasks.
-version: 1.1.4
+version: 1.1.5
 author:
   - fastrevmd-lab
   - Claude

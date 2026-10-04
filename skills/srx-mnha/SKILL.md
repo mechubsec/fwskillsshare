@@ -1,7 +1,7 @@
 ---
 name: srx-mnha
 description: Design, configure, audit, and troubleshoot Juniper SRX Multi-Node High Availability. Use when handling routed, default-gateway, or hybrid modes, chassis-cluster migration, SRGs, ICL or ICD, session sync, BGP or BFD failover, VIPs, IPsec, NAT, proxy ARP, routing instances, or DHCP. Use focused SRX skills for non-MNHA behavior.
-version: 1.3.2
+version: 1.3.3
 author:
   - fastrevmd-lab
   - Claude

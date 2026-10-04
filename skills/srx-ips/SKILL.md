@@ -1,7 +1,7 @@
 ---
 name: srx-ips
 description: Manage SRX IPS (Junos IDP) lifecycle through a Junos MCP server - triage detections, propose monitor-to-enforce changes, design and validate custom signatures for findings the predefined database does not cover. Reads IDP policy and logs, reports what fired and each rule's action, stages changes behind approval gates, checks coverage read-only, chooses context/direction/pattern, validates syntax without activating. Use when reviewing IDP logs, investigating suspicious traffic, deciding which no-action rules to enforce, when a scanner finding needs IDP detection, or when extending IDP coverage. Not for attack database updates or IDP license maintenance.
-version: 0.1.1
+version: 0.1.2
 author:
   - fastrevmd-lab
   - Claude
@@ -81,7 +81,7 @@ metadata:
 - [Commit and verification requirements](#commit-and-verification-requirements)
 - [Hand-offs](#hand-offs)
 
-> **STATUS: draft (v0.1.1).** Contributed by Javier Grizzuti
+> **STATUS: draft (v0.1.2).** Contributed by Javier Grizzuti
 > ([@jgrizzuti](https://github.com/jgrizzuti)) from lab work through a Junos MCP
 > server, then revised against Juniper documentation. Items marked **[unverified]**
 > have not yet been checked on a vSRX and must not be relied on until they are.

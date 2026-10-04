@@ -1,7 +1,7 @@
 ---
 name: srx-policy
 description: Design, migrate, configure, audit, and troubleshoot Juniper SRX security policy on Junos 23.x+, including Branch SRX300/SRX400 platforms. Use when handling global or zone policy, address and application objects, AppID, AppFW, NGWF, EWF, SecIntel, ATP, logging, rule order, hit counts, default deny, or cross-VLAN mDNS and SSDP boundaries.
-version: 1.3.0
+version: 1.3.1
 author:
   - fastrevmd-lab
   - Claude

@@ -1,7 +1,7 @@
 ---
 name: srx-nat
 description: Design, configure, audit, and troubleshoot Juniper SRX NAT. Use when handling source, destination, static, NAT64, DNS64, CGN, PBA, persistent or address-persistent NAT, hairpinning, proxy ARP, rule order, pool exhaustion, security nat configuration, show security nat output, sessions, or RT_NAT logs.
-version: 1.1.2
+version: 1.1.3
 author:
   - fastrevmd-lab
   - Claude

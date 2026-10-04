@@ -1,7 +1,7 @@
 ---
 name: parsing-fortinet-configs
 description: Parse FortiGate and FortiOS full-configuration or backup exports into the shared firewall schema. Use when input contains config/edit/set/next/end blocks, VDOM, firewall policy or address, srcintf, dstintf, UTM profiles, or VIPs, including audit, conversion, diff, summary, and explanation tasks.
-version: 1.1.4
+version: 1.1.5
 author:
   - fastrevmd-lab
   - Claude

@@ -1,7 +1,7 @@
 ---
 name: srx-syslog-logging
 description: Configure and troubleshoot Juniper SRX/vSRX logging to an external collector or SIEM. Use when system syslog or security logs are not arriving, when choosing between fxp0 and a revenue interface as the log source, when working with mgmt_junos, or when onboarding to Security Director Cloud. Covers the RE vs PFE logging split and why a non-default syslog port can silently fail.
-version: 1.1.0
+version: 1.1.1
 author:
   - fastrevmd-lab
   - Claude

@@ -1,7 +1,7 @@
 ---
 name: srx-dynamic-ip-feed
 description: Configure, audit, and troubleshoot Juniper SRX dynamic IP objects from HTTPS feeds. Use when handling feed archives, dynamic-address mapping, certificate validation, basic auth, mTLS, session scanning, routing-instance reachability, Recovery Mode after reboot, show security dynamic-address, ipfd logs, or feed and TLS failures. Use srx-policy for SecIntel feeds.
-version: 1.0.3
+version: 1.0.4
 author:
   - fastrevmd-lab
   - Claude

@@ -1,7 +1,7 @@
 ---
 name: parsing-cisco-configs
 description: Parse Cisco ASA and FTD LINA running configurations into the shared firewall schema. Use when input contains show running-config, access-list, access-group, object network, object-group, nameif, security-level, NAT, interfaces, or failover, including audit, conversion, diff, summary, and explanation tasks. For FMC- or FDM-managed Firepower policy exported as JSON, use parsing-firepower-configs instead.
-version: 1.1.5
+version: 1.1.6
 author:
   - fastrevmd-lab
   - Claude

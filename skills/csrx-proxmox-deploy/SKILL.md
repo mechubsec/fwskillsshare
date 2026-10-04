@@ -1,7 +1,7 @@
 ---
 name: csrx-proxmox-deploy
 description: Deploy a Juniper cSRX container firewall as a Docker workload on a Proxmox VE KVM guest, in both secure-wire (L2 bump-in-the-wire) and routing (L3) forwarding modes, drawn from an end-to-end build rather than vendor documentation. Use when sizing the Docker host guest, setting the mandatory host CPU model, wiring cSRX data-plane interfaces through Docker macvlan networks, diagnosing a container that reports healthy with no forwarding plane at all, TCP that hangs or corrupts while ICMP passes cleanly, a deny policy that blocks traffic but logs nothing, a routing-mode rebuild with no addressable interface, rediscovering the CSRX_* environment-variable surface for a different image release, judging a throughput number against a known baseline, or verifying isolation and enforcement with a test that can actually fail.
-version: 0.1.0
+version: 0.1.1
 author:
   - fastrevmd-lab
   - Claude
@@ -35,7 +35,7 @@ metadata:
 - [Day-2 operations](#day-2-operations)
 - [Rollback](#rollback)
 
-> **STATUS: draft (v0.1.0).** Every claim below comes from one end-to-end build
+> **STATUS: draft (v0.1.1).** Every claim below comes from one end-to-end build
 > on **Proxmox VE 9.2.20** running **cSRX 26.2R1.7** as a Docker container,
 > exercised in both secure-wire and routing forwarding modes. It has **not**
 > been repeated on a different cSRX release or a second Proxmox estate. No

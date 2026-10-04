@@ -1,7 +1,7 @@
 ---
 name: parsing-srx-configs
 description: Parse Juniper SRX and Junos display-set or hierarchical configurations into the shared firewall schema. Use when input contains set security, zones, policies, address-book, from-zone, to-zone, NAT rule-set, chassis cluster, logical-systems, or routing-instances, including audit, conversion, diff, summary, and explanation tasks.
-version: 1.4.0
+version: 1.4.1
 author:
   - fastrevmd-lab
   - Claude

@@ -1,7 +1,7 @@
 ---
 name: srx-advpn
 description: Design, configure, audit, and troubleshoot Juniper SRX ADVPN spoke-to-spoke IPsec shortcuts. Use when handling suggester or partner roles, multipoint st0, OSPF p2mp, certificates, PKI, shortcut lifecycle, or “No public key found” IKE_AUTH failures. Use AutoVPN for hub backhaul and static IPsec for small fixed estates.
-version: 1.1.2
+version: 1.1.3
 author:
   - fastrevmd-lab
   - Claude
