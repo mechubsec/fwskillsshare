@@ -15,6 +15,19 @@ metadata:
 
 # Firewall Config Diff
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Input Handling](#input-handling)
+- [Semantic Identity](#semantic-identity)
+- [Diff Workflow](#diff-workflow)
+- [Output & Verdict](#output--verdict)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to compare two firewall or NGFW configurations and report how they differ, by pivoting both through the `parsing-*` intermediate JSON schema. Each side is normalized to the same vendor-neutral sections — `address_objects`, `address_groups`, `service_objects`, `service_groups`, `security_policies`, `nat_rules`, `zones`, `interfaces`, `static_routes` / `virtual_routers` / routing, `vpn_tunnels`, `ha_config`, `admin_users`, and `system` — and then compared section by section. Because the comparison happens on the schema pivot rather than the raw text, same-vendor and cross-vendor diffs are one mechanism: the only cross-vendor addition is a normalization step for constructs that two vendors model differently.

@@ -1,5 +1,11 @@
 # Worked Examples: Firewall Config Diff
 
+## Contents
+
+- [Scenario 1 — Same-vendor drift (Cisco ASA → Cisco ASA)](#scenario-1--same-vendor-drift-cisco-asa--cisco-asa)
+- [Scenario 2 — Cross-vendor parity (Cisco ASA-shaped vs Juniper SRX-shaped)](#scenario-2--cross-vendor-parity-cisco-asa-shaped-vs-juniper-srx-shaped)
+- [Scenario 3 — Round-trip conversion self-test (Cisco schema A vs re-parsed SRX schema B)](#scenario-3--round-trip-conversion-self-test-cisco-schema-a-vs-re-parsed-srx-schema-b)
+
 Three worked diffs produced by the `firewall-config-diff` skill, each emitting the exact
 **Output & Verdict** template from `SKILL.md` and applying the pairing/classification rules
 in `references/equivalence-rules.md`. Every comparison is **semantic** (by meaning, not text):

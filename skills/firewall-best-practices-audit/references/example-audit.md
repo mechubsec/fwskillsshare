@@ -1,5 +1,13 @@
 # Firewall Best-Practices Audit — Worked Example
 
+## Contents
+
+- [Input](#input)
+- [Workflow walk-through](#workflow-walk-through)
+- [Findings](#findings)
+- [Audit Summary](#audit-summary)
+- [What changed since v1.0](#what-changed-since-v10)
+
 > Reference material for the `firewall-best-practices-audit` skill; loaded on
 > demand. A single end-to-end audit over a real parsing fixture, demonstrating
 > the workflow, the Finding template, and the Audit Summary. All findings below

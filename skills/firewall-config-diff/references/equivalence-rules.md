@@ -1,5 +1,10 @@
 # Equivalence Rules — Semantic Identity & Cross-Vendor Not-Comparable Catalog
 
+## Contents
+
+- [Part 1 — Per-section semantic identity & attribute comparison](#part-1--per-section-semantic-identity--attribute-comparison)
+- [Part 2 — Cross-vendor not-comparable catalog](#part-2--cross-vendor-not-comparable-catalog)
+
 The detail behind the `firewall-config-diff` workflow's pairing and classification steps.
 It answers two questions for every comparison:
 

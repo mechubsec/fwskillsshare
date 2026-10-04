@@ -1,5 +1,12 @@
 # ClearPass day-2 operations — certificates, licensing, and the API
 
+## Contents
+
+- [Licensing](#licensing)
+- [HTTPS certificate import](#https-certificate-import)
+- [The REST API — access works, token minting does not](#the-rest-api--access-works-token-minting-does-not)
+- [Driving the GUI headlessly](#driving-the-gui-headlessly)
+
 Everything here was confirmed on a live **6.14.0.371380 / C1000V** appliance on
 2026-08-15 and 2026-08-16, after the deploy procedure in `SKILL.md` completed.
 The deploy skill ends at a booted, addressed appliance; this file covers what

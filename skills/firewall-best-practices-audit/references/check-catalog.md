@@ -1,5 +1,12 @@
 # Firewall Best-Practices Audit — Check Catalog
 
+## Contents
+
+- [Policy population contract](#policy-population-contract)
+- [Security Checks](#security-checks)
+- [Operational Checks](#operational-checks)
+- [Thresholds](#thresholds)
+
 > Reference material for the `firewall-best-practices-audit` skill; loaded on
 > demand. Each entry: id, what it detects, the intermediate-schema fields it
 > reads, default severity, and confidence notes.

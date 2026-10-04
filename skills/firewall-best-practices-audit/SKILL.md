@@ -15,6 +15,20 @@ metadata:
 
 # Firewall Best-Practices Audit
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Policy population contract](#policy-population-contract)
+- [Input Handling](#input-handling)
+- [Severity & Confidence](#severity--confidence)
+- [Audit Workflow](#audit-workflow)
+- [Reference Material (load on demand)](#reference-material-load-on-demand)
+- [Output Templates](#output-templates)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to audit a firewall or NGFW rulebase for security and operational hygiene, vendor-neutrally, over the `parsing-*` intermediate JSON schema. The audit reads normalized `security_policies`, `nat_rules`, address/service objects and groups, `zones`, `vpn_tunnels`, `system`, and `admin_users`, then emits prioritized findings across the security and operational check families (full catalog: `references/check-catalog.md`). Each finding carries a severity, a confidence, the affected references, why it matters, and remediation.

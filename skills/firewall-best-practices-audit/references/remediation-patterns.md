@@ -1,5 +1,29 @@
 # Firewall Best-Practices Audit — Remediation Patterns
 
+## Contents
+
+- [Overly permissive / any-any (SEC-ANY-ANY, SEC-ANY-SVC, SEC-BROAD-SRC, SEC-BROAD-DST)](#overly-permissive--any-any-sec-any-any-sec-any-svc-sec-broad-src-sec-broad-dst)
+- [Missing logging / no owner (SEC-NO-LOG, SEC-NO-DESC)](#missing-logging--no-owner-sec-no-log-sec-no-desc)
+- [Plaintext management (SEC-PLAINTEXT-MGMT)](#plaintext-management-sec-plaintext-mgmt)
+- [Exposed risky / management services (SEC-EXPOSED-MGMT, SEC-EXPOSED-RISKY, SEC-INBOUND-ANY, SEC-MGMT-DATAZONE)](#exposed-risky--management-services-sec-exposed-mgmt-sec-exposed-risky-sec-inbound-any-sec-mgmt-datazone)
+- [Weak IKE / IPsec (SEC-WEAK-IKE, SEC-WEAK-IPSEC, SEC-PSK-WEAK)](#weak-ike--ipsec-sec-weak-ike-sec-weak-ipsec-sec-psk-weak)
+- [Shadowed / redundant / ordering (SEC-SHADOW, SEC-REDUNDANT, SEC-OVERLAP, SEC-NO-DENY-ALL, SEC-DISABLED, SEC-ORPHAN-REF)](#shadowed--redundant--ordering-sec-shadow-sec-redundant-sec-overlap-sec-no-deny-all-sec-disabled-sec-orphan-ref)
+- [Object & group cleanup (OPS-UNUSED-OBJ, OPS-DUP-OBJ, OPS-REDUNDANT-OBJ, OPS-LARGE-GROUP, OPS-NESTED-GROUP, OPS-NO-DESC-OBJ, OPS-NAMING, OPS-CONSOLIDATE)](#object--group-cleanup-ops-unused-obj-ops-dup-obj-ops-redundant-obj-ops-large-group-ops-nested-group-ops-no-desc-obj-ops-naming-ops-consolidate)
+- [SSH / management hardening (SEC-SSH-ROOT-LOGIN)](#ssh--management-hardening-sec-ssh-root-login)
+- [Unreferenced security services (SEC-SERVICES-UNREFERENCED)](#unreferenced-security-services-sec-services-unreferenced)
+- [Zones/NAT without policy + empty policy set (SEC-ZONES-NAT-NO-POLICY, SEC-EMPTY-POLICYSET)](#zonesnat-without-policy--empty-policy-set-sec-zones-nat-no-policy-sec-empty-policyset)
+- [Host-inbound exposure (SEC-HOST-INBOUND-EXPOSURE)](#host-inbound-exposure-sec-host-inbound-exposure)
+- [No screen on external zone (SEC-NO-SCREEN)](#no-screen-on-external-zone-sec-no-screen)
+- [Auth hardening (SEC-AUTH-HARDENING)](#auth-hardening-sec-auth-hardening)
+- [SEC-LARGE-PORTRANGE — Oversized port ranges](#sec-large-portrange--oversized-port-ranges)
+- [SEC-IPV6-POSTURE — Unmanaged IPv6](#sec-ipv6-posture--unmanaged-ipv6)
+- [SEC-NO-CONTROL-PLANE-PROTECTION — Missing RE/control-plane filter](#sec-no-control-plane-protection--missing-recontrol-plane-filter)
+- [OPS-ZERO-HIT — Zero-hit / stale rules](#ops-zero-hit--zero-hit--stale-rules)
+- [OPS-LOG-COMPLETENESS — Incomplete logging pipeline](#ops-log-completeness--incomplete-logging-pipeline)
+- [SEC-NAME-ACTION-MISMATCH — Rule name contradicts action](#sec-name-action-mismatch--rule-name-contradicts-action)
+- [SEC-PLAINTEXT-FEED-TRANSPORT — Threat feed over HTTP](#sec-plaintext-feed-transport--threat-feed-over-http)
+- [Notes](#notes)
+
 > Reference material for the `firewall-best-practices-audit` skill; loaded on
 > demand. The body's Finding template draws the `Fix (<source-vendor>)` line
 > from the matching family below. Snippets are **illustrative templates** — use
