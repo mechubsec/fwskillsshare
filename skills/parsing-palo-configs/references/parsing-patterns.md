@@ -1,5 +1,20 @@
 # PAN-OS Parsing Patterns and Edge Cases
 
+## Contents
+
+- [XML Parsing Rules](#xml-parsing-rules)
+- [Application Handling (raw + canonical)](#application-handling-raw--canonical)
+- [Profile Group Resolution](#profile-group-resolution)
+- [Dynamic Address Group Handling](#dynamic-address-group-handling)
+- [Negate Source/Destination](#negate-sourcedestination)
+- [User-ID (source-user)](#user-id-source-user)
+- [Action Mapping](#action-mapping)
+- [Multi-vsys Processing](#multi-vsys-processing)
+- [Panorama Pre/Post Rulebase](#panorama-prepost-rulebase)
+- [Implicit Rules](#implicit-rules)
+- [Common Warnings](#common-warnings)
+- [Canonical Application Mapping](#canonical-application-mapping)
+
 ## XML Parsing Rules
 
 1. **Always treat `<entry>` as array** — even when only one entry exists
@@ -133,3 +148,36 @@ Both should be tagged `_implicit: true` (the single canonical flag for parser-sy
 | Any/any zones | info | "Rule applies to all zone pairs" |
 | Missing log-end | info | "Consider enabling log-at-session-end" |
 | Profile group unresolved | warning | "Profile group definition not found" |
+
+## Canonical Application Mapping
+
+Map PAN-OS application names to canonical application identifiers for cross-vendor conversion and comparison. For each resolved application, populate the policy's `apps` array with the canonical mapping.
+
+| PAN-OS Name | Canonical App | Category |
+|-------------|---------------|----------|
+| `ssl` | `https` | web |
+| `web-browsing` | `http` | web |
+| `ssh` | `ssh` | remote-access |
+| `ms-rdp` | `rdp` | remote-access |
+| `dns` | `dns` | network-mgmt |
+| `smtp` | `smtp` | email |
+| `ntp` | `ntp` | network-mgmt |
+| `snmp` | `snmp` | network-mgmt |
+| `ftp` | `ftp` | file-transfer |
+| `tftp` | `tftp` | file-transfer |
+| `sip` | `sip` | voip |
+| `ldap` | `ldap` | auth |
+| `kerberos` | `kerberos` | auth |
+| `smb` | `smb` | file-transfer |
+| `ms-sql-s` | `mssql` | database |
+| `mysql` | `mysql` | database |
+| `postgresql` | `postgresql` | database |
+| `ms-teams` | `ms-teams` | collaboration |
+| `zoom` | `zoom` | collaboration |
+| `webex` | `webex` | collaboration |
+| `slack` | `slack` | collaboration |
+| `youtube` | `youtube` | streaming |
+| `netflix` | `netflix` | streaming |
+| `office365-enterprise-access` | `ms-office365` | collaboration |
+| `google-drive-web` | `google-drive` | cloud-storage |
+| `dropbox` | `dropbox` | cloud-storage |

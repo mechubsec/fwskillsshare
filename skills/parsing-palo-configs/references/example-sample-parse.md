@@ -1,5 +1,10 @@
 # PAN-OS Config Parsing Example
 
+## Contents
+
+- [Input Config (XML)](#input-config-xml)
+- [Extracted Output](#extracted-output)
+
 ## Input Config (XML)
 
 ```xml

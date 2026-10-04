@@ -1,5 +1,10 @@
 # Fixture: Minimal Firepower Input
 
+## Contents
+
+- [Input Format](#input-format)
+- [Coverage](#coverage)
+
 This is a synthetic FMC REST API export bundle demonstrating the parsing patterns
 and edge cases. No real addresses, hostnames, or secrets are present.
 

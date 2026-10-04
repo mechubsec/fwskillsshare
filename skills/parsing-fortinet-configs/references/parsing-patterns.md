@@ -1,5 +1,21 @@
 # FortiGate Parsing Patterns and Edge Cases
 
+## Contents
+
+- [Interface-as-Zone Merging](#interface-as-zone-merging)
+- [Subnet Mask to CIDR Conversion](#subnet-mask-to-cidr-conversion)
+- [Application Mapping](#application-mapping)
+- [VIP as Destination NAT](#vip-as-destination-nat)
+- [Profile Group Resolution](#profile-group-resolution)
+- [UTM Profile Mapping](#utm-profile-mapping)
+- [Logging Interpretation](#logging-interpretation)
+- [Schedule Handling](#schedule-handling)
+- [Policy ID vs Name](#policy-id-vs-name)
+- [Multi-VDOM Handling](#multi-vdom-handling)
+- [Intrazone Policy](#intrazone-policy)
+- [Common Warnings](#common-warnings)
+- [Canonical Application Mapping](#canonical-application-mapping)
+
 ## Interface-as-Zone Merging
 
 FortiGate policies use `srcintf` / `dstintf` which can reference either:
@@ -168,3 +184,33 @@ Only model intrazone behavior for EXPLICIT `config system zone` entries that car
 | Policy with `action accept` + no UTM | info | "No UTM inspection on permit rule" |
 | FSSO groups in policy | warning | "FSSO user/group matching requires identity integration" |
 | `set status disable` | info | "Policy is disabled" |
+
+## Canonical Application Mapping
+
+Map FortiOS application names to canonical application identifiers for cross-vendor conversion and comparison. When application references are resolved, populate the policy's `apps` array with the canonical mapping while keeping service matches separate.
+
+| FortiOS Name | Canonical App | Category |
+|-------------|---------------|----------|
+| `HTTPS` | `https` | web |
+| `HTTP` | `http` | web |
+| `SSH` | `ssh` | remote-access |
+| `RDP` | `rdp` | remote-access |
+| `DNS` | `dns` | network-mgmt |
+| `SMTP` | `smtp` | email |
+| `NTP` | `ntp` | network-mgmt |
+| `SNMP` | `snmp` | network-mgmt |
+| `FTP` | `ftp` | file-transfer |
+| `TFTP` | `tftp` | file-transfer |
+| `SIP` | `sip` | voip |
+| `LDAP` | `ldap` | auth |
+| `Kerberos` | `kerberos` | auth |
+| `SMB` | `smb` | file-transfer |
+| `MySQL` | `mysql` | database |
+| `MSSQL` | `mssql` | database |
+| `PostgreSQL` | `postgresql` | database |
+| `MongoDB` | `mongodb` | database |
+| `Zoom` | `zoom` | collaboration |
+| `Microsoft.Teams` | `ms-teams` | collaboration |
+| `Slack` | `slack` | collaboration |
+| `YouTube` | `youtube` | streaming |
+| `Netflix` | `netflix` | streaming |

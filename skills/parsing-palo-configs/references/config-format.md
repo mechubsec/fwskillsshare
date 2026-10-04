@@ -1,5 +1,17 @@
 # PAN-OS XML Configuration Format Reference
 
+## Contents
+
+- [XML Structure Overview](#xml-structure-overview)
+- [Critical XML Patterns](#critical-xml-patterns)
+- [Zone Definition](#zone-definition)
+- [Address Object Types](#address-object-types)
+- [Address Group Types](#address-group-types)
+- [Service Definition](#service-definition)
+- [Security Rule](#security-rule)
+- [NAT Rule](#nat-rule)
+- [HA Configuration](#ha-configuration)
+
 ## XML Structure Overview
 
 PAN-OS configs are XML documents. The root element is `<config>`.

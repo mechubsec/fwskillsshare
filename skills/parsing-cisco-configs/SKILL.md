@@ -31,6 +31,21 @@ metadata:
 
 # Parsing Cisco ASA / FTD Configurations
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Input Format](#input-format)
+- [Extraction Pipeline](#extraction-pipeline)
+- [Output Format](#output-format)
+- [Parser Quality Gates](#parser-quality-gates)
+- [Analysis Checks](#analysis-checks)
+- [Reference Files](#reference-files)
+- [Secret Handling](#secret-handling)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to parse Cisco ASA and ASA-style FTD running configurations into the shared vendor-neutral firewall intermediate schema. It focuses on line-oriented `show running-config` text with parent commands and indented subcommands, including interfaces/nameifs, ACLs/access-groups, network and service objects, object-groups, NAT, routes, VPN, failover, and system settings.
@@ -289,46 +304,18 @@ However, when converting FROM ASA to an app-aware platform (PAN-OS, FortiGate), 
 configs, the parser should attempt to resolve well-known port/protocol combinations to canonical
 application names.
 
-**Resolution from port-based services:**
-For each service object or inline port match, check if the protocol+port maps to a known application:
-
-| Protocol | Port(s) | Canonical App | Category |
-|----------|---------|---------------|----------|
-| TCP | 443 | `https` | web |
-| TCP | 80 | `http` | web |
-| TCP | 22 | `ssh` | remote-access |
-| TCP | 3389 | `rdp` | remote-access |
-| UDP | 53 | `dns` | network-mgmt |
-| TCP | 25 | `smtp` | email |
-| TCP | 465 | `smtps` | email |
-| TCP | 993 | `imaps` | email |
-| TCP | 143 | `imap` | email |
-| UDP | 123 | `ntp` | network-mgmt |
-| UDP | 161 | `snmp` | network-mgmt |
-| UDP | 162 | `snmp-trap` | network-mgmt |
-| TCP | 21 | `ftp` | file-transfer |
-| TCP | 23 | `telnet` | remote-access |
-| TCP | 389 | `ldap` | auth |
-| TCP | 636 | `ldaps` | auth |
-| UDP | 69 | `tftp` | file-transfer |
-| TCP | 1433 | `mssql` | database |
-| TCP | 3306 | `mysql` | database |
-| TCP | 5432 | `postgresql` | database |
-| TCP | 445 | `smb` | file-transfer |
-| UDP | 500 | `ipsec` | tunnel |
-| UDP | 4500 | `ipsec-nat-t` | tunnel |
-| TCP | 5060 | `sip` | voip |
-| UDP | 5060 | `sip` | voip |
+**Resolution from port-based services:** For each service object or inline port match, check if the protocol+port maps to a known application. The full canonical mapping table is in `references/parsing-patterns.md` "Canonical Application Mapping".
 
 **ASA named port keywords:** Map ASA port names to numbers before resolving — full table in references/parsing-patterns.md "Port Name Resolution". Caution: ASA literals predate IANA assignments (`radius`=1645, `radius-acct`=1646, `kerberos`=750) — do not "correct" them from prior knowledge; use the reference table.
 
-**On policy output:** When a service match resolves to a known application, populate the policy's
-`apps` array with `{ vendor_name: "tcp/443", canonical: "https", confidence: 1.0, category: "web" }`.
-The `services` array still keeps the port-based match. This enables downstream converters to use
-the app-aware rule on platforms that support it.
+**On policy output:** When a service match resolves to a known application, populate the policy's `apps` array with `{ vendor_name: "tcp/443", canonical: "https", confidence: 1.0, category: "web" }`. The `services` array still keeps the port-based match. This enables downstream converters to use the app-aware rule on platforms that support it.
 
-**Unresolvable services:** Complex port ranges, non-standard ports, or protocol groups that don't
-map to a single known application → keep as port-based services only, no `apps` entry.
+**Unresolvable services:** Complex port ranges, non-standard ports, or protocol groups that don't map to a single known application → keep as port-based services only, no `apps` entry.
+
+**Example:** An ACL line `access-list outside_in extended permit tcp any any eq 443` produces:
+- **Service entry:** `"tcp/443"` in the policy's `services` array (a string, as in `references/fixture-expected-output.json`)
+- **Application entry:** `{ vendor_name: "tcp/443", canonical: "https", confidence: 1.0, category: "web" }` in the policy's `apps` array
+Both fields are populated — the port-based service match and the resolved application identity.
 
 ### 15. Application Groups
 

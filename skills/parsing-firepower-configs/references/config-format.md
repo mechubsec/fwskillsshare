@@ -1,5 +1,17 @@
 # Cisco FMC and FDM REST API JSON Format Reference
 
+## Contents
+
+- [Documentation Sources](#documentation-sources)
+- [Input Packaging](#input-packaging)
+- [Collecting a Complete Configuration](#collecting-a-complete-configuration)
+- [Query Parameters](#query-parameters)
+- [Paging and Truncation](#paging-and-truncation)
+- [Reference Shape](#reference-shape)
+- [FMC Endpoint Families](#fmc-endpoint-families)
+- [FDM (Firepower Threat Defense) Differences](#fdm-firepower-threat-defense-differences)
+- [Out of Scope](#out-of-scope)
+
 ## Documentation Sources
 
 ### Official Cisco Documentation (Verified Accessible 2026-09-12)

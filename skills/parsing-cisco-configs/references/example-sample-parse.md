@@ -1,5 +1,10 @@
 # Cisco ASA Config Parsing Example
 
+## Contents
+
+- [Input Config](#input-config)
+- [Extracted Output](#extracted-output)
+
 ## Input Config
 
 ```

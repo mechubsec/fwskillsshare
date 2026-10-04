@@ -1,5 +1,19 @@
 # FortiOS Configuration Format Reference
 
+## Contents
+
+- [Block Syntax](#block-syntax)
+- [Firewall Address Types](#firewall-address-types)
+- [Firewall Service](#firewall-service)
+- [Firewall Policy](#firewall-policy)
+- [VIP (Destination NAT)](#vip-destination-nat)
+- [IP Pool (Source NAT)](#ip-pool-source-nat)
+- [System Zone](#system-zone)
+- [System Interface](#system-interface)
+- [HA Configuration](#ha-configuration)
+- [Multi-VDOM](#multi-vdom)
+- [Predefined Services](#predefined-services)
+
 ## Block Syntax
 
 FortiGate configs use a hierarchical block format with these keywords:

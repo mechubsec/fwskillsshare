@@ -34,6 +34,21 @@ metadata:
 
 # Parsing Palo Alto PAN-OS Configurations
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Input Format](#input-format)
+- [Extraction Pipeline](#extraction-pipeline)
+- [Output Format](#output-format)
+- [Parser Quality Gates](#parser-quality-gates)
+- [Analysis Checks](#analysis-checks)
+- [Reference Files](#reference-files)
+- [Secret Handling](#secret-handling)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to parse Palo Alto PAN-OS firewall or Panorama configuration exports into the shared vendor-neutral firewall intermediate schema. It primarily targets XML exports and also covers flat `set`-style output when available, including vsys, device-groups, shared objects, zones, address/service/application objects, security rules, NAT rules, routes, profiles, tags, User-ID references, and system settings.
@@ -280,53 +295,11 @@ PAN-OS has the richest L7 application model of any firewall vendor. Security pol
    as an L7 application reference under `applications`/`apps`. Capture its `<default><port>` definition
    as app metadata / a conversion hint (e.g. `default_port`), but do NOT replace the application with a
    service object — a custom App-ID remains an L7 application.
-4. **Cross-vendor canonical resolution:** Resolve through the app mapping table
+4. **Cross-vendor canonical resolution:** Resolve PAN-OS application names (e.g., `ssl`, `web-browsing`, `ms-rdp`) to canonical identifiers. The full canonical mapping table is in `references/parsing-patterns.md` "Canonical Application Mapping". For each resolved app, populate `apps`: `{ vendor_name: "ssl", canonical: "https", confidence: 1.0, category: "web" }`.
 
-**PAN-OS application names to canonical:**
+**`application-default` service:** When a policy sets `<service><member>application-default</member>`, PAN-OS uses each application's built-in default port. For the IR, keep `services: ["application-default"]` and rely on the `apps` array for resolution. During conversion to port-based platforms, decompose each resolved app's default port into explicit service matches.
 
-| PAN-OS Name | Canonical App | Category |
-|-------------|---------------|----------|
-| `ssl` | `https` | web |
-| `web-browsing` | `http` | web |
-| `ssh` | `ssh` | remote-access |
-| `ms-rdp` | `rdp` | remote-access |
-| `dns` | `dns` | network-mgmt |
-| `smtp` | `smtp` | email |
-| `ntp` | `ntp` | network-mgmt |
-| `snmp` | `snmp` | network-mgmt |
-| `ftp` | `ftp` | file-transfer |
-| `tftp` | `tftp` | file-transfer |
-| `sip` | `sip` | voip |
-| `ldap` | `ldap` | auth |
-| `kerberos` | `kerberos` | auth |
-| `smb` | `smb` | file-transfer |
-| `ms-sql-s` | `mssql` | database |
-| `mysql` | `mysql` | database |
-| `postgresql` | `postgresql` | database |
-| `ms-teams` | `ms-teams` | collaboration |
-| `zoom` | `zoom` | collaboration |
-| `webex` | `webex` | collaboration |
-| `slack` | `slack` | collaboration |
-| `youtube` | `youtube` | streaming |
-| `netflix` | `netflix` | streaming |
-| `office365-enterprise-access` | `ms-office365` | collaboration |
-| `google-drive-web` | `google-drive` | cloud-storage |
-| `dropbox` | `dropbox` | cloud-storage |
-
-**`application-default` service:** When a policy sets `<service><member>application-default</member>`,
-PAN-OS uses each application's built-in default port. For the IR, keep `services: ["application-default"]`
-and rely on the `apps` array for resolution. During conversion to port-based platforms, decompose
-each resolved app's default port into explicit service matches.
-
-**On policy output:** For each resolved app, populate `apps` array:
-`{ vendor_name: "ssl", canonical: "https", confidence: 1.0, category: "web" }`
-
-**Custom applications** (`application.entry[]`): Extract the `<default><port><member>` list.
-Format is `tcp/80,443` or `udp/53` — parse protocol and port range and attach it as app metadata
-(e.g. a `default_port` field / conversion hint) on the custom app's entry under `applications`/`apps`.
-Keep the custom app as an L7 application reference; do NOT create a service object or move it into the
-policy's `services` array. Only decompose the default port into explicit service matches during target
-conversion when the target platform requires it. Set `confidence: 0.9` since custom apps may not have
+**Custom applications** (`application.entry[]`): Extract the `<default><port><member>` list. Format is `tcp/80,443` or `udp/53` — parse protocol and port range and attach it as app metadata (e.g. a `default_port` field / conversion hint) on the custom app's entry under `applications`/`apps`. Keep the custom app as an L7 application reference; do NOT create a service object or move it into the policy's `services` array. Only decompose the default port into explicit service matches during target conversion when the target platform requires it. Set `confidence: 0.9` since custom apps may not have
 an exact canonical equivalent.
 
 **Unresolvable apps:** PAN-OS has 3000+ built-in application signatures. Many are vendor-specific

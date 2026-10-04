@@ -37,6 +37,23 @@ metadata:
 
 # Parsing Cisco Firepower (FMC / FDM) Exports
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Input Format](#input-format)
+- [Extraction Pipeline](#extraction-pipeline)
+- [Rule ordering](#rule-ordering)
+- [Multi-domain and policy scope](#multi-domain-and-policy-scope)
+- [Output Format](#output-format)
+- [Parser Quality Gates](#parser-quality-gates)
+- [Analysis Checks](#analysis-checks)
+- [Reference Files](#reference-files)
+- [Secret Handling](#secret-handling)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to parse Cisco Secure Firewall (Firepower) FMC and FDM management exports into the shared vendor-neutral firewall intermediate schema. It focuses on JSON from the FMC or FDM REST API, including access control policies, prefilter policies, NAT policies, security zones, intrusion policies, file policies, network and service objects, and application filters.
@@ -87,7 +104,7 @@ If a response's `paging.count` exceeds the actual number of items in `items`, th
 
 ### Collecting a Complete Pull
 
-No single FMC endpoint returns a complete configuration. A complete pull requires collecting many responses across five dependency phases: (1) domain UUID from auth token; (2) object collections (networks, zones, services, applications); (3) policy containers to learn policy IDs; (4) policy child collections using those IDs (access rules, prefilter rules, NAT rules, default actions); (5) device records to learn device IDs, then per-device interfaces, routing, and HA. Skipping an endpoint silently breaks downstream analysis — for example, omitting `securityzones` yields empty zone names, making zone-scoped policy audits meaningless while appearing to succeed. See `references/config-format.md` "Collecting a Complete Configuration" for the full dependency sequence and a completeness checklist showing what breaks when each endpoint is skipped.
+No single FMC endpoint returns a complete configuration. A complete pull requires collecting many responses across five dependency phases (domain UUID, objects, policy containers, policy rules, device-scoped data), where later phases depend on IDs from earlier ones. Skipping an endpoint silently breaks downstream analysis (e.g., omitting `securityzones` yields empty zone names in rules). See `references/config-format.md` "Collecting a Complete Configuration" for the full dependency sequence and what breaks when each endpoint is skipped.
 
 ## Extraction Pipeline
 

@@ -1,5 +1,33 @@
 # Intermediate Schema Reference
 
+## Contents
+
+- [Top-Level Structure](#top-level-structure)
+- [Zone](#zone)
+- [Address Object](#address-object)
+- [Address Group](#address-group)
+- [Service Object](#service-object)
+- [Service Group](#service-group)
+- [Security Policy](#security-policy)
+- [NAT Rule](#nat-rule)
+- [Application (Resolved L7 App on a Policy)](#application-resolved-l7-app-on-a-policy)
+- [Application Group](#application-group)
+- [Schedule](#schedule)
+- [Interface](#interface)
+- [Static Route](#static-route)
+- [HA Config](#ha-config)
+- [Screen/IDS Config](#screenids-config)
+- [Metadata](#metadata)
+- [System](#system)
+- [Security Services](#security-services)
+- [Virtual Router](#virtual-router)
+- [OSPF Config](#ospf-config)
+- [BGP Config](#bgp-config)
+- [VPN Tunnel](#vpn-tunnel)
+- [Admin User](#admin-user)
+- [DHCP Config](#dhcp-config)
+- [Residual Raw](#residual-raw)
+
 > Maintenance note: this schema is intentionally duplicated across the five `parsing-*` skills so each skill stays self-contained. Treat the SRX copy as canonical, sync changes to the other copies, and run `python3 scripts/check-shared-schema.py` from the repository root. See `skills/SHARED-SCHEMA.md`.
 
 This is the vendor-neutral intermediate JSON schema that all firewall config parsers produce.

@@ -1,5 +1,12 @@
 # SRX Configuration Format Reference
 
+## Contents
+
+- [Set Command Format](#set-command-format)
+- [Hierarchical Format](#hierarchical-format)
+- [Multi-Context](#multi-context)
+- [Key Predefined Applications](#key-predefined-applications)
+
 ## Set Command Format
 
 The most common format from `show configuration | display set`:

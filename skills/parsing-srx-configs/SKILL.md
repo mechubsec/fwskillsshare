@@ -32,6 +32,21 @@ metadata:
 
 # Parsing Juniper SRX Configurations
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Input Format Detection](#input-format-detection)
+- [Extraction Pipeline](#extraction-pipeline)
+- [Output Format](#output-format)
+- [Parser Quality Gates](#parser-quality-gates)
+- [Analysis Checks](#analysis-checks)
+- [Reference Files](#reference-files)
+- [Secret Handling](#secret-handling)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to parse Juniper SRX / Junos firewall configurations into the shared vendor-neutral firewall intermediate schema. It supports both `show configuration | display set` lines and hierarchical curly-brace configuration, including zones, address books, applications, security policies, NAT, logical-systems, routing-instances, interfaces, routing protocols, VPN, chassis cluster, and system settings.
@@ -188,50 +203,9 @@ Map `protocol` values: `6` or `tcp` → TCP, `17` or `udp` → UDP, `1` or `icmp
 
 ### 5. Application Mapping (L7 → Canonical)
 
-JunOS uses predefined `junos-*` applications that are matched by name in security policies.
-These are L7-aware on SRX and must be resolved to canonical names for cross-vendor conversion.
+JunOS uses predefined `junos-*` applications that are matched by name in security policies. These are L7-aware on SRX and must be resolved to canonical names for cross-vendor conversion. The full canonical mapping table is in `references/parsing-patterns.md` "Canonical Application Mapping".
 
-**JunOS predefined application names to canonical:**
-
-| JunOS Name | Protocol/Port | Canonical App | Category |
-|------------|---------------|---------------|----------|
-| `junos-https` | TCP/443 | `https` | web |
-| `junos-http` | TCP/80 | `http` | web |
-| `junos-ssh` | TCP/22 | `ssh` | remote-access |
-| `junos-telnet` | TCP/23 | `telnet` | remote-access |
-| `junos-ftp` | TCP/21 | `ftp` | file-transfer |
-| `junos-tftp` | UDP/69 | `tftp` | file-transfer |
-| `junos-dns-udp` | UDP/53 | `dns` | network-mgmt |
-| `junos-dns-tcp` | TCP/53 | `dns` | network-mgmt |
-| `junos-ntp` | UDP/123 | `ntp` | network-mgmt |
-| `junos-smtp` | TCP/25 | `smtp` | email |
-| `junos-smtps` | TCP/587, TCP/465 | `smtps` | email |
-| `junos-imap` | TCP/143 | `imap` | email |
-| `junos-imaps` | TCP/993 | `imaps` | email |
-| `junos-pop3` | TCP/110 | `pop3` | email |
-| `junos-ldap` | TCP/389 | `ldap` | auth |
-| `junos-bgp` | TCP/179 | `bgp` | network-mgmt |
-| `junos-ospf` | IP-89 | `ospf` | network-mgmt |
-| `junos-sip` | UDP/5060 | `sip` | voip |
-| `junos-h323` | TCP/1720 (+UDP/1719 RAS, TCP/1503/389/522/1731 — multi-term) | `h323` | voip |
-| `junos-ms-rpc` | TCP+UDP/135 (application-set) | `msrpc` | other |
-| `junos-ms-sql` | TCP/1433 | `mssql` | database |
-| `junos-smb` | TCP/139, TCP/445 | `smb` | file-transfer |
-| `junos-ike` | UDP/500 | `ipsec` | tunnel |
-| `junos-ike-nat` | UDP/4500 | `ipsec-nat-t` | tunnel |
-| `junos-pptp` | TCP/1723 | `pptp` | tunnel |
-| `junos-ping` | ICMP (proto 1, all types) | `ping` | network-mgmt |
-| `junos-icmp-ping` | ICMP echo-request | `ping` | network-mgmt |
-| `junos-icmp-all` | ICMP (all types) | `icmp-all` | network-mgmt |
-| `junos-pingv6` | ICMPv6 (proto 58, all types) | `ping6` | network-mgmt |
-| `junos-icmp6-all` | ICMPv6 (all types) | `icmpv6-all` | network-mgmt |
-| `junos-nntp` | TCP/119 | `nntp` | other |
-| `junos-rdp` | TCP/3389 | `rdp` | remote-access |
-| `junos-syslog` | UDP/514 | `syslog` | network-mgmt |
-
-Names verified against `show configuration groups junos-defaults applications` on
-Junos 24.4. Note there is **no** predefined `junos-snmp`, `junos-snmptrap`,
-`junos-mysql`, `junos-ike-nat-t`, `junos-icmpv6-all`, or `junos-ping6` — SNMP and
+Names verified against `show configuration groups junos-defaults applications` on Junos 24.4. Note there is **no** predefined `junos-snmp`, `junos-snmptrap`, `junos-mysql`, `junos-ike-nat-t`, `junos-icmpv6-all`, or `junos-ping6` — SNMP and
 MySQL matching require custom `applications application` definitions (extract
 those as custom apps); the NAT-T/ICMPv6 predefined names are `junos-ike-nat`,
 `junos-icmp6-all`, and `junos-pingv6`.

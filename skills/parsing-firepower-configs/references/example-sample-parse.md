@@ -1,5 +1,17 @@
 # Cisco Firepower FMC Parse Example
 
+## Contents
+
+- [1. Detection](#1-detection)
+- [2. Input Assembly](#2-input-assembly)
+- [3. Object Extraction](#3-object-extraction)
+- [4. UUID Reference Resolution](#4-uuid-reference-resolution)
+- [5. Rule Flattening and Evaluation Order](#5-rule-flattening-and-evaluation-order)
+- [6. Action Mapping](#6-action-mapping)
+- [7. Implicit-Rule Append](#7-implicit-rule-append)
+- [8. Warnings Block](#8-warnings-block)
+- [Complete Extracted Output](#complete-extracted-output)
+
 This example walks through parsing the minimal fixture input (`fixture-minimal-input.md`) to produce the expected intermediate schema output (`fixture-expected-output.json`), narrating each stage of the transformation.
 
 ## 1. Detection

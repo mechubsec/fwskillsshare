@@ -1,5 +1,21 @@
 # SRX Parsing Patterns and Edge Cases
 
+## Contents
+
+- [Name Sanitization](#name-sanitization)
+- [IP Version Detection](#ip-version-detection)
+- [Address Type Inference](#address-type-inference)
+- [Port Range Normalization](#port-range-normalization)
+- [Application Mapping (Cross-Vendor)](#application-mapping-cross-vendor)
+- [Well-Known Ports Reverse Lookup](#well-known-ports-reverse-lookup)
+- [Global Policies](#global-policies)
+- [Action Mapping](#action-mapping)
+- [Security Profile Extraction](#security-profile-extraction)
+- [Scheduler Parsing](#scheduler-parsing)
+- [Screen/IDS Profile Fields](#screenids-profile-fields)
+- [Common Warnings to Generate](#common-warnings-to-generate)
+- [Canonical Application Mapping](#canonical-application-mapping)
+
 ## Name Sanitization
 
 Junos names have these constraints:
@@ -127,3 +143,43 @@ set schedulers scheduler <name> ...
 | Permit without session-close log | info | "Consider enabling session-close logging" |
 | Deactivated policy | info | "Policy is deactivated (inactive)" |
 | Unknown application name | warning | "Application not in predefined list — may need manual mapping" |
+
+## Canonical Application Mapping
+
+Map JunOS predefined application names to canonical application identifiers for cross-vendor conversion and comparison. JunOS uses `junos-*` applications matched by name in security policies. For each resolved application, populate the policy's `apps` array with the canonical mapping.
+
+| JunOS Name | Protocol/Port | Canonical App | Category |
+|------------|---------------|---------------|----------|
+| `junos-https` | TCP/443 | `https` | web |
+| `junos-http` | TCP/80 | `http` | web |
+| `junos-ssh` | TCP/22 | `ssh` | remote-access |
+| `junos-telnet` | TCP/23 | `telnet` | remote-access |
+| `junos-ftp` | TCP/21 | `ftp` | file-transfer |
+| `junos-tftp` | UDP/69 | `tftp` | file-transfer |
+| `junos-dns-udp` | UDP/53 | `dns` | network-mgmt |
+| `junos-dns-tcp` | TCP/53 | `dns` | network-mgmt |
+| `junos-ntp` | UDP/123 | `ntp` | network-mgmt |
+| `junos-smtp` | TCP/25 | `smtp` | email |
+| `junos-smtps` | TCP/587, TCP/465 | `smtps` | email |
+| `junos-imap` | TCP/143 | `imap` | email |
+| `junos-imaps` | TCP/993 | `imaps` | email |
+| `junos-pop3` | TCP/110 | `pop3` | email |
+| `junos-ldap` | TCP/389 | `ldap` | auth |
+| `junos-bgp` | TCP/179 | `bgp` | network-mgmt |
+| `junos-ospf` | IP-89 | `ospf` | network-mgmt |
+| `junos-sip` | UDP/5060 | `sip` | voip |
+| `junos-h323` | TCP/1720 (+UDP/1719 RAS, TCP/1503/389/522/1731 — multi-term) | `h323` | voip |
+| `junos-ms-rpc` | TCP+UDP/135 (application-set) | `msrpc` | other |
+| `junos-ms-sql` | TCP/1433 | `mssql` | database |
+| `junos-smb` | TCP/139, TCP/445 | `smb` | file-transfer |
+| `junos-ike` | UDP/500 | `ipsec` | tunnel |
+| `junos-ike-nat` | UDP/4500 | `ipsec-nat-t` | tunnel |
+| `junos-pptp` | TCP/1723 | `pptp` | tunnel |
+| `junos-ping` | ICMP (proto 1, all types) | `ping` | network-mgmt |
+| `junos-icmp-ping` | ICMP echo-request | `ping` | network-mgmt |
+| `junos-icmp-all` | ICMP (all types) | `icmp-all` | network-mgmt |
+| `junos-pingv6` | ICMPv6 (proto 58, all types) | `ping6` | network-mgmt |
+| `junos-icmp6-all` | ICMPv6 (all types) | `icmpv6-all` | network-mgmt |
+| `junos-nntp` | TCP/119 | `nntp` | other |
+| `junos-rdp` | TCP/3389 | `rdp` | remote-access |
+| `junos-syslog` | UDP/514 | `syslog` | network-mgmt |

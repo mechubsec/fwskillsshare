@@ -1,5 +1,20 @@
 # Cisco ASA Parsing Patterns and Edge Cases
 
+## Contents
+
+- [Building Command Blocks](#building-command-blocks)
+- [Zone Derivation from Security Levels](#zone-derivation-from-security-levels)
+- [ACL Token Parsing — State Machine](#acl-token-parsing--state-machine)
+- [Subnet Mask Conversion](#subnet-mask-conversion)
+- [Port Name Resolution](#port-name-resolution)
+- [Combining ACLs with Access-Groups](#combining-acls-with-access-groups)
+- [Object NAT Extraction](#object-nat-extraction)
+- [Twice NAT Parsing](#twice-nat-parsing)
+- [Threat Detection to Screen Mapping](#threat-detection-to-screen-mapping)
+- [Time Range Parsing](#time-range-parsing)
+- [Common Warnings](#common-warnings)
+- [Canonical Application Mapping](#canonical-application-mapping)
+
 ## Building Command Blocks
 
 Parse the config into structured blocks:
@@ -234,4 +249,36 @@ Day keywords: `weekdays`, `weekend`, `daily`, `Monday`, `Tuesday`, etc.
 | Failover detected | info | "HA failover configuration present" |
 | Object NAT + Twice NAT | info | "Mixed NAT types — review ordering (section 1 manual → section 2 auto → section 3 after-auto)" |
 | `interface` as NAT target | info | "NAT translates to interface IP (PAT)" |
+
+## Canonical Application Mapping
+
+Map well-known protocol/port combinations to canonical application names for cross-vendor conversion and comparison. When a service object or inline port match resolves to a known application, populate the policy's `apps` array while keeping the port-based match in `services`.
+
+| Protocol | Port(s) | Canonical App | Category |
+|----------|---------|---------------|----------|
+| TCP | 443 | `https` | web |
+| TCP | 80 | `http` | web |
+| TCP | 22 | `ssh` | remote-access |
+| TCP | 3389 | `rdp` | remote-access |
+| UDP | 53 | `dns` | network-mgmt |
+| TCP | 25 | `smtp` | email |
+| TCP | 465 | `smtps` | email |
+| TCP | 993 | `imaps` | email |
+| TCP | 143 | `imap` | email |
+| UDP | 123 | `ntp` | network-mgmt |
+| UDP | 161 | `snmp` | network-mgmt |
+| UDP | 162 | `snmp-trap` | network-mgmt |
+| TCP | 21 | `ftp` | file-transfer |
+| TCP | 23 | `telnet` | remote-access |
+| TCP | 389 | `ldap` | auth |
+| TCP | 636 | `ldaps` | auth |
+| UDP | 69 | `tftp` | file-transfer |
+| TCP | 1433 | `mssql` | database |
+| TCP | 3306 | `mysql` | database |
+| TCP | 5432 | `postgresql` | database |
+| TCP | 445 | `smb` | file-transfer |
+| UDP | 500 | `ipsec` | tunnel |
+| UDP | 4500 | `ipsec-nat-t` | tunnel |
+| TCP | 5060 | `sip` | voip |
+| UDP | 5060 | `sip` | voip |
 | Security-level based permit | warning | "Implicit high-to-low permit may exist without ACLs" |

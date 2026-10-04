@@ -1,5 +1,10 @@
 # SRX Config Parsing Example
 
+## Contents
+
+- [Input Config (Set Commands)](#input-config-set-commands)
+- [Extracted Output](#extracted-output)
+
 ## Input Config (Set Commands)
 
 ```
