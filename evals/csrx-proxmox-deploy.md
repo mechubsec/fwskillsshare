@@ -9,7 +9,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 **Input:** None
 
 **Must:**
-- Loads SKILL.md and references cSRX resource/licensing table
+- References cSRX resource and licensing requirements
 - Identifies vCPU, RAM, and license SKU for 10 Gbps (if documented)
 - Warns about evaluation vs production licensing
 - Notes first-boot license installation requirement

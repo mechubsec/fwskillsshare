@@ -10,8 +10,8 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 
 **Must:**
 - Loads references/control-mapping.md for NIST 800-171 requirements
-- Identifies relevant families (AC, AU, SC, SI)
-- Explains firewall role in access control (AC-4), audit (AU-2, AU-3), boundary protection (SC-7)
+- Identifies relevant requirement families (3.1 access control, 3.3 audit, 3.13 boundary protection, 3.14 monitoring)
+- Explains firewall role in access control (3.1.1, 3.1.3), audit logging (3.3.1), boundary protection (3.13.1)
 - Does NOT claim the firewall makes the org "800-171 compliant"
 - Distinguishes firewall technical controls from broader SSP and process requirements
 
@@ -22,7 +22,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 
 ## Scenario 2: Assess boundary protection and access enforcement
 
-**Prompt:** We need SC-7 boundary protection for CMMC Level 2. What does our firewall need?
+**Prompt:** We need 3.13.1 boundary protection for CMMC Level 2. What does our firewall need?
 
 **Input:**
 ```json
@@ -37,7 +37,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
       "src_addresses": ["any"],
       "dst_addresses": ["any"],
       "applications": ["any"],
-      "logging": {"end": true}
+      "log_end": true
     }
   ],
   "zones": [
@@ -48,9 +48,9 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 ```
 
 **Must:**
-- Recognizes SC-7 requires managed interfaces at boundaries
-- Notes zones separate trust domains (supports SC-7)
-- Identifies explicit deny-all with logging (supports AC-4, AU-2)
+- Recognizes 3.13.1 requires monitored and controlled communications at boundaries
+- Notes zones separate trust domains (supports 3.13.1 boundary protection)
+- Identifies explicit deny-all with logging (supports 3.1.1 authorized access, 3.3.1 audit logging, 3.13.6 deny-by-default)
 - States this is one device; CMMC/800-171 requires org-wide SSP
 - Does NOT claim this config achieves CMMC Level 2
 

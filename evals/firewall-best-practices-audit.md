@@ -13,16 +13,16 @@ Run each scenario in a fresh agent session with the skill installed, then again 
   "security_policies": [
     {
       "name": "rule-1",
-      "_rule_index": 0,
-      "action": "permit",
+      "_rule_index": 1,
+      "action": "allow",
       "src_zones": ["trust"],
       "dst_zones": ["untrust"],
       "src_addresses": ["any"],
       "dst_addresses": ["any"],
       "applications": ["any"],
-      "services": [],
+      "services": ["any"],
       "dynamic_applications": [],
-      "logging": {"end": false},
+      "log_end": false,
       "disabled": false,
       "_implicit": false
     }
@@ -55,24 +55,26 @@ Run each scenario in a fresh agent session with the skill installed, then again 
   "security_policies": [
     {
       "name": "allow-all-web",
-      "_rule_index": 0,
-      "action": "permit",
+      "_rule_index": 1,
+      "action": "allow",
       "src_zones": ["trust"],
       "dst_zones": ["untrust"],
       "src_addresses": ["any"],
       "dst_addresses": ["any"],
+      "services": ["application-default"],
       "applications": ["web-browsing", "ssl"],
       "disabled": false,
       "_implicit": false
     },
     {
       "name": "allow-specific-web",
-      "_rule_index": 1,
-      "action": "permit",
+      "_rule_index": 2,
+      "action": "allow",
       "src_zones": ["trust"],
       "dst_zones": ["untrust"],
       "src_addresses": ["192.0.2.0/24"],
       "dst_addresses": ["any"],
+      "services": ["application-default"],
       "applications": ["web-browsing"],
       "disabled": false,
       "_implicit": false

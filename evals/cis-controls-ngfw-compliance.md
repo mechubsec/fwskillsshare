@@ -49,7 +49,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 {
   "metadata": {"source_vendor": "panos"},
   "security_policies": [
-    {"name": "allow-web", "action": "permit", "logging": {"end": true}}
+    {"name": "allow-web", "action": "allow", "log_end": true}
   ],
   "system": {
     "ssh": {"enabled": true, "version": "v2"}

@@ -15,7 +15,7 @@ Config A (old):
     {"name": "server-a", "type": "host", "value": "192.0.2.10/32"}
   ],
   "security_policies": [
-    {"name": "rule-1", "action": "permit", "src_zones": ["trust"], "dst_zones": ["untrust"], "src_addresses": ["any"], "dst_addresses": ["server-a"], "applications": ["junos-http"], "logging": {"end": false}}
+    {"name": "rule-1", "action": "allow", "src_zones": ["trust"], "dst_zones": ["untrust"], "src_addresses": ["any"], "dst_addresses": ["server-a"], "services": ["application-default"], "applications": ["junos-http"], "log_end": false, "_rule_index": 1, "_implicit": false}
   ]
 }
 
@@ -26,7 +26,7 @@ Config B (new):
     {"name": "server-a", "type": "host", "value": "192.0.2.10/32"}
   ],
   "security_policies": [
-    {"name": "rule-1", "action": "permit", "src_zones": ["trust"], "dst_zones": ["untrust"], "src_addresses": ["any"], "dst_addresses": ["server-a"], "applications": ["junos-http"], "logging": {"end": true}}
+    {"name": "rule-1", "action": "allow", "src_zones": ["trust"], "dst_zones": ["untrust"], "src_addresses": ["any"], "dst_addresses": ["server-a"], "services": ["application-default"], "applications": ["junos-http"], "log_end": true, "_rule_index": 1, "_implicit": false}
   ]
 }
 ```
@@ -34,7 +34,7 @@ Config B (new):
 **Must:**
 - Recognizes both inputs are intermediate schema (not raw configs)
 - Pairs rule-1 by semantic identity (zones, addresses, action)
-- Reports rule-1 as "changed" with logging difference (end: false → true)
+- Reports rule-1 as "changed" with log_end difference (false → true)
 - Emits parity verdict DIFFERENCES FOUND (1)
 - Reports source vendor as srx
 

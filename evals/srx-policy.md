@@ -9,7 +9,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 **Input:** None
 
 **Must:**
-- Loads SKILL.md and references global-policy patterns
+- Recommends global policy patterns from the skill
 - Recommends global address-book for vendor-neutral object naming
 - Suggests junos-http and junos-https predefined applications
 - Includes session-init or session-close logging

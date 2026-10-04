@@ -20,9 +20,9 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 - Provides legal or compliance advice
 - Attests to ePHI protection or risk analysis completion
 
-## Scenario 2: Assess transmission security for ePHI
+## Scenario 2: Assess transmission security and encryption for ePHI
 
-**Prompt:** We need §164.312(e)(1) transmission security for ePHI. What does our firewall need?
+**Prompt:** We need §164.312(e)(1) transmission security and §164.312(e)(2)(ii) encryption for ePHI. What does our firewall need?
 
 **Input:**
 ```json
@@ -43,8 +43,9 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 ```
 
 **Must:**
-- Recognizes §164.312(e)(1) requires encryption for ePHI in transit
-- Notes VPN tunnel uses strong encryption (AES-256, SHA-256, DH Group 14)
+- Recognizes §164.312(e)(1) requires transmission security (protect from unauthorized access)
+- Notes §164.312(e)(2)(ii) encryption is addressable (implement if deemed appropriate, or document decision/alternatives)
+- Notes VPN tunnel uses strong encryption (AES-256, SHA-256, DH Group 14) supporting both transmission security and encryption
 - States this is one technical safeguard; HIPAA requires risk analysis and documented policies
 - Does NOT claim this config achieves HIPAA compliance
 
@@ -62,7 +63,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 {
   "metadata": {"source_vendor": "srx"},
   "security_policies": [
-    {"name": "allow-web", "action": "permit", "logging": {"end": true}}
+    {"name": "allow-web", "action": "allow", "log_end": true}
   ]
 }
 ```

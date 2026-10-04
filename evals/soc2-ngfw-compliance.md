@@ -10,7 +10,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 
 **Must:**
 - Loads references/control-mapping.md for SOC 2 TSC
-- Identifies relevant criteria (CC6.6 logical access, CC7.2 system monitoring, CC6.1 boundary protection)
+- Identifies relevant criteria (CC6.1 access security, CC6.6 external boundary protection, CC7.2 system monitoring)
 - Explains firewall role in boundary protection, access control, security monitoring
 - Does NOT claim the firewall makes the org "SOC 2 compliant"
 - Distinguishes firewall technical controls from broader control environment and risk assessment
@@ -31,11 +31,12 @@ Run each scenario in a fresh agent session with the skill installed, then again 
   "security_policies": [
     {
       "name": "restrict-admin",
-      "action": "permit",
+      "action": "allow",
       "src_zones": ["mgmt"],
       "dst_zones": ["internal"],
-      "services": [{"protocol": "tcp", "dst_ports": ["22", "443"]}],
-      "logging": {"start": true, "end": true}
+      "services": ["SSH", "HTTPS"],
+      "log_start": true,
+      "log_end": true
     }
   ],
   "system": {

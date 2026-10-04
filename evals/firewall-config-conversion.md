@@ -20,13 +20,15 @@ Run each scenario in a fresh agent session with the skill installed, then again 
   "security_policies": [
     {
       "name": "allow-web",
-      "action": "permit",
+      "action": "allow",
       "src_zones": ["trust"],
       "dst_zones": ["untrust"],
       "src_addresses": ["any"],
       "dst_addresses": ["web-server"],
-      "services": [{"protocol": "tcp", "dst_ports": ["443"]}],
-      "logging": {"end": true}
+      "services": ["tcp/443"],
+      "log_end": true,
+      "_rule_index": 1,
+      "_implicit": false
     }
   ]
 }
@@ -59,11 +61,15 @@ Run each scenario in a fresh agent session with the skill installed, then again 
   "security_policies": [
     {
       "name": "allow-apps",
-      "action": "permit",
+      "action": "allow",
       "src_zones": ["trust"],
       "dst_zones": ["untrust"],
+      "src_addresses": ["any"],
+      "dst_addresses": ["any"],
       "applications": ["web-browsing", "ssl"],
-      "services": []
+      "services": ["application-default"],
+      "_rule_index": 1,
+      "_implicit": false
     }
   ]
 }

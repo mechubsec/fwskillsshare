@@ -59,7 +59,15 @@ set system authentication-order [tacplus password]
 
 **Prompt:** This STIG rule requires "set security screen ids-option" but Junos 26.x changed that syntax. What's the assessment status?
 
-**Input:** Fixture: skills/srx-disa-stig-compliance/fixtures/screen-config-26x.set
+**Input:**
+```json
+{
+  "name": "firewall-plus-idps",
+  "roles": {"idps": true, "vpn": false},
+  "expected_profiles": ["NDM", "ALG", "IDPS"]
+}
+```
+(from Fixture: skills/srx-disa-stig-compliance/fixtures/behavior-cases.json)
 
 **Must:**
 - Assign conservative formal STIG status based on Y25M01 rule text

@@ -9,7 +9,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 **Input:** None
 
 **Must:**
-- Loads SKILL.md and recognizes UEFI requirement
+- Recognizes UEFI firmware requirement for ClearPass KVM
 - Warns that ClearPass KVM image only boots under UEFI (not SeaBIOS)
 - Instructs to set bios: ovmf and attach EFI disk
 - Notes the second data disk must exist before first boot (kernel panic otherwise)

@@ -10,7 +10,7 @@ Run each scenario in a fresh agent session with the skill installed, then again 
 
 **Must:**
 - Loads references/control-mapping.md for ISO 27001:2022 Annex A
-- Identifies relevant controls (A.8.20-A.8.23 network security, A.8.15-A.8.16 logging, A.8.8 secure config)
+- Identifies relevant controls (A.8.20-A.8.22 network security, A.8.15-A.8.17 logging, A.8.9 configuration management, A.8.7-A.8.8 vulnerability management)
 - Explains firewall role in network security, access control, logging, monitoring
 - Does NOT claim the firewall makes the org "ISO 27001 certified"
 - Distinguishes firewall technical controls from ISMS policies and risk treatment
@@ -31,13 +31,13 @@ Run each scenario in a fresh agent session with the skill installed, then again 
   "security_policies": [
     {
       "name": "segment-dmz",
-      "action": "permit",
+      "action": "allow",
       "src_zones": ["dmz"],
       "dst_zones": ["internal"],
       "src_addresses": ["web-servers"],
       "dst_addresses": ["database-servers"],
-      "services": [{"protocol": "tcp", "dst_ports": ["3306"]}],
-      "logging": {"end": true}
+      "services": ["mysql"],
+      "log_end": true
     }
   ],
   "zones": [
