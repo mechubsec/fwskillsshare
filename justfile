@@ -22,6 +22,7 @@ lint:
     python3 scripts/test-runtime-intake-safety.py
     python3 scripts/check-readme-branding.py
     python3 scripts/check-checksums.py
+    python3 scripts/check-evals.py
 
 test:
     python3 scripts/test-inventory.py
@@ -38,6 +39,7 @@ test:
     python3 scripts/check-srx-stig-catalog.py
     python3 scripts/check-srx-stig-behavior.py
     python3 scripts/check-srx-license-signature-contract.py
+    python3 scripts/test-check-evals.py
 
 guard: lint test shell
 
