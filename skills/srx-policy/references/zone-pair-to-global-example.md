@@ -1,5 +1,12 @@
 # Zone-Pair to Global Rewrite Example
 
+## Contents
+
+- [Detect the Source Shape](#detect-the-source-shape)
+- [Build the Order Map](#build-the-order-map)
+- [Emit One Ordered Global Table](#emit-one-ordered-global-table)
+- [Validate and Cut Over](#validate-and-cut-over)
+
 Use this synthetic example during day-one SRX onboarding when the existing rulebase
 contains zone-pair policy contexts. It converts two independent ordered contexts into
 one single ordered global table while retaining exact source and destination zones.

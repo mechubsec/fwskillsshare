@@ -36,6 +36,28 @@ metadata:
 
 # SRX Multi-Node High Availability (MNHA)
 
+## Contents
+
+- [Overview](#overview)
+- [Runtime intake](#runtime-intake)
+- [Chassis Cluster vs MNHA](#chassis-cluster-vs-mnha)
+- [Chassis-Cluster to MNHA Interface Migration](#chassis-cluster-to-mnha-interface-migration)
+- [Deployment Modes](#deployment-modes)
+- [Services Redundancy Groups](#services-redundancy-groups)
+- [ICL: Inter-Chassis Link](#icl-inter-chassis-link)
+- [ICD: Inter-Chassis Datalink](#icd-inter-chassis-datalink)
+- [IPsec VPNs on MNHA with Multiple Routing Instances](#ipsec-vpns-on-mnha-with-multiple-routing-instances)
+- [NAT, Proxy ARP, and Deterministic Routing](#nat-proxy-arp-and-deterministic-routing)
+- [Runtime Object and Session Synchronization](#runtime-object-and-session-synchronization)
+- [Configuration Synchronization](#configuration-synchronization)
+- [Hybrid MNHA with eBGP Pattern](#hybrid-mnha-with-ebgp-pattern)
+- [DHCP on MNHA](#dhcp-on-mnha)
+- [Verification Checklist](#verification-checklist)
+- [Troubleshooting Commands](#troubleshooting-commands)
+- [Common Pitfalls](#common-pitfalls)
+- [Field-Confirmed Behaviors](#field-confirmed-behaviors)
+- [Source Notes](#source-notes)
+
 ## Overview
 
 Multi-Node High Availability (MNHA) is Juniper SRX high availability built around independent SRX nodes that synchronize runtime state over routed HA links. Unlike chassis cluster, MNHA nodes do not become a single logical chassis. Each node keeps its own control plane, hostname, management, routing protocols, interface addressing, and node-specific configuration. Stateful firewall/NAT/IPsec runtime objects can still synchronize so traffic can survive a path or node failover when the design keeps routing, interfaces, policy, and HA state aligned.
@@ -183,80 +205,11 @@ Use hybrid MNHA when:
 
 ## Services Redundancy Groups
 
-Juniper articles refer to Services Redundancy Groups, abbreviated SRGs. Use the Junos hierarchy under `chassis high-availability services-redundancy-group`.
+SRG0 is the default routed-MNHA group with no active/backup ownership; routing selects the forwarding node. SRG1+ provides active/backup behavior for VIPs, route signaling, failover triggers, and IPsec termination.
 
-### SRG0
+**Important:** The config syntax changed by release. Junos ≤24.x uses the flat `local-id local-ip` / `peer-id peer-ip` model; Junos 26.x requires the **grid model** (`grid-id`, `local-domain-id`, `peer-domain-id … peer-id`) and rejects the flat form. For `deployment-type routing`, `activeness-probe dest-ip <X> src-ip <Y>` is mandatory. A reboot is required to activate chassis-HA.
 
-SRG0 is the default forwarding group for routed MNHA behavior.
-
-Operational model:
-
-- no active/backup ownership model like a VIP group
-- both nodes can be ready to forward
-- no VIP/vMAC ownership is normally involved
-- routing determines which node sees traffic
-- runtime state can synchronize over ICL
-
-If ICL is lost, state synchronization is affected. Routing may still deliver packets to either node, but stateful continuity is at risk until synchronization is restored.
-
-### SRG1 and Higher
-
-SRG1+ provides active/backup service behavior.
-
-Use SRG1+ for:
-
-- default gateway VIPs
-- hybrid mode VIPs
-- route signaling based on active/backup status
-- interface/BFD/object monitoring tied to failover
-- IPsec termination designs that require synchronized tunnel/SAs, where supported
-- active/active distribution by using different SRGs active on different nodes
-
-Common SRG1+ attributes:
-
-```junos
-set chassis high-availability services-redundancy-group <SRG> deployment-type <routing|hybrid|switching>
-# deployment-type: routed/L3 = routing; hybrid = hybrid; default-gateway/L2 = switching
-set chassis high-availability services-redundancy-group <SRG> peer-id <PEER_ID>
-set chassis high-availability services-redundancy-group <SRG> activeness-priority <PRIORITY>
-```
-
-Verify:
-
-```text
-show chassis high-availability services-redundancy-group <SRG>
-```
-
-Look for:
-
-- deployment type
-- ACTIVE or BACKUP status
-- activeness priority
-- preemption state
-- peer status
-- health status
-- failover readiness
-- VIP status when configured
-
-### Config model: flat (≤24.x) vs grid (26.x) — RELEASE-DEPENDENT
-
-The `chassis high-availability` syntax **changed by release**. The flat
-`local-id local-ip` / `peer-id <ID> peer-ip` form used elsewhere in this skill and
-in the ≤24.x sources is **rejected on Junos 26.x**, which needs the **grid model**
-(`grid-id`, `local-domain-id`, `peer-domain-id … peer-id`). Symptom of the wrong
-model: commit fails, or `show chassis high-availability information` returns
-`mode not configured` even though your config is present. Confirm the model for the
-target release before writing config.
-
-The complete grid-model configuration, field-confirmed on **vSRX 26.2R1.7**
-(routed pair, SRG1 `deployment-type routing`, with the Node B mirror pattern),
-is in `references/mnha-grid-model-field-notes.md`. Two commit-blocking rules:
-
-- **`activeness-probe dest-ip <X> src-ip <Y>` is mandatory for `deployment-type
-  routing`** (commit fails otherwise). `src-ip` is a **sub-field of `dest-ip`** —
-  one statement. Aim it at a real reachable data-segment address, not the ICL.
-- **Enabling chassis-HA needs a reboot** to activate (says *mode not configured*
-  until then); a node may take **two reboot cycles** to reach `Node Status: ONLINE`.
+Complete SRG0/SRG1+ operational models, configuration attributes, verification commands, and grid-model field notes are in `references/srg-details.md`.
 
 ## ICL: Inter-Chassis Link
 

@@ -1,15 +1,15 @@
 # SRX MNHA Advanced Workflows
 
-Use this reference for chassis-cluster migration, MNHA IPsec, deterministic NAT, state and configuration synchronization, hybrid routing, and DHCP. Load only the relevant section.
-
 ## Contents
 
-- [Chassis-cluster interface migration](#chassis-cluster-interface-migration)
-- [IPsec with multiple routing instances](#ipsec-with-multiple-routing-instances)
-- [NAT and deterministic routing](#nat-and-deterministic-routing)
-- [Runtime and configuration synchronization](#runtime-and-configuration-synchronization)
-- [Hybrid routing with signal routes](#hybrid-routing-with-signal-routes)
+- [Chassis-Cluster Interface Migration](#chassis-cluster-interface-migration)
+- [IPsec with Multiple Routing Instances](#ipsec-with-multiple-routing-instances)
+- [NAT and Deterministic Routing](#nat-and-deterministic-routing)
+- [Runtime and Configuration Synchronization](#runtime-and-configuration-synchronization)
+- [Hybrid Routing with Signal Routes](#hybrid-routing-with-signal-routes)
 - [DHCP on MNHA](#dhcp-on-mnha)
+
+Use this reference for chassis-cluster migration, MNHA IPsec, deterministic NAT, state and configuration synchronization, hybrid routing, and DHCP. Load only the relevant section.
 
 ## Chassis-Cluster Interface Migration
 
