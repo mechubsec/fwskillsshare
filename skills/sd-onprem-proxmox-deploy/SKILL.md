@@ -323,15 +323,16 @@ Key items agents must obey:
 - **`lo0` not selectable as log source** — pick physical revenue port (LAN for
   tunnel branches, not WAN).
 - **Device-connection VIP:7804 needs same source-NAT** as logs for tunnel branches.
-- **Flavor validated as WHOLE SET** — cannot bump only CPU/RAM; must resize all
-  three disks too or RKE2 never starts.
+- **Flavor validated as WHOLE SET** — cannot bump only CPU/RAM; match the target
+  flavor's full CPU/RAM/data-disk tuple (disk-0 stays 200 GB in every flavor) or
+  RKE2 never starts.
 
 ## Verification checklist
 
 Complete before declaring deployment successful:
 
 **Predeployment (Stage 1):**
-- [ ] All 4 IPs answer `arping`, outside DHCP pool
+- [ ] All 4 IPs are free (no `arping` reply), outside DHCP pool
 - [ ] DNS resolves from exact SD source (probe VM/namespace)
 - [ ] NTP synchronized from exact SD source (`chronyd -Q` / `ntpdate -q` / `sntp`)
 - [ ] Bundle retrieval completes with correct byte count (HTTP `COMPLETE` or SCP log)
