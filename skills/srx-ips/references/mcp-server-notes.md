@@ -1,5 +1,11 @@
 # Junos MCP server capabilities
 
+## Contents
+
+- [Capability mapping](#capability-mapping)
+- [Juniper junos-mcp-server](#juniper-junos-mcp-server)
+- [rust-junosmcp](#rust-junosmcp)
+
 The srx-ips skill works with any Junos MCP server that exposes the core
 operational and configuration capabilities listed below. Different servers
 implement different subsets and have different operational characteristics.

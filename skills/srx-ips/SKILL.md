@@ -57,6 +57,30 @@ metadata:
 
 # SRX IPS Management
 
+## Contents
+
+- [Overview](#overview)
+- [Runtime intake](#runtime-intake)
+- [Workflow A: Triage existing detections](#workflow-a-triage-existing-detections)
+  - [Step 0 — Identify the target and the transport](#step-0--identify-the-target-and-the-transport)
+  - [Step 1 — Establish current state (read-only)](#step-1--establish-current-state-read-only)
+  - [Step 2 — Pull logs, small and attributable](#step-2--pull-logs-small-and-attributable)
+  - [Step 3 — Parse and cross-reference](#step-3--parse-and-cross-reference)
+  - [Step 4 — State the finding in plain language first](#step-4--state-the-finding-in-plain-language-first)
+  - [Step 5 — One combined, reviewed proposal](#step-5--one-combined-reviewed-proposal)
+  - [Step 6 — After approval: commit with rollback, then verify the data plane](#step-6--after-approval-commit-with-rollback-then-verify-the-data-plane)
+  - [Step 7 — Prove the change with traffic](#step-7--prove-the-change-with-traffic)
+- [Workflow B: Custom signatures](#workflow-b-custom-signatures)
+  - [Step 0 — Is a custom signature the right tool?](#step-0--is-a-custom-signature-the-right-tool)
+  - [Step 1 — One signature or two?](#step-1--one-signature-or-two)
+  - [Step 2 — Choose context and direction](#step-2--choose-context-and-direction)
+  - [Step 3 — Write the pattern defensively](#step-3--write-the-pattern-defensively)
+  - [Step 4 — Draft, validate without activating, then stage in monitor mode](#step-4--draft-validate-without-activating-then-stage-in-monitor-mode)
+  - [Step 5 — Prove it matches, with real evidence](#step-5--prove-it-matches-with-real-evidence)
+  - [Step 6 — Propose enforcement, then re-verify](#step-6--propose-enforcement-then-re-verify)
+- [Commit and verification requirements](#commit-and-verification-requirements)
+- [Hand-offs](#hand-offs)
+
 > **STATUS: draft (v0.1.1).** Contributed by Javier Grizzuti
 > ([@jgrizzuti](https://github.com/jgrizzuti)) from lab work through a Junos MCP
 > server, then revised against Juniper documentation. Items marked **[unverified]**
@@ -209,45 +233,7 @@ explicitly approves the push.
 
 ## Step 6 — After approval: commit with rollback, then verify the data plane
 
-Every commit here follows the repository write policy:
-
-1. Show the candidate with `show | compare` and confirm it matches the approved
-   lines exactly.
-2. Commit with a rollback window — `commit confirmed <minutes>` — where the MCP
-   server supports it, and confirm with a second commit only after verification
-   passes. If the server supports change sets with a confirm window (create,
-   approve, apply with `confirm_timeout_mins`, then confirm), prefer that flow.
-3. **Check whether your transport can do that.** Some Junos MCP servers perform a
-   plain `commit` with no confirmed or dry-run option; others support
-   `confirm_timeout_mins` on `load_and_commit_config` or change sets with apply-time
-   confirm windows. If the tool cannot do a confirmed commit, say so, and get
-   approval that explicitly accepts a manual rollback plan (`rollback 1` then
-   `commit`) before pushing.
-4. **Verified on vSRX 26.2R1.7, 2026-09-23:** `commit confirmed` works correctly
-   with IDP configured. The device auto-rolled back a 1-minute confirmed commit
-   cleanly and logged `UI_COMMIT_NOT_CONFIRMED`. **Operational timing:** the
-   rollback fires roughly 30–45 seconds AFTER the nominal window expires, not on
-   the second — verify a rollback by waiting past the window with margin.
-   **[unverified on Branch SRX]** Juniper KB21334 reports that `commit confirmed`
-   is unsupported on Branch SRX with IDP. Until checked, treat confirmed commit as
-   unavailable on Branch SRX with IDP and use the manual rollback plan.
-
-A successful commit does **not** mean the new policy is enforcing. IDP compiles
-and loads in the background after commit, with no fixed duration. Poll, do not
-sleep for a fixed time:
-
-```
-show security idp policy-commit-status
-```
-
-**Verified on vSRX 26.2R1.7, 2026-09-23:** `policy-commit-status` never reached a
-"loaded successfully" wording. It reported `Reading set file for compilation` and
-stayed there for the entire life of the loaded policy, minutes after the compile
-had finished. The authoritative completion signal is the syslog event
-`IDP_COMMIT_COMPLETED: IDP policy commit is complete.` `Policy Name` and `Running
-Detector Version` in `show security idp status` do NOT confirm a new policy load —
-both stayed `none` throughout a verified successful compile. On a cluster, verify
-each node.
+Follow the commit and verification procedures in [`references/commit-and-verification.md`](references/commit-and-verification.md). This includes showing the candidate with `show | compare`, committing with a rollback window where supported (or getting approval for a manual rollback plan), and verifying policy load by polling `show security idp policy-commit-status` and waiting for the `IDP_COMMIT_COMPLETED` syslog event.
 
 ## Step 7 — Prove the change with traffic
 
@@ -255,6 +241,8 @@ Offer to regenerate the original traffic — with the operator running the tool,
 not the agent — and pull the log again. The change is proven when the same
 attack now logs the new action (for example `CLOSE` or `DROP` instead of
 `NONE`) and the client sees the connection fail.
+
+**Verification checklist**: [`references/commit-and-verification.md#triage-workflow`](references/commit-and-verification.md#triage-workflow)
 
 # Workflow B: Custom signatures
 
@@ -430,8 +418,9 @@ Then:
    pre-flight validation step) and discard the candidate.
 2. **Get explicit approval** to stage it, stating that it is `no-action` and what
    it is scoped to.
-3. **Commit with a rollback window** where available, following the shared commit
-   guidance below, including the MCP server's commit capabilities and the
+3. **Commit with a rollback window** where available; see
+   [`references/commit-and-verification.md`](references/commit-and-verification.md)
+   for the complete procedure, including MCP server capability checks and the
    **[unverified]** Branch SRX confirmed-commit restriction.
 4. **Verify the policy loaded** with `show security idp policy-commit-status`,
    polling rather than waiting a fixed time.
@@ -459,82 +448,24 @@ Only after monitor-mode matches are proven and false positives reviewed:
 1. Propose renaming `DETECT-<NAME>` to `BLOCK-<NAME>` and setting the action.
    Prefer an action proven in this environment; the contributor's lab found
    `close-client-and-server` most consistent for its HTTP traffic.
-2. Get explicit approval, commit with the rollback approach below, and verify
-   the policy loaded.
+2. Get explicit approval, commit following the procedures in
+   [`references/commit-and-verification.md`](references/commit-and-verification.md),
+   and verify the policy loaded.
 3. Re-run the same test traffic. Done means the client sees the connection
    fail **and** the log shows the new action (for example `CLOSE`).
 
-# Shared commit and verification guidance
+**Verification checklist**: [`references/commit-and-verification.md#custom-signature-workflow`](references/commit-and-verification.md#custom-signature-workflow)
 
-## Commit with rollback
+# Commit and verification requirements
 
-Every commit here follows the repository write policy:
+**All IDP policy commits require:**
 
-1. Show the candidate with `show | compare` and confirm it matches the approved
-   lines exactly.
-2. Commit with a rollback window — `commit confirmed <minutes>` — where the MCP
-   server supports it, and confirm with a second commit only after verification
-   passes. If the server supports change sets with a confirm window (create,
-   approve, apply with `confirm_timeout_mins`, then confirm), prefer that flow.
-3. **Check whether your transport can do that.** Some Junos MCP servers perform a
-   plain `commit` with no confirmed or dry-run option; others support
-   `confirm_timeout_mins` on `load_and_commit_config` or change sets with apply-time
-   confirm windows. If the tool cannot do a confirmed commit, say so, and get
-   approval that explicitly accepts a manual rollback plan (`rollback 1` then
-   `commit`) before pushing.
-4. **Verified on vSRX 26.2R1.7, 2026-09-23:** `commit confirmed` works correctly
-   with IDP configured. The device auto-rolled back a 1-minute confirmed commit
-   cleanly and logged `UI_COMMIT_NOT_CONFIRMED`. **Operational timing:** the
-   rollback fires roughly 30–45 seconds AFTER the nominal window expires, not on
-   the second — verify a rollback by waiting past the window with margin.
-   **[unverified on Branch SRX]** Juniper KB21334 reports that `commit confirmed`
-   is unsupported on Branch SRX with IDP. Until checked, treat confirmed commit as
-   unavailable on Branch SRX with IDP and use the manual rollback plan.
+- **Explicit approval** for the exact configuration lines to be pushed
+- **Rollback protection**: use `commit confirmed` where supported, or get approval for a manual rollback plan before pushing
+- **Policy load verification**: poll `show security idp policy-commit-status` after commit; wait for `IDP_COMMIT_COMPLETED` syslog event (verify per-node on clusters)
+- **Transport capability check**: confirm your MCP server supports confirmed commits or change sets with confirm windows before relying on them
 
-## Policy load verification
-
-A successful commit does **not** mean the new policy is enforcing. IDP compiles
-and loads in the background after commit, with no fixed duration. Poll, do not
-sleep for a fixed time:
-
-```
-show security idp policy-commit-status
-```
-
-**Verified on vSRX 26.2R1.7, 2026-09-23:** `policy-commit-status` never reached a
-"loaded successfully" wording. It reported `Reading set file for compilation` and
-stayed there for the entire life of the loaded policy, minutes after the compile
-had finished. The authoritative completion signal is the syslog event
-`IDP_COMMIT_COMPLETED: IDP policy commit is complete.` `Policy Name` and `Running
-Detector Version` in `show security idp status` do NOT confirm a new policy load —
-both stayed `none` throughout a verified successful compile. On a cluster, verify
-each node.
-
-# Verification checklists
-
-## Triage workflow
-
-- [ ] Rule table built from the **active** policy, including actions and scope
-- [ ] idp-policy binding through `application-services` confirmed
-- [ ] Logs read without deleting evidence; any `clear log` separately approved
-- [ ] Finding stated in plain language with raw repeat values
-- [ ] One combined proposal with exact lines, blast radius, and rollback
-- [ ] Explicit approval received for the push
-- [ ] Commit used a rollback window, or the lack of one was approved
-- [ ] `policy-commit-status` shows the new policy loaded, per node
-- [ ] Before-and-after log evidence shows the new action
-
-## Custom signature workflow
-
-- [ ] Existing coverage checked read-only; no commit used as a lookup
-- [ ] Finding confirmed detectable by pattern
-- [ ] Context and direction chosen and justified; direction is mandatory
-- [ ] Pattern reviewed for false positives, scoped by destination
-- [ ] Candidate validated with `commit check`, not a real commit
-- [ ] Staged as `DETECT-<NAME>` in `no-action` after explicit approval
-- [ ] Monitor-mode match proven with run-unique test traffic
-- [ ] False-positive test passed
-- [ ] Enforcement separately approved, committed with rollback, and verified
+**Full procedures** (commit workflow, MCP server variations, verified timing, Branch SRX restriction): [`references/commit-and-verification.md`](references/commit-and-verification.md)
 
 # Hand-offs
 
