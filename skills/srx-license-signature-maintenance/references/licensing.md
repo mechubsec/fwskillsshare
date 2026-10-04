@@ -1,5 +1,15 @@
 # Licensing — Baseline, Staging, Transport, Cleanup
 
+## Contents
+
+- [Baseline (read-only, every mode)](#baseline-read-only-every-mode)
+- [Staging (Gate A)](#staging-gate-a)
+- [Transport](#transport)
+- [Install (Gate A)](#install-gate-a)
+- [Verify (Gate A)](#verify-gate-a)
+- [Cleanup](#cleanup)
+- [Failure interpretation](#failure-interpretation)
+
 Reference for the `srx-license-signature-maintenance` skill; load on demand.
 Everything here runs **only** under Gate A approval, except the Baseline
 section, which is read-only.

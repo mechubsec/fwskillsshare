@@ -1,5 +1,13 @@
 # Verification
 
+## Contents
+
+- [Per-stage criteria](#per-stage-criteria)
+- [The finished-device matrix](#the-finished-device-matrix)
+- [When verification fails after a commit](#when-verification-fails-after-a-commit)
+- [Cross-stage dependencies and verification order](#cross-stage-dependencies-and-verification-order)
+- [Verification vs. monitoring](#verification-vs-monitoring)
+
 Every stage in this skill requires verification after its gaps close. Verification proves the configuration change achieved its intended effect and that the device remains reachable.
 
 ## Per-stage criteria

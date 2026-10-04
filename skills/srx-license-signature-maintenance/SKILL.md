@@ -41,6 +41,21 @@ metadata:
 
 # SRX License and Signature Maintenance
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [1. Intake and read-only baseline](#1-intake-and-read-only-baseline)
+- [2. Gate A — license installation](#2-gate-a--license-installation)
+- [3. Gate B — signature installation](#3-gate-b--signature-installation)
+- [4. Offline signature update](#4-offline-signature-update)
+- [5. Post-change verification](#5-post-change-verification)
+- [Failure handling](#failure-handling)
+- [Output contract](#output-contract)
+- [Reference material (load on demand)](#reference-material-load-on-demand)
+- [Verification checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to audit and maintain **AppID and IDP/IPS entitlements** and

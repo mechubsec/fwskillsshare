@@ -1,5 +1,12 @@
 # Entry-State Assessment
 
+## Contents
+
+- [Entry states](#entry-states)
+- [Evidence to collect](#evidence-to-collect)
+- [Classification rules](#classification-rules)
+- [Chassis cluster](#chassis-cluster)
+
 Read-only. Runs before any question about intent and before any write is proposed.
 
 ## Entry states

@@ -1,5 +1,12 @@
 # Worked example: a healthy two-node cluster
 
+## Contents
+
+- [Hypervisor](#hypervisor)
+- [Junos configuration](#junos-configuration)
+- [What healthy looks like](#what-healthy-looks-like)
+- [Two known deviations](#two-known-deviations)
+
 A complete build to diff your own against. Every value was measured on a running, healthy cluster: two vSRX guests on one Proxmox VE host, cluster-id 2, Junos 24.4R1.9, five reth interfaces.
 
 ## Hypervisor

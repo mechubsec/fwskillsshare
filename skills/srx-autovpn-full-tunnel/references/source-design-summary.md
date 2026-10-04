@@ -1,5 +1,18 @@
 # AutoVPN Full-Tunnel Backhaul — Derived Design Summary
 
+## Contents
+
+- [Reference addressing (lab)](#reference-addressing-lab)
+- [Crypto parameters](#crypto-parameters)
+- [AutoVPN dynamic gateway (hub)](#autovpn-dynamic-gateway-hub)
+- [Single bound tunnel + traffic selectors](#single-bound-tunnel--traffic-selectors)
+- [Hub source NAT (internet egress only)](#hub-source-nat-internet-egress-only)
+- [Hub security policies](#hub-security-policies)
+- [Routing and the two gotchas](#routing-and-the-two-gotchas)
+- [Validation result (lab)](#validation-result-lab)
+- [Deployment order](#deployment-order)
+- [Juniper references (from the lab)](#juniper-references-from-the-lab)
+
 Derived summary of Jason Anderson's lab
 [`srx-autovpn-backhaul-public`](https://github.com/anderson-jason573/srx-autovpn-backhaul-public)
 (author: Jason Anderson). Built and validated on four vSRX firewalls (Junos OS

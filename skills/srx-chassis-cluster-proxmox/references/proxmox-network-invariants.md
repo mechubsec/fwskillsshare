@@ -1,5 +1,16 @@
 # Proxmox network invariants for chassis cluster
 
+## Contents
+
+- [Bridge and VLAN design](#bridge-and-vlan-design)
+- [MTU: the fabric needs jumbo, the control link does not](#mtu-the-fabric-needs-jumbo-the-control-link-does-not)
+- [The anti-spoof trap](#the-anti-spoof-trap)
+- [Bridge port flags](#bridge-port-flags)
+- [Tap interface state](#tap-interface-state)
+- [Netfilter](#netfilter)
+- [Offloads](#offloads)
+- [Node symmetry](#node-symmetry)
+
 Every value here was measured on a healthy two-node vSRX cluster running as Proxmox VE guests. Where a requirement follows from a mechanism rather than a direct observation, the text says so.
 
 ## Bridge and VLAN design

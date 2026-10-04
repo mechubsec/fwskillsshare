@@ -1,5 +1,13 @@
 # fxp0, management routing instances, and syslog
 
+## Contents
+
+- [What fxp0 is](#what-fxp0-is)
+- [Should fxp0 go in a management routing instance?](#should-fxp0-go-in-a-management-routing-instance)
+- [Why Security Director Cloud requires a revenue interface](#why-security-director-cloud-requires-a-revenue-interface)
+- [Which source for which log type](#which-source-for-which-log-type)
+- [Do and don't](#do-and-dont)
+
 Background for the logging skill. Junos treats the control plane (Routing Engine,
 fxp0) and the data plane (PFE, revenue ports) as separate paths, and the rules
 differ by what you are sending and where. Most confusion in this area comes from

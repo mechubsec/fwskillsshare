@@ -32,6 +32,23 @@ metadata:
 
 # SRX Static Point-to-Point IPsec Hub-and-Spoke (Full-Tunnel Backhaul)
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Topology Model](#topology-model)
+- [Static Hub-and-Spoke Mechanics](#static-hub-and-spoke-mechanics)
+- [Routing — the entire story](#routing--the-entire-story)
+- [Hub NAT and Security Policies](#hub-nat-and-security-policies)
+- [Config Skeleton (`set` format)](#config-skeleton-set-format)
+- [Verification](#verification)
+- [Troubleshooting Matrix](#troubleshooting-matrix)
+- [Caveats and Tradeoffs](#caveats-and-tradeoffs)
+- [Choose This vs. AutoVPN](#choose-this-vs-autovpn)
+- [Verification Checklist](#verification-checklist)
+- [Source Notes](#source-notes)
+
 ## Overview
 
 Static per-spoke route-based IPsec is the simplest, most explicit way to build a

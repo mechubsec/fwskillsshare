@@ -1,12 +1,12 @@
 # Advanced SRX NAT Patterns
 
-Use this reference for NAT64/DNS64, carrier-grade NAT, port block allocation, persistent NAT, and address-persistent troubleshooting.
-
 ## Contents
 
 - [NAT64 with DNS64](#nat64-with-dns64)
-- [CGN, PBA, and persistent NAT](#cgn-pba-and-persistent-nat)
-- [Address-persistent symptoms](#address-persistent-symptoms)
+- [CGN, PBA, and Persistent NAT](#cgn-pba-and-persistent-nat)
+- [Address-Persistent Symptoms](#address-persistent-symptoms)
+
+Use this reference for NAT64/DNS64, carrier-grade NAT, port block allocation, persistent NAT, and address-persistent troubleshooting.
 
 ## NAT64 with DNS64
 

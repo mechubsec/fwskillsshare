@@ -53,6 +53,22 @@ metadata:
 
 # SRX first-time setup
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [1. Entry-state assessment (read-only)](#1-entry-state-assessment-read-only)
+- [2. Gap list](#2-gap-list)
+- [Gate protocol](#gate-protocol)
+- [3. Stages](#3-stages)
+- [4. Entitlement readout](#4-entitlement-readout)
+- [5. Verification](#5-verification)
+- [Failure handling](#failure-handling)
+- [Output contract](#output-contract)
+- [Reference material (load on demand)](#reference-material-load-on-demand)
+- [Verification checklist](#verification-checklist)
+
 ## Overview
 
 Use this skill to bring a new or factory-reset Juniper SRX from its shipped state to a reachable, zoned, screened, and minimally policied device. It automates Day-0 and Day-1 setup for Branch SRX300/400, campus SRX1600/4120, and datacenter SRX4300/4700/5000 platforms.

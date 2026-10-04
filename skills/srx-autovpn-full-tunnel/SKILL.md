@@ -40,6 +40,24 @@ metadata:
 
 # SRX AutoVPN Full-Tunnel Backhaul
 
+## Contents
+
+- [Overview](#overview)
+- [Runtime intake](#runtime-intake)
+- [Scope and routing](#scope-and-routing)
+- [Topology Model](#topology-model)
+- [AutoVPN Mechanics](#autovpn-mechanics)
+- [Traffic Selectors — the core](#traffic-selectors--the-core)
+- [Routing Changes](#routing-changes)
+- [Hub NAT and Security Policies](#hub-nat-and-security-policies)
+- [Config Skeleton (hub, `set` format)](#config-skeleton-hub-set-format)
+- [Verification](#verification)
+- [Troubleshooting Matrix](#troubleshooting-matrix)
+- [Caveats and Tradeoffs](#caveats-and-tradeoffs)
+- [Choose This vs. Static Hub-Spoke](#choose-this-vs-static-hub-spoke)
+- [Verification Checklist](#verification-checklist)
+- [Source Notes](#source-notes)
+
 ## Overview
 
 AutoVPN lets one hub gateway accept IPsec connections from any number of spokes

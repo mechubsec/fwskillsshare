@@ -1,5 +1,13 @@
 # Virtual NIC to Junos interface mapping
 
+## Contents
+
+- [The rule](#the-rule)
+- [Standalone-shaped guests cannot be promoted in place](#standalone-shaped-guests-cannot-be-promoted-in-place)
+- [Verify the mapping, do not assume it](#verify-the-mapping-do-not-assume-it)
+- [Release coverage](#release-coverage)
+- [Sizing the NIC list](#sizing-the-nic-list)
+
 ## The rule
 
 When a vSRX guest boots in chassis-cluster mode, its virtual NICs map to Junos interfaces like this:

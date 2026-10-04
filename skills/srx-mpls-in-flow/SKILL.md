@@ -24,6 +24,24 @@ metadata:
 
 # SRX MPLS in Flow
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [Version and Platform Notes](#version-and-platform-notes)
+- [Forwarding Mode Baselines](#forwarding-mode-baselines)
+- [Minimal MPLS L3VPN Building Blocks](#minimal-mpls-l3vpn-building-blocks)
+- [Security Zones and Host-Inbound](#security-zones-and-host-inbound)
+- [Security Policy Models](#security-policy-models)
+- [VRF-Aware NAT and AppID](#vrf-aware-nat-and-appid)
+- [PowerMode / RFP Guidance](#powermode--rfp-guidance)
+- [Verification Workflow](#verification-workflow)
+- [Troubleshooting Matrix](#troubleshooting-matrix)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+- [Source Notes](#source-notes)
+
 ## Overview
 
 Junos 24.2R1 introduced a cleaner SRX forwarding model for MPLS security use cases: keep `family mpls` in packet mode while processing `family inet` and `family inet6` in SRX flow mode. That lets an SRX act as an MPLS L3VPN PE/CPE and still apply stateful firewall, NAT, AppID, IPS/IDP, and other flow services to customer IPv4/IPv6 traffic.

@@ -1,5 +1,13 @@
 # Branch Factory-Default Configuration
 
+## Contents
+
+- [What ships on the device](#what-ships-on-the-device)
+- [Why removal is a lockout-risk change](#why-removal-is-a-lockout-risk-change)
+- [Adopt or remove](#adopt-or-remove)
+- [Gap entries](#gap-entries)
+- [Platform applicability](#platform-applicability)
+
 Applies to **SRX300 and SRX400 Branch platforms only**.
 
 > **Interface names in this file are SRX345-specific.** They were captured from a live SRX345 and are used as a worked example, not as a portable port map. Port counts and interface names differ across Branch SKUs — an SRX320 has no `ge-0/0/15`, for instance. **Always enumerate the actual units from assessment output (`show interfaces terse`, `show configuration security zones`) and substitute them; never emit the literal interface names below as CLI against a device you have not read.** The *structure* (which zone, which hierarchy, which service) is what generalises. Campus and datacenter platforms (SRX1600, SRX4120, SRX4300, SRX4700, SRX5000 series) do **not** ship this configuration; on those, an entry state of `factory-default` means a different shipped state and this file does not apply.

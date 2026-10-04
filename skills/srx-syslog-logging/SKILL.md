@@ -27,6 +27,22 @@ metadata:
 
 # SRX / vSRX logging to an external collector
 
+## Contents
+
+- [Overview](#overview)
+- [Runtime intake](#runtime-intake)
+- [The split that explains most failures](#the-split-that-explains-most-failures)
+- [The non-default port trap](#the-non-default-port-trap)
+- [Security log mode decides which knob applies](#security-log-mode-decides-which-knob-applies)
+- [Stream transport: UDP, TCP, TLS](#stream-transport-udp-tcp-tls)
+- [Checking delivery on the device](#checking-delivery-on-the-device)
+- [Diagnosing "logs are not arriving"](#diagnosing-logs-are-not-arriving)
+- [Red herrings](#red-herrings)
+- [Attribution: the hostname trap](#attribution-the-hostname-trap)
+- [Working configuration](#working-configuration)
+- [Device-write safety](#device-write-safety)
+- [Verification checklist](#verification-checklist)
+
 ## Overview
 
 Getting logs off an SRX fails in confusing ways because **two independent

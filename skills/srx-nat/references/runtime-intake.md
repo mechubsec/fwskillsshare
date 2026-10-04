@@ -1,5 +1,11 @@
 # Runtime Intake
 
+## Contents
+
+- [When to ask](#when-to-ask)
+- [Tool adaptation](#tool-adaptation)
+- [Question catalog](#question-catalog)
+
 ## When to ask
 
 Use this catalog only after inspecting the request and evidence. Ask an entry

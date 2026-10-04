@@ -55,6 +55,24 @@ metadata:
 
 # SRX NAT
 
+## Contents
+
+- [Overview](#overview)
+- [Scope and routing](#scope-and-routing)
+- [Runtime intake](#runtime-intake)
+- [NAT Processing Order](#nat-processing-order)
+- [Rule-Set Selection and Rule Order](#rule-set-selection-and-rule-order)
+- [Basic Source NAT Patterns](#basic-source-nat-patterns)
+- [Destination NAT and Static NAT Patterns](#destination-nat-and-static-nat-patterns)
+- [Proxy ARP Decision](#proxy-arp-decision)
+- [Hairpin NAT](#hairpin-nat)
+- [Advanced NAT](#advanced-nat)
+- [Verification Commands](#verification-commands)
+- [Troubleshooting Matrix](#troubleshooting-matrix)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+- [Source Notes](#source-notes)
+
 ## Overview
 
 SRX NAT is flow-based translation performed during first-packet session setup. Use this skill to reason about how Junos chooses a NAT rule, how translated addresses affect route and policy lookup, and how to verify the resulting session wings.

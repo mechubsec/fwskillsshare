@@ -1,5 +1,17 @@
 # Offline Signature Updates
 
+## Contents
+
+- [Preconditions](#preconditions)
+- [Archive validation](#archive-validation)
+- [Rollout shape](#rollout-shape)
+- [Extraction](#extraction)
+- [Installation](#installation)
+- [Polling rules](#polling-rules)
+- [Chassis clusters](#chassis-clusters)
+- [Stop conditions](#stop-conditions)
+- [Cleanup](#cleanup)
+
 Reference for the `srx-license-signature-maintenance` skill; load on demand.
 Everything here runs **only** under Gate B approval. A Gate A licensing
 approval does not authorize any of it.

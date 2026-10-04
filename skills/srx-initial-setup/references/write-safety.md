@@ -1,5 +1,15 @@
 # Write Safety
 
+## Contents
+
+- [The gate protocol](#the-gate-protocol)
+- [Timer default](#timer-default)
+- [Hazard: enabling NTP moves the clock the timer rides on](#hazard-enabling-ntp-moves-the-clock-the-timer-rides-on)
+- [Confirming the commit](#confirming-the-commit)
+- [Lockout-risk changes](#lockout-risk-changes)
+- [Rollback points](#rollback-points)
+- [What this protocol does not cover](#what-this-protocol-does-not-cover)
+
 This repository's skills default to read, parse, plan, and dry-run. This skill writes. The exception is bounded here and nowhere else.
 
 ## The gate protocol

@@ -1,5 +1,18 @@
 # Static P2P IPsec Hub-and-Spoke Full-Tunnel Backhaul — Derived Design Summary
 
+## Contents
+
+- [Reference addressing (lab)](#reference-addressing-lab)
+- [Crypto parameters (same as the AutoVPN lab)](#crypto-parameters-same-as-the-autovpn-lab)
+- [Per-spoke gateway and VPN (no dynamic gateway, no selectors)](#per-spoke-gateway-and-vpn-no-dynamic-gateway-no-selectors)
+- [Static vs. AutoVPN — same backhaul, different mechanism](#static-vs-autovpn--same-backhaul-different-mechanism)
+- [Routing (the entire story here)](#routing-the-entire-story-here)
+- [Hub source NAT (internet egress only)](#hub-source-nat-internet-egress-only)
+- [Hub security policies](#hub-security-policies)
+- [Validation (lab)](#validation-lab)
+- [Deployment order](#deployment-order)
+- [Juniper references (from the lab)](#juniper-references-from-the-lab)
+
 Derived summary of Jason Anderson's lab
 [`srx-p2p-ipsec-public`](https://github.com/anderson-jason573/srx-p2p-ipsec-public)
 (author: Jason Anderson). Built on four vSRX firewalls (Junos OS **23.2R2.21**)

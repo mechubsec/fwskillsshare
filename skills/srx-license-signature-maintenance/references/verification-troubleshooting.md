@@ -1,5 +1,14 @@
 # Verification and Troubleshooting
 
+## Contents
+
+- [Per-target verification matrix](#per-target-verification-matrix)
+- [Version-token normalization](#version-token-normalization)
+- [No active IDP policy](#no-active-idp-policy)
+- [Disabled or unhealthy cluster secondary](#disabled-or-unhealthy-cluster-secondary)
+- [Troubleshooting table](#troubleshooting-table)
+- [Reporting discipline](#reporting-discipline)
+
 Reference for the `srx-license-signature-maintenance` skill; load on demand.
 Read-only throughout — nothing here changes device state.
 

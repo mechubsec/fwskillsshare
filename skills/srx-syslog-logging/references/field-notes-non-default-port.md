@@ -1,5 +1,15 @@
 # Field notes: system syslog silently dropped on a non-default port
 
+## Contents
+
+- [Symptom](#symptom)
+- [The three devices](#the-three-devices)
+- [What was eliminated, and how](#what-was-eliminated-and-how)
+- [The test that found it](#the-test-that-found-it)
+- [The fix](#the-fix)
+- [Second fault, found during verification](#second-fault-found-during-verification)
+- [Lessons worth carrying](#lessons-worth-carrying)
+
 **Platform:** vSRX, Junos 25.4R1.12. Addresses below are documentation ranges
 (RFC 5737); device names are generic. Verify the behaviour on your own platform
 and release before designing around it.

@@ -1,5 +1,18 @@
 # Failure modes and their hypervisor causes
 
+## Contents
+
+- [Reths down immediately post-commit: RG1 hold state](#reths-down-immediately-post-commit-rg1-hold-state)
+- [Reths up, no traffic](#reths-up-no-traffic)
+- [Undersized fabric segment](#undersized-fabric-segment)
+- [Secondary ineligible or disabled](#secondary-ineligible-or-disabled)
+- [Intermittent or one-way](#intermittent-or-one-way)
+- [Traffic stops after failover, returns in about five minutes](#traffic-stops-after-failover-returns-in-about-five-minutes)
+- [Nodes cannot see each other despite correct VLANs](#nodes-cannot-see-each-other-despite-correct-vlans)
+- [Duplicate MAC complaints](#duplicate-mac-complaints)
+- [Internet-facing segment dies when clustering is enabled](#internet-facing-segment-dies-when-clustering-is-enabled)
+- [Worked post-mortem: three independent faults](#worked-post-mortem-three-independent-faults)
+
 Chassis-cluster failures on a hypervisor rarely announce themselves. This table maps what you see to what is actually wrong.
 
 | Symptom | Cause |
