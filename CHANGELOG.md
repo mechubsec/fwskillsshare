@@ -14,6 +14,7 @@ Every skill was reviewed against Anthropic's skill-authoring guidance, the agent
 
 ### Also in this release
 
+- **srx-ips v0.1.2, srx-mnha-builder v0.2.1:** recognize junos-mcp-server with commit confirmed — the [`jgrizzuti/junos-mcp-server`](https://github.com/jgrizzuti/junos-mcp-server) fork, proposed upstream as [Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34) — as a third server in the capability mapping. It is identified by its `confirm_commit` tool: `load_and_commit_config` always commit-checks first and takes `dry_run` and `confirm_timeout_mins`, `render_and_apply_j2_template` takes `confirm_timeout_mins`, and `confirm_commit` confirms. Both skills warn that re-sending `load_and_commit_config` does not confirm on that server (no diff, no commit). srx-mnha-builder pushes stages there with a 10-minute confirmed commit, both Stage 1 nodes inside one window, and lets an unverified stage roll back instead of pushing an undo. Field-confirmed 2026-10-02 on vSRX 24.4R2.21: dry run left no commit; an unconfirmed 2-minute commit rolled back at +2:45; `confirm_commit` kept the change past the window.
 - **Publishing:** never leave bytecode in the staged export tree; gate() now fails-closed on any .pyc or __pycache__.
 - **Publishing:** the JNPR downstream keeps its own secret-scan workflow; rust-junosmcp is named without its org.
 - **Contributors:** added top-level `CONTRIBUTORS.md` listing the maintainer and contributors, linked from README and CONTRIBUTING.

@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-builder
 description: Build a new two-node SRX/vSRX Multi-Node High Availability pair from standalone nodes over a Junos MCP server, covering routing, switching or hybrid mode, dedicated or shared ICL, pair sheet, staged configs with pre-push checks and approval gates, HA-activation reboot, formation checks and failover test. Use when standing up an MNHA pair or turning two SRXs into HA. For design or troubleshooting a running pair, use srx-mnha.
-version: 0.1.1
+version: 0.2.1
 author:
   - fastrevmd-lab
   - Claude
@@ -199,6 +199,8 @@ server-specific mappings):
   with `apply_config: true, dry_run: true`
 - **Juniper junos-mcp-server:** `render_and_apply_j2_template` with `apply_config: true,
   dry_run: true`
+- junos-mcp-server with commit confirmed: `load_and_commit_config` with `config_text` (the
+  rendered stage), `config_format: "set"` and `dry_run: true`, or the J2 tool as above
 
 Template parameters (when using the J2 tool):
 - `template_content` = the rendered stage text
@@ -225,12 +227,18 @@ an undo would remove.
      with `confirm_timeout_mins: 10`, then a plain follow-up commit. The user's chat
      approval at each gate is required; server-side approval (or lab-mode auto-approval) is
      not user approval.
+   - **junos-mcp-server with commit confirmed:** `render_and_apply_j2_template` with
+     `apply_config: true, dry_run: false, confirm_timeout_mins: 10` → verify →
+     `confirm_commit` on each node. Push both nodes inside one window, because the ICL
+     checks need both. Never confirm by re-sending `load_and_commit_config`.
    - **Juniper junos-mcp-server:** `render_and_apply_j2_template` with `apply_config: true,
      dry_run: false` (runs commit check before committing; no commit confirmed)
 2. Verify per `references/verification.md` → "After Stage 1":
    - ICL ping, including the 1400-byte DF ping
    - each segment's neighbor answers ping
-3. If verification fails, run `undo-stage1` and diagnose before going on.
+3. If verification fails: with a confirmed commit still pending, do not confirm, let it
+   roll back, wait past the window with margin and check the diff against the baseline;
+   otherwise run `undo-stage1`. Diagnose before going on.
 
 ## Step 8 - Stage 2: HA stanza
 

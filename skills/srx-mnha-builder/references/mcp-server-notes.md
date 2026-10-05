@@ -7,35 +7,44 @@
 - [Juniper junos-mcp-server](#juniper-junos-mcp-server)
 - [rust-junosmcp](#rust-junosmcp)
 
-This workflow uses a Junos MCP server and is compatible with **both** Juniper's
-junos-mcp-server and rust-junosmcp. Each step names the capability it
-needs ("dry run the stage", "push with commit confirmed"), and this file maps those
-capabilities to the tools each server exposes.
+This workflow uses a Junos MCP server and is compatible with Juniper's
+junos-mcp-server (v1.1.1), junos-mcp-server with commit confirmed, and
+rust-junosmcp. Each step names the capability it needs ("dry run the stage", "push
+with commit confirmed"), and this file maps those capabilities to the tools each
+server exposes.
 
 ## Identify the server
 
 - **rust-junosmcp**: exposes `commit_check_config` and `create_junos_change_set`.
-- **Juniper junos-mcp-server**: exposes neither of those; the core surface is
+- **junos-mcp-server with commit confirmed**: exposes `confirm_commit`, and
+  `load_and_commit_config` takes `confirm_timeout_mins`, but neither rust-junosmcp
+  tool. This is the [`jgrizzuti/junos-mcp-server`](https://github.com/jgrizzuti/junos-mcp-server)
+  fork (ten tools), proposed upstream as
+  [Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34);
+  Juniper releases that merge it match this column.
+- **Juniper junos-mcp-server (v1.1.1)**: exposes none of those; the core surface is
   `get_router_list`, `gather_device_facts`, `execute_junos_command`,
   `get_junos_config`, `junos_config_diff`, `load_and_commit_config`,
   `render_and_apply_j2_template`.
 
+Decide from the tool list, not the server's name.
+
 ## Capability mapping
 
-| Capability | Juniper junos-mcp-server | rust-junosmcp |
-|---|---|---|
-| **List devices** | `get_router_list` | `get_router_list` |
-| **Gather facts** | `gather_device_facts` | `gather_device_facts` |
-| **Read config baseline** | `get_junos_config` (set format) | `get_junos_config` with `format: "set"` (v0.26.0+; on older versions use `execute_junos_command` with `show configuration \| display set` or upgrade) |
-| **Op commands (single router)** | `execute_junos_command` | `execute_junos_command` |
-| **Op commands (batch, both nodes)** | run twice (sequential or parallel client-side) | `execute_junos_command_batch` (parallel server-side) |
-| **Diff vs rollback N** | `junos_config_diff` with `version: <N>` | `junos_config_diff` with `version: <N>` |
-| **Commit check / dry run** | `render_and_apply_j2_template` with `apply_config: true, dry_run: true` (loads, checks, diffs, rolls back) | `commit_check_config` (never commits) or `render_and_apply_j2_template` with `apply_config: true, dry_run: true` |
-| **Push (direct commit)** | `load_and_commit_config` (**skips commit check**, no commit confirmed) or `render_and_apply_j2_template` with `apply_config: true, dry_run: false` (runs commit check before committing) | `load_and_commit_config` with optional `confirm_timeout_mins` (commit confirmed N) |
-| **Push with commit confirmed** | **Not available** | `load_and_commit_config` with `confirm_timeout_mins` |
-| **Confirm commit** | **Not available** (no confirmed-commit support) | `load_and_commit_config` (another commit without confirm_timeout_mins) |
-| **Change-set flow** | **Not available** | `create_junos_change_set` → `approve_junos_change_set` → `apply_junos_change_set` (accepts `confirm_timeout_mins`) → `confirm_junos_change_set` |
-| **Rollback** | **Not available** (no `rollback_config` tool; push the pre-rendered `undo-stageN.set` file with `load_and_commit_config` for a dry-run-first rollback, or hand off to the operator for `rollback <N>` + `commit` at the CLI/console) | `rollback_config` with `commit: true` (if `--allow-direct-commit`) or change-set with `rollback_source: <N>` |
+| Capability | Juniper junos-mcp-server (v1.1.1) | junos-mcp-server with commit confirmed | rust-junosmcp |
+|---|---|---|---|
+| **List devices** | `get_router_list` | `get_router_list` | `get_router_list` |
+| **Gather facts** | `gather_device_facts` | `gather_device_facts` | `gather_device_facts` |
+| **Read config baseline** | `get_junos_config` (set format) | `get_junos_config` (set format) | `get_junos_config` with `format: "set"` (v0.26.0+; on older versions use `execute_junos_command` with `show configuration \| display set` or upgrade) |
+| **Op commands (single router)** | `execute_junos_command` | `execute_junos_command` | `execute_junos_command` |
+| **Op commands (batch, both nodes)** | run twice (sequential or parallel client-side) | `execute_junos_command_batch` (parallel server-side) | `execute_junos_command_batch` (parallel server-side) |
+| **Diff vs rollback N** | `junos_config_diff` with `version: <N>` | `junos_config_diff` with `version: <N>` | `junos_config_diff` with `version: <N>` |
+| **Commit check / dry run** | `render_and_apply_j2_template` with `apply_config: true, dry_run: true` (loads, checks, diffs, rolls back) | `load_and_commit_config` with `dry_run: true`, or `render_and_apply_j2_template` with `apply_config: true, dry_run: true` | `commit_check_config` (never commits) or `render_and_apply_j2_template` with `apply_config: true, dry_run: true` |
+| **Push (direct commit)** | `load_and_commit_config` (**skips commit check**, no commit confirmed) or `render_and_apply_j2_template` with `apply_config: true, dry_run: false` (runs commit check before committing) | `load_and_commit_config` or `render_and_apply_j2_template` with `apply_config: true, dry_run: false` (both run a commit check before committing) | `load_and_commit_config` with optional `confirm_timeout_mins` (commit confirmed N) |
+| **Push with commit confirmed** | **Not available** | `load_and_commit_config` or `render_and_apply_j2_template` with `confirm_timeout_mins` | `load_and_commit_config` with `confirm_timeout_mins` |
+| **Confirm commit** | **Not available** (no confirmed-commit support) | `confirm_commit` (a repeated `load_and_commit_config` does **not** confirm: with no diff it commits nothing) | `load_and_commit_config` (another commit without confirm_timeout_mins) |
+| **Change-set flow** | **Not available** | **Not available** | `create_junos_change_set` → `approve_junos_change_set` → `apply_junos_change_set` (accepts `confirm_timeout_mins`) → `confirm_junos_change_set` |
+| **Rollback** | **Not available** (no `rollback_config` tool; push the pre-rendered `undo-stageN.set` file with `load_and_commit_config` for a dry-run-first rollback, or hand off to the operator for `rollback <N>` + `commit` at the CLI/console) | Let a pending confirmed commit expire, or push the `undo-stageN.set` file with `load_and_commit_config` (`dry_run: true` first); no `rollback_config` tool | `rollback_config` with `commit: true` (if `--allow-direct-commit`) or change-set with `rollback_source: <N>` |
 
 ## Juniper junos-mcp-server
 
@@ -86,6 +95,32 @@ server version changes.
 - **Dry-run cumulatively.** A stage-2 dry run on a fresh node fails when it is run on its
   own, because it references stage-1 interfaces and zones. Dry-run stage 1 alone, and then
   1+2+3 concatenated. The tool rolls everything back after the check.
+
+## junos-mcp-server with commit confirmed
+
+Checked against the [`jgrizzuti/junos-mcp-server`](https://github.com/jgrizzuti/junos-mcp-server)
+fork, `main` at `094c320` (Juniper's code plus
+[Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34)).
+Everything in the Juniper section above still applies, except:
+
+- `load_and_commit_config` always runs a **commit check** before committing; a failed
+  check commits nothing and rolls the candidate back. `dry_run: true` loads, checks,
+  returns the diff and rolls back.
+- `confirm_timeout_mins: N` (1–65535) on `load_and_commit_config` or
+  `render_and_apply_j2_template` commits with `commit confirmed N` (on every target
+  router for the J2 tool).
+- `confirm_commit` (`router_name`) confirms the pending commit with a plain commit. It
+  refuses when the candidate holds uncommitted changes, so it never commits anything new.
+  Do **not** confirm by re-sending `load_and_commit_config`: with no diff it returns
+  "No configuration changes detected" and commits nothing, so the rollback still fires.
+- `execute_junos_command_batch` and `execute_junos_pfe_command` are available.
+
+**Verified on vSRX 24.4R2.21, 2026-10-02:** a `dry_run` left no commit; a 2-minute
+confirmed commit that was not confirmed rolled back at +2:45 (`show system commit` shows
+`by root via other`); a 2-minute confirmed commit followed by `confirm_commit` was still
+present after the window.
+
+**Caution:** as with any confirmed commit, confirm Stage 2 **before** the user reboots.
 
 ## rust-junosmcp
 

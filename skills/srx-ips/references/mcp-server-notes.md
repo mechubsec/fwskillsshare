@@ -13,17 +13,23 @@ Verify each capability against your server and version before relying on it.
 
 ## Capability mapping
 
-| Capability | Juniper junos-mcp-server<br/>(v1.1.1) | rust-junosmcp<br/>(v0.26.0+) |
-|---|---|---|
-| **List devices** | `get_router_list` | `get_router_list` |
-| **Execute operational commands** | `execute_junos_command` | `execute_junos_command` |
-| **Read configuration** | `get_junos_config` | `get_junos_config` |
-| **Commit check (validate without committing)** | `render_and_apply_j2_template` dry\_run=true | `commit_check_config` |
-| **Direct commit (no rollback window)** | `load_and_commit_config` | `load_and_commit_config` (requires `--allow-direct-commit`) |
-| **Commit confirmed (auto-rollback)** | Not available | `load_and_commit_config` with `confirm_timeout_mins` |
-| **Change sets (two-person control)** | Not available | `create_junos_change_set`, `approve_junos_change_set`, `apply_junos_change_set` with `confirm_timeout_mins`, `confirm_junos_change_set` |
-| **Rollback to previous config** | Not available | `rollback_config` |
-| **Discard uncommitted changes** | Not available | `discard_candidate` |
+| Capability | Juniper junos-mcp-server<br/>(v1.1.1) | junos-mcp-server with<br/>commit confirmed | rust-junosmcp<br/>(v0.26.0+) |
+|---|---|---|---|
+| **List devices** | `get_router_list` | `get_router_list` | `get_router_list` |
+| **Execute operational commands** | `execute_junos_command` | `execute_junos_command` | `execute_junos_command` |
+| **Read configuration** | `get_junos_config` | `get_junos_config` | `get_junos_config` |
+| **Commit check (validate without committing)** | `render_and_apply_j2_template` dry\_run=true | `load_and_commit_config` dry\_run=true (or the J2 tool) | `commit_check_config` |
+| **Direct commit (no rollback window)** | `load_and_commit_config` | `load_and_commit_config` (commit check runs first) | `load_and_commit_config` (requires `--allow-direct-commit`) |
+| **Commit confirmed (auto-rollback)** | Not available | `load_and_commit_config` with `confirm_timeout_mins` | `load_and_commit_config` with `confirm_timeout_mins` |
+| **Confirm a confirmed commit** | Not available | `confirm_commit` | another `load_and_commit_config` without `confirm_timeout_mins` |
+| **Change sets (two-person control)** | Not available | Not available | `create_junos_change_set`, `approve_junos_change_set`, `apply_junos_change_set` with `confirm_timeout_mins`, `confirm_junos_change_set` |
+| **Rollback to previous config** | Not available | Not available (let an unconfirmed commit expire) | `rollback_config` |
+| **Discard uncommitted changes** | Not available | Not available | `discard_candidate` |
+
+Identify the server from its tool list, not its name: `confirm_commit` (with
+`confirm_timeout_mins` on `load_and_commit_config`) marks junos-mcp-server with
+commit confirmed; `commit_check_config` and `create_junos_change_set` mark
+rust-junosmcp; neither marks Juniper v1.1.1.
 
 ## Juniper junos-mcp-server
 
@@ -103,6 +109,33 @@ the matching `... status` command until it reaches a terminal state; see
 **[unverified]** Packet-capture filenames rejected `.`, `/`, `%`, and spaces. If
 a commit fails with a specific "must not contain" error, that message is
 usually the whole story — adjust the value and retry.
+
+## junos-mcp-server with commit confirmed
+
+**Version checked:** `main` at `094c320`
+**Repository:** <https://github.com/jgrizzuti/junos-mcp-server> (fork of
+Juniper's server; proposed upstream as
+[Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34))
+
+Ten tools: Juniper's nine plus `confirm_commit`. Everything in the Juniper
+section above still applies, except the commit behavior:
+
+- `load_and_commit_config` always runs a **commit check** first; a failed check
+  commits nothing and rolls the candidate back. `dry_run: true` loads, checks,
+  returns the diff and rolls back.
+- `confirm_timeout_mins: N` (1–65535) on `load_and_commit_config` or
+  `render_and_apply_j2_template` commits with `commit confirmed N`.
+- `confirm_commit` (`router_name`) confirms the pending commit and cancels the
+  rollback. It refuses when the candidate holds uncommitted changes. Do **not**
+  confirm by re-sending `load_and_commit_config`: with no diff it returns "No
+  configuration changes detected" and commits nothing, so the rollback still
+  fires.
+
+**Verified on vSRX 24.4R2.21, 2026-10-02:** a `dry_run` left no commit; a
+2-minute confirmed commit that was not confirmed rolled back automatically about
+45 seconds after the window (`by root via other`), matching the timing recorded
+in `SKILL.md`; a 2-minute confirmed commit followed by `confirm_commit` was still
+present after the window.
 
 ## rust-junosmcp
 
