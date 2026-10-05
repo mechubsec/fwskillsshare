@@ -15,7 +15,10 @@ Every commit here follows the repository write policy:
 3. **Check whether your transport can do that.** Some Junos MCP servers perform a
    plain `commit` with no confirmed or dry-run option; others support
    `confirm_timeout_mins` on `load_and_commit_config` or change sets with apply-time
-   confirm windows. If the tool cannot do a confirmed commit, say so, and get
+   confirm windows. Confirm with the server's own confirm step from
+   `references/mcp-server-notes.md` — on a server with a `confirm_commit` tool,
+   use it; re-sending the same config there commits nothing and the rollback still
+   fires. If the tool cannot do a confirmed commit, say so, and get
    approval that explicitly accepts a manual rollback plan (`rollback 1` then
    `commit`) before pushing.
 4. **Verified on vSRX 26.2R1.7, 2026-09-23:** `commit confirmed` works correctly

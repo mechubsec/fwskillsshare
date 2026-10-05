@@ -89,6 +89,21 @@
   **Security Director Cloud** — the client is `outbound-ssh` to an EMS either way.
 - **MNHA:** each node has an independent config (configure the route on both);
   only the active node logs (backup is idle, streams on failover).
+- **SD auto-generates and installs the device certs (`sd_ca` + `sd_local`) on
+  onboarding — but only if the secmgt cert controller is already up.** There is
+  **no manual "install certificate" action** in the GUI or a generate API (the
+  `install_*_certificate` endpoints are multipart BYO-cert uploads). Devices
+  onboarded in the **first ~2 minutes after the appliance's first boot** miss
+  the cert step: standalones stick at `certificate_ready:false` (no `sd_local`
+  at all), and cluster/MNHA devices get a cert the **log collector rejects at
+  the TLS layer** — the stream flaps with `RTLOG_CONN_ERROR: Com 85 abort`,
+  reconnecting endlessly. **Fix (both cases):** delete the SD device entry
+  (`POST /api/v1/devices/remove` — allowed even when `POST /api/v1/devices/sync`
+  BulkSync is token-capability-denied with 403) and re-create BROWN_FIELD; the
+  cert regenerates and installs within ~60 s on re-adopt. **For MNHA/chassis
+  cluster, delete the cluster entry** (it cascades to the children) and
+  recreate — deleting a child entry instead leaves the cluster on its
+  rejected cert.
 - **Disks are virtio (`virtio0/1/2`), machine q35** per the generated XML.
 - The `--no-run` "not enough disk space (thick)" message is benign under thin.
 - **Flavor is validated as a WHOLE SET on every boot — you cannot partially

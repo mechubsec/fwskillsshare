@@ -292,6 +292,8 @@ log-stream (VIP:6514 TLS) sessions, confirms events appear in SD GUI.
 - **SD auto-generates device certs on onboarding — but only if cert controller is
   up.** Devices onboarded in first ~2 min after appliance first boot miss cert
   step. Fix: delete device entry, re-create BROWN_FIELD; cert regenerates within ~60 s.
+  **For MNHA or a chassis cluster, delete the cluster entry** (it cascades to the
+  children), not a child entry — see `references/gotchas.md`.
 - **Inert factory `default-permit` zone-pair policy silently suppresses logging.**
   Zone-pair policies evaluate BEFORE global. A leftover `from-zone trust to-zone
   untrust policy default-permit` (permit, no log) matches first; traffic never
