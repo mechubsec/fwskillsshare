@@ -40,6 +40,7 @@ jobs:
           python3 scripts/test-runtime-intake-safety.py
           python3 scripts/check-readme-branding.py
           python3 scripts/check-checksums.py
+          python3 scripts/check-evals.py
 
       - name: Test (fixtures, shared schema, behavioral contracts)
         run: |
@@ -47,6 +48,7 @@ jobs:
           python3 scripts/test-inventory.py
           python3 scripts/test-skill-packages.py
           python3 scripts/test-markdown-links.py
+          python3 scripts/test-check-evals.py
           python3 scripts/check-shared-schema.py
           python3 scripts/check-installer.py
           python3 scripts/test-installer-supply-chain.py
