@@ -58,7 +58,7 @@ Automated eval harnesses may be added later; for now, hand-run each one.
 ## Repository integration
 
 - **Adding a skill requires adding its eval file.** `scripts/check-evals.py` enforces a 1:1 correspondence between `skills/<name>/SKILL.md` and `evals/<name>.md`.
-- **Evals are never installed.** `install.sh` copies only `skills/` and `scripts/` excludes `evals/` — this is development and verification tooling, not distributed skill content.
+- **Evals are never installed.** `install.sh` copies only `skills/`; evals are development and verification tooling, not skill content. They are published to the downstream distribution with `scripts/`, because `scripts/check-evals.py` (run by `just lint`) requires them.
 - **Evals are validated at `just lint` and `just test` time.** The checker ensures every skill has an eval file, every file has the required structure (H1, >= 2 scenarios, Prompt/Input/Must/Must not per scenario), and no eval exists for a nonexistent skill.
 
 ## Coverage

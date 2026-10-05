@@ -55,7 +55,7 @@ PUBLISH_FILES = (
     ".gitleaks.toml",  # downstream keeps its own security workflow; ship the config it reads
     ".gitleaks-vendor.toml",  # vendor rules extended by .gitleaks.toml
 )
-PUBLISH_DIRS = ("skills", "scripts")
+PUBLISH_DIRS = ("skills", "scripts", "evals")  # evals/: scripts/check-evals.py requires it
 
 # Files the downstream keeps that must survive the sync. These are neither
 # published nor deleted -- they are preserved as-is when present in the target.

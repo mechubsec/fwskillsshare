@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Publishing:** `evals/` is now published to the downstream distribution. The 1.10.0 note said evals are never published; they are still never installed, but `scripts/check-evals.py` ships with `scripts/` and `just lint` fails without them.
+
 ## 1.10.0 — Skills restructured to authoring best practice; per-skill evals
 
 Every skill was reviewed against Anthropic's skill-authoring guidance, the agentskills.io specification and this repository's rules, and the gaps were fixed. No device syntax, safety gate or verification procedure changed meaning; every skill takes a patch version bump.
