@@ -106,4 +106,6 @@ reboot, delete, or failover actions.
 
 ## Evidence
 
+An end-to-end run is in [references/worked-example.md](references/worked-example.md), against the synthetic fixture [references/cluster-sample.set](references/cluster-sample.set).
+
 Cited Juniper facts and the list of uncertain items live in [references/vendor-evidence.md](references/vendor-evidence.md). Anything not listed there as a fact is uncertain and must be labeled so in output.
