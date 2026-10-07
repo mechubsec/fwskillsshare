@@ -72,6 +72,8 @@ Ask, per candidate group:
 - "Which node should normally own it, and should it preempt back after recovery?" (node0 no preempt / node0 preempt / node1)
 - "Which VIPs and IPsec gateways follow this group?" (list from inventory)
 
+If the user wants SRG0 only but the inventory has an IKE gateway, do not accept it: state that IPsec cannot anchor on SRG0 (E2, E3), propose an SRG1+ for the IPsec anchor, and generate nothing for IPsec under SRG0.
+
 If one redundancy group owns reths whose segments got different modes in topic 1
 (for example routed upstream plus default-gateway hosts), propose splitting it
 into one SRG per mode, because `deployment-type` is per SRG, and say that the

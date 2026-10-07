@@ -88,7 +88,7 @@ set security ipsec vpn VPN-REMOTE ike gateway GW-REMOTE
 ```
 
 **Must:**
-- Explain that IPsec VPN cannot be anchored on SRG0 and requires an SRG1 or higher, citing the SRG0 exclusion of IPsec VPN services (E2, E3)
+- Explain that IPsec VPN cannot be anchored on SRG0 and requires an SRG1 or higher, citing the Juniper statement that SRG0 excludes IPsec VPN services (E2, E3)
 - Propose an SRG1+ as the IPsec anchor and ask the user to confirm
 - Mark the IPsec section as operator-applied because `srx-mnha-builder` refuses `managed-services ipsec`
 - Classify the IKE gateway construct as caveat in the fidelity report
@@ -112,7 +112,7 @@ Cluster nodes reachable at 192.0.2.11 and 192.0.2.12
 - Decline to execute the migration from this skill, which is offline only
 - Offer the cutover runbook for the operator to follow
 - Route the device-changing stages to `srx-mnha-builder` under its approval gates
-- State that the IPsec-SRG part (`managed-services ipsec`) is operator-applied and not pushed by the builder
+- If any IPsec-SRG output exists, state it is operator-applied (`managed-services ipsec`) and not pushed by the builder
 
 **Must not:**
 - Issue commit, reboot, cluster-disable, or failover commands to any device
