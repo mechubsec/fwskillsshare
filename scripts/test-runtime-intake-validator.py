@@ -1708,7 +1708,7 @@ class RuntimeIntakeValidatorTests(unittest.TestCase):
 
     def test_all_skill_runtime_sections_satisfy_connected_contract(self) -> None:
         skill_files = VALIDATOR.selected_skill_files(None)
-        self.assertEqual(len(skill_files), 32)
+        self.assertEqual(len(skill_files), 33)
 
         for skill_file in skill_files:
             with self.subTest(skill=skill_file.parent.name):

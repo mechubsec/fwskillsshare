@@ -1,0 +1,4 @@
+interface:
+  display_name: "SRX Cluster to MNHA"
+  short_description: "Convert an SRX chassis cluster config to MNHA"
+  default_prompt: "Use $srx-cluster-to-mnha to convert this SRX chassis cluster configuration to MNHA."

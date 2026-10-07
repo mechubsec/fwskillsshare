@@ -58,6 +58,7 @@ declare -a SRX=(
     "srx-syslog-logging"
     "srx-ips"
     "srx-mnha-builder"
+    "srx-cluster-to-mnha"
 )
 
 declare -a TOOLING=(

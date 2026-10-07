@@ -95,6 +95,11 @@
     "reviewed": false
   },
   {
+    "name": "srx-cluster-to-mnha",
+    "family": "srx",
+    "reviewed": false
+  },
+  {
     "name": "firewall-best-practices-audit",
     "family": "tooling",
     "reviewed": true

@@ -17,8 +17,8 @@
 <em>a mechub project — sovereign network-security automation</em></p>
 
 <p align="center">
-  <img alt="skills" src="https://img.shields.io/badge/skills-32-0D9488">
-  <img alt="reviewed" src="https://img.shields.io/badge/reviewed-26%2F32-262B38">
+  <img alt="skills" src="https://img.shields.io/badge/skills-33-0D9488">
+  <img alt="reviewed" src="https://img.shields.io/badge/reviewed-26%2F33-262B38">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-262B38">
   <img alt="vendors" src="https://img.shields.io/badge/vendors-Cisco%20%C2%B7%20Fortinet%20%C2%B7%20Palo%20Alto%20%C2%B7%20Juniper%20%C2%B7%20HPE%20Aruba-262B38">
 </p>
@@ -28,7 +28,7 @@ Agent skills for the firewall work you actually do — parsing, auditing, conver
 
 Firewall work is unforgiving. A confidently wrong `access-list` line, a Junos stanza that won't commit, a compliance claim you can't back up in an audit — these aren't cosmetic. Coding agents are astonishingly good at producing *plausible* firewall config and astonishingly bad at knowing when it's wrong.
 
-These skills exist to close that gap. They pin the agent to vendor syntax that's been checked against real devices, to one shared schema so four vendors speak the same language, and to control-to-evidence maps that don't overpromise. They're small, self-contained, and composable — copy the two you need or all 32. Hack around with them. Make them your own.
+These skills exist to close that gap. They pin the agent to vendor syntax that's been checked against real devices, to one shared schema so four vendors speak the same language, and to control-to-evidence maps that don't overpromise. They're small, self-contained, and composable — copy the two you need or all 33. Hack around with them. Make them your own.
 
 <!-- brand:disclaimer:start -->
 > **Unofficial / community project.** Not affiliated with, endorsed by, or supported by Cisco, Fortinet, Palo Alto Networks, Juniper Networks, or HPE. See [License and Provenance](#license-and-provenance) for the full notice and the trademark disclaimer.
@@ -103,7 +103,7 @@ invoked, so what an installed-but-unused skill costs you is its description sitt
 in the discovery surface. How much that costs depends on the runtime and version —
 Codex 0.147.0 routes discovery through a dynamic selector and treats a flat
 concatenated list as a fallback, truncating metadata to fit its budget rather than
-failing — so the direct token cost is modest and not worth optimizing: all 32
+failing — so the direct token cost is modest and not worth optimizing: all 33
 descriptions together are on the order of ten thousand characters, and
 `scripts/check-skill-packages.py` reports the current figure rather than this page
 pinning a number that goes stale. The cost that matters is **selection**: the more
@@ -199,7 +199,7 @@ Firewall fundamentals don't get easier in the AI age — the blast radius just g
 
 ## Reference
 
-**32 skills** across five families. All of them are **model-invoked** — the agent reaches for them automatically when it sees vendor keywords, an SRX operational topic, a Security Director On-Prem or ClearPass deployment request, or compliance language in your message or a pasted config. 26 of the 32 packages have completed the review record below; `clearpass-proxmox-deploy`, `csrx-proxmox-deploy`, `srx-ips`, and `srx-mnha-builder` ship as drafts, while `parsing-firepower-configs` and `srx-syslog-logging` have not yet been through the two-stage review. Invoke one explicitly as `/srx-nat` in Claude Code or Hermes, or `$srx-nat` in Codex.
+**33 skills** across five families. All of them are **model-invoked** — the agent reaches for them automatically when it sees vendor keywords, an SRX operational topic, a Security Director On-Prem or ClearPass deployment request, or compliance language in your message or a pasted config. 26 of the 33 packages have completed the review record below; `clearpass-proxmox-deploy`, `csrx-proxmox-deploy`, `srx-ips`, `srx-mnha-builder`, and `srx-cluster-to-mnha` ship as drafts, while `parsing-firepower-configs` and `srx-syslog-logging` have not yet been through the two-stage review. Invoke one explicitly as `/srx-nat` in Claude Code or Hermes, or `$srx-nat` in Codex.
 
 Extended notes on the compliance and SRX playbooks — what they cover and when to reach for one — are in **[SKILLS.md](./SKILLS.md)**. Every skill also documents itself in its own `SKILL.md`, linked above.
 
@@ -222,6 +222,7 @@ Actionable Junos playbooks — commands, design guidance, verification, troubles
 - **[srx-ips](./skills/srx-ips/SKILL.md)** — *(v0.1.1, draft)* IPS detection triage and custom signature authoring through a Junos MCP server: build the active rule table, read logs safely, monitor-to-enforce escalation behind an approval gate, and custom signature design with read-only coverage checks, context/direction/binding choice, false-positive-aware patterns, `commit check` validation, and monitor-mode proof before enforcement.
 - **[srx-mnha](./skills/srx-mnha/SKILL.md)** — Multi-Node High Availability: routed/default-gateway/hybrid modes, SRGs, ICL/ICD, eBGP/BFD failover, VIPs, DHCP caveats.
 - **[srx-mnha-builder](./skills/srx-mnha-builder/SKILL.md)** — *(v0.1.0, draft)* Build a new two-node MNHA pair end-to-end through a Junos MCP server (Juniper junos-mcp-server or rust-junosmcp): routing, switching, or hybrid mode selection, dedicated or shared and optionally encrypted ICL, one pair sheet used to write per-node staged configs from a stage reference and checked against a pre-push checklist, with pre-computed undo files, device dry runs, per-stage approval gates, the user-performed HA-activation reboot, formation checks, eBGP signal-route export, and a role-consistency failover test. Works with either MCP server.
+- **[srx-cluster-to-mnha](./skills/srx-cluster-to-mnha/SKILL.md)** — *(v0.1.0, draft)* Convert an existing SRX or vSRX chassis-cluster configuration into two node-local MNHA configs through an SRX-architect interview: cluster inventory, per-segment mode choice, SRG and ICL design, a fidelity report, and a cutover runbook. Offline only.
 - **[srx-advpn](./skills/srx-advpn/SKILL.md)** — Auto Discovery VPN dynamic spoke-to-spoke shortcuts, suggester/partner roles, multipoint st0, OSPF p2mp, the cert-auth requirement and the `No public key found` fix.
 - **[srx-autovpn-full-tunnel](./skills/srx-autovpn-full-tunnel/SKILL.md)** — AutoVPN hub-and-spoke full-tunnel backhaul: dynamic `group-ike-id`, traffic selectors + ARI, shared st0.0, anti-recursion route.
 - **[srx-ipsec-hub-spoke](./skills/srx-ipsec-hub-spoke/SKILL.md)** — Static point-to-point route-based IPsec hub-and-spoke, one explicit tunnel per spoke, hub source-NAT egress, spoke-to-spoke hairpin.
@@ -264,8 +265,8 @@ Install with `--family deployment`.
 
 ## Quality and Review
 
-**26 of the 32 skills** have passed independent technical review. The exceptions
-are `clearpass-proxmox-deploy`, `csrx-proxmox-deploy`, `srx-ips`, and `srx-mnha-builder`, which ship as drafts,
+**26 of the 33 skills** have passed independent technical review. The exceptions
+are `clearpass-proxmox-deploy`, `csrx-proxmox-deploy`, `srx-ips`, `srx-mnha-builder`, and `srx-cluster-to-mnha`, which ship as drafts,
 while `parsing-firepower-configs` and `srx-syslog-logging` have not yet been through
 the two-stage review. Four review rounds, the
 live-device validation runs, what those runs falsified, and the per-family table
@@ -293,7 +294,7 @@ cd fwskillsshare
 Flags:
 
 ```text
---all                 Select all 32 skills
+--all                 Select all 33 skills
 --skill NAME          Select a specific skill by name (repeatable)
 --family NAME         Select a whole family: parsers | srx | tooling | compliance | deployment (repeatable)
 --target WHERE        claude | codex | hermes | both | all
