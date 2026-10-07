@@ -65,3 +65,4 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 - Exact list of cluster features unsupported in MNHA beyond transparent mode (E10): no authoritative source located.
 - Whether `delete chassis cluster` in configuration is an alternative to the op command: no authoritative source located.
 - Exact SRG IP-monitoring statement syntax and its flexible path `monitor-object` form: the monitoring page (E13) names the feature but the fetch showed no statements. Confirm from the Flexible path monitoring page or MNHA examples before emitting.
+- Config-sync scope: E8 says only that configuration is replicated with `commit peers-synchronize`. Which statements replicate, and whether it can overwrite node-local configuration (interfaces, routing, `chassis high-availability`, SRG settings), is not documented in what was fetched. Do not rely on it for node-local isolation; confirm in a lab.

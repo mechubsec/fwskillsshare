@@ -79,18 +79,33 @@ Phase 0 baseline, no traffic arriving on node1.
 ## Phase 2 - Node1 leaves the cluster; load MNHA config; bring up ICL
 
 - Cable or bring up the routed ICL path between the nodes' ICL interfaces
-  (E4); node0 is not yet MNHA, so only node1 needs the path now.
+  (E4); node0 is not yet MNHA, so only node1 needs the path now. The ICL uses
+  ports separate from fab and control; those remain cabled until Phase 4.
 - On node1 console: `set chassis cluster disable reboot` (operational
   command, E11).
 - Caveat (E11): the generated `node0`/`node1` groups are cluster-only. After
-  the reboot node1 may fail to load its configuration; use the console and
-  `delete` then `load set node1.set` (the groups are not in it) rather than
-  trying to edit the old config.
+  the reboot node1 may fail to load its configuration; use the console and the
+  targeted cleanup below rather than trying to edit the old config.
 - Install the IKE package if the ICL is encrypted:
   `request system software add optional://junos-ike.tgz` (E6).
-- `delete`, then `load set node1.set`, `commit check`, then `commit`. Do not
-  commit `needed` placeholders. (`delete` plus `load set` is the documented-style
-  path for set files; any other load method here is uncertain.)
+- Targeted cleanup, then merge. Do **not** run a bare `delete` followed by
+  `load set`: the node files carry no `system login`, `root-authentication`,
+  `system services`, `snmp` or `syslog` stanzas (T24), so a full wipe would
+  remove console and management access. Instead, in configuration mode on the
+  node:
+  `delete apply-groups`, `delete groups node0`, `delete groups node1`,
+  `delete chassis cluster`, `delete interfaces fab0`, `delete interfaces fab1`,
+  and for each reth `delete interfaces reth<N>`, each child port's
+  `delete interfaces <PHYS> gigether-options redundant-parent`, and every
+  remaining reth reference (zone membership, NAT proxy ARP, IKE
+  `external-interface`) as listed in the inventory. Then `load set node1.set`
+  (merge), `commit check`; the check names any dangling reth or group
+  reference, which you delete and repeat. Do not commit `needed` placeholders.
+  Confirm before commit that `show configuration system` still has the
+  operator's login, services, snmp and syslog (the system baseline). Uncertain:
+  the delete list is derived from the inventory, not a Juniper-documented
+  procedure; `commit check` is the arbiter.
+- `commit`.
 - Operator-applied: uncomment, review and `load set` the IPsec-SRG block (T14)
   from `node1.set` now, so the VPN anchor exists before traffic moves.
   `srx-mnha-builder` will not push it.
@@ -122,6 +137,16 @@ enabled; `show configuration chassis high-availability`;
 > child ports and confirm `show chassis cluster status` shows two nodes.
 
 ## Phase 3 - Move traffic to node1
+
+**Pre-gate (before step 1).** Phase 2 expects the IPsec SRG to sit in `HOLD`
+with no peer, but step 2 below needs node1 to own the VIP. Before moving
+anything, on node1 run
+`show chassis high-availability services-redundancy-group <N>` for every SRG
+that carries a VIP or VPN, and confirm each SRG can become active standalone
+(not `HOLD` or ineligible), or that the VIP can be installed locally. Uncertain,
+unsourced: whether a standalone node1 with no peer promotes an SRG out of
+`HOLD`; verify in a lab. If any SRG will not go active, abort: do not touch
+node0; use rollback box 3 (nothing has moved yet).
 
 Order, for every segment type (routed, default-gateway, hybrid), and never
 reversed:
@@ -162,8 +187,10 @@ Verify on node1, and compare with the Phase 0 baseline:
 - Confirm Phase 3 verification is stable for the agreed soak time.
 - On node0 console: `set chassis cluster disable reboot` (E11, same groups
   caveat).
-- After reboot, install the IKE package, `delete`, then `load set node0.set`,
-  `commit check`, `commit`. Revenue ports stay down until Phase 5 verification.
+- After reboot, install the IKE package, run the same targeted cleanup as
+  Phase 2 (never a bare `delete`), then `load set node0.set`, `commit check`,
+  `commit`. Revenue ports stay down until Phase 5 verification, except any
+  port that carries the ICL.
 - Remove or disable control and fabric cabling (T10, T11); these links have no
   MNHA role.
 
@@ -186,24 +213,51 @@ and `ping <NODE1_ICL_IP> size 1400 do-not-fragment count 5` both 0% loss.
   configuration form requires it. Uncertain, unsourced: a node may need two
   reboot cycles (seen in field notes in `srx-mnha-builder`, not in Juniper
   documentation).
-- Enable node0's revenue ports in the order from the decision record.
+- Keep preemption off for the cutover, even if the decision record wants it
+  later, so a higher-priority node0 does not take ownership the moment HA
+  forms. Enable it afterwards as a separate approved change.
+- Order is form HA, verify, then enable ports. Node0's revenue ports stay down
+  (except a port that carries the ICL) until the gate below passes.
 
-Verify on both nodes:
+**Gate A, with node0's data ports still down.** Run on both nodes:
 
 - `show chassis high-availability information`: `Node Status: ONLINE`, peer
   `Conn State: UP`, `Cold Sync Status: COMPLETE`, `Encrypted: YES` when the
   ICL is encrypted.
-- `show chassis high-availability services-redundancy-group 0` and
-  `show chassis high-availability services-redundancy-group <N>` for each SRG:
-  exactly one `ACTIVE` per active/backup SRG, VIP `INSTALLED` only on the
-  active node, signal routes where expected.
+- `show chassis high-availability services-redundancy-group <N>` for SRG0 and
+  every other SRG: exactly one `ACTIVE` per active/backup SRG (node1, which
+  carries traffic), node0 backup or hold.
+
+If cold sync fails, both nodes can self-elect ACTIVE (`srx-mnha` pitfall 22),
+which would duplicate the VIP and gateway once node0's ports come up. **Do not
+enable node0's revenue ports if two nodes show ACTIVE for an SRG, if `Conn State`
+is not UP, or if cold sync is not COMPLETE.** Abort path: leave node0's data
+ports down (traffic stays on node1), first rule out the ICL zone missing
+`host-inbound-traffic protocols bfd` (pitfall 22), then re-check the ICL path;
+if unresolved inside the window, use the phase 5 rollback box. If node0 shows
+ACTIVE alone, fail the SRG back to node1 with the Phase 6 failover command
+(`peer-id` mandatory) before continuing. Uncertain: which node wins the initial
+election with preemption off.
+
+- Then enable node0's revenue ports in the order from the decision record.
+
+**Gate B, after ports are up**, on both nodes:
+
+- Re-run the Gate A checks. VIP `INSTALLED` only on the active node, signal
+  routes where expected, and `show arp no-resolve` shows one MAC per gateway.
 - `show security ipsec security-associations ha-link-encryption`.
 - `show bfd session extensive` (when BFD is used).
-- Config sync: `commit peers-synchronize` test of the common block, then
-  compare `show configuration | display set` common sections.
+- Config parity, read-only: save `show configuration | display set` from each
+  node and compare the common sections off the box. Do not run
+  `commit peers-synchronize` from this runbook: its scope is Uncertain (E8
+  says only that config is replicated), and it may overwrite node-local
+  configuration. If the operator still wants it, only after confirming
+  node-local isolation in a lab, and under `commit confirmed`.
 - Session sync: `show security flow session summary` on both nodes.
 
-> **Rollback box, phase 5:** controlled order, outage expected. (1) Shut both
+> **Rollback box, phase 5:** trigger: Gate A fails (two ACTIVE, `Conn State`
+> not UP, cold sync not COMPLETE) and is not fixed in the window, or Gate B
+> shows a duplicate gateway MAC. Controlled order, outage expected. (1) Shut both
 > nodes' revenue ports at the switches. (2) On each node console restore the
 > cluster backup (`load override <CLUSTER_BACKUP_FILE>`, or `delete` then
 > `load set <CLUSTER_BACKUP_SET>`) and `commit`. (3) Restore control and

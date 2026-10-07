@@ -37,6 +37,7 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | 18 | Transparent / L2 | `family ethernet-switching` on interface units, `set vlans`, `set bridge-domains`, zones containing such interfaces | any L2 or transparent segment |
 | 19 | Policies, address books | `set security policies`, `set security address-book`, `set applications` | zone pairs, policy names |
 | 20 | NAT rules | `set security nat source\|destination\|static` (proxy-arp is #14) | rule-sets, pools |
+| 21 | System access and logging | `set system login`, `root-authentication`, `set system services`, `set snmp`, `set system syslog`, `set system ntp\|name-server` outside the node groups | users, services, snmp, syslog hosts (never secrets); these are not in the node files (T24) |
 
 ### Node groups
 
@@ -78,7 +79,7 @@ these columns verbatim.
 
 Column rules:
 
-- **Construct**: `cluster`, `reth`, `redundancy-group`, `fab`, `control-port`, `fxp0`, `zone`, `policy`, `nat`, `routing`, `ike-gateway`, `nat-proxy-arp`, `dhcp`, `lsys`, `tenant`, `multicast`, `l2`.
+- **Construct**: `cluster`, `reth`, `redundancy-group`, `fab`, `control-port`, `fxp0`, `zone`, `policy`, `nat`, `routing`, `ike-gateway`, `nat-proxy-arp`, `dhcp`, `lsys`, `tenant`, `multicast`, `l2`, `system`.
 - **Name**: `reth0`, `RG1`, `fab0`, `trust`, and so on.
 - **node0 / node1**: the per-node member (child port, priority, fxp0 address); `-` when not per-node.
 - **Attached services**: zone, routing protocols, IKE gateways, NAT, DHCP on that construct.

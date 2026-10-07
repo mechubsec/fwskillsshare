@@ -26,7 +26,7 @@ validated on a device and not production-ready."
 
 Plain `display set` lines. Section markers are Junos `#` comment lines, which
 are valid in a set file when loaded with `load set`. Use exactly these two
-markers, once each, in this order:
+markers (plus the optional operator-applied marker below), once each, in this order:
 
 ```junos
 # ---- common ----
@@ -43,17 +43,25 @@ Rules:
 
 - **common** holds what the config-sync split (global decision, topic 6)
   marked identical on both nodes: zones, policies, NAT, address books,
-  applications, and SRG settings identical on both nodes. The block is byte-identical in both files, so it can be applied
-  to one node and replicated with `commit peers-synchronize` (E8), or loaded
-  on both.
+  applications, and any SRG statements identical on both nodes. The block is
+  byte-identical in both files and is loaded on each node with `load set`.
+  Whether `commit peers-synchronize` replicates it, and whether it could
+  overwrite node-local configuration, is Uncertain (E8, vendor-evidence
+  `## Uncertain`); the runbook does not rely on it.
 - **node-local** holds host-name, fxp0 and `backup-router` (T13), interface
   addresses and LAG members (T1), routing neighbors and router-ids (T17),
   `local-id`/`local-ip`/`peer-id`/`peer-ip` (T10 replacement), per-node
   `activeness-priority` (T6), SRG `peer-id` references (they differ per node), node-specific license or certificate references.
+- **System baseline.** The node files deliberately omit `system login`,
+  `root-authentication`, `system services`, `snmp` and `syslog` (T24). The
+  delivery states this under a "System baseline (preserved / operator-supplied)"
+  note: these stanzas stay on each node through the runbook's targeted cleanup,
+  or the operator supplies them. Never regenerate them; add one `<SYSTEM_BASELINE>`
+  row to the values table.
 - Expand `groups node0`/`node1` into the matching file; neither file contains
   `groups node0`, `groups node1`, `apply-groups "${node}"`, or `set chassis
   cluster` (T12, E11).
-- Plus an optional third marker, `# ---- operator-applied: ipsec-srg ----`,
+- The optional third marker is `# ---- operator-applied: ipsec-srg ----`,
   at the end of a file for IPsec-SRG lines (T14, `managed-services ipsec`).
   Holds the whole IPsec section (floating `lo0`, `managed-services ipsec`,
   IKE and IPsec proposals, policies, gateway, `ipsec vpn`, `st0` and its zone
@@ -88,6 +96,7 @@ Rules:
 |---|---|---|---|---|
 | <NODE0_ICL_IP> | node0 ICL local address | node0.set, runbook phase 2 | user | needed |
 | <HA_VPN_PROFILE> | IKEv2 profile for HA link encryption (E4, E5) | both | user | needed |
+| <SYSTEM_BASELINE> | login, root-authentication, services, snmp, syslog kept on each node (T24) | runbook phases 2, 4 | user | needed |
 ```
 
 `Status` is `needed` until the user supplies it. Any `needed` row means the

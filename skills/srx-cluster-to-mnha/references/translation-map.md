@@ -16,7 +16,7 @@ stay uncertain.
 | `manual` | No confident mapping; the report names the open question and who decides. Generate nothing for it. |
 | `unsupported` | No MNHA equivalent. Say so; do not emit a lookalike. |
 
-Row IDs `T1..T23` are stable; the output format, runbook and worked example
+Row IDs `T1..T24` are stable; the output format, runbook and worked example
 reference them. Do not renumber; append new rows at the end.
 
 ## Syntax rules for snippets
@@ -52,6 +52,7 @@ reference them. Do not renumber; append new rows at the end.
 | T21 | Platform/release capability of the source model | MNHA support verdict | Global: platform/release | caveat | Supported-by-example only (22.4R1 example, E6) or uncertain; Feature Explorer follow-up required (E7). |
 | T22 | Security policies, address books, applications, and source, destination or static NAT rules (not proxy ARP) | Same statements in the common block; zone and policy names are unchanged | Config-sync split | converted | Policy logic is unchanged; verify NAT pools on a reth subnet against T15 and sessions are re-established after cutover. |
 | T23 | `chassis cluster cluster-id`, `reth-count`, other cluster-only statements | None | none | unsupported | Cluster-only (E11); delete from both node files. |
+| T24 | `system login`, `root-authentication`, `system services`, `snmp`, `system syslog` (and NTP, name-servers) outside the node groups | None generated; stays on each node | Config-sync split | manual | The node files omit these, so a bare `delete` plus `load set` would remove management access. Runbook uses targeted deletes to keep them; the operator confirms the baseline, or supplies it for a rebuilt node. Secrets are never reproduced. |
 
 ## Stanza reference
 
