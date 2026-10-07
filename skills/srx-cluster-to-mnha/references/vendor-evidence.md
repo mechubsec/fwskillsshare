@@ -54,7 +54,7 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 
 ### E13 — MNHA monitoring options
 - **Claim:** MNHA documents three monitoring types: BFD ("Monitors reachability to the next hop by examining the link layer along with the actual link"), IP ("Monitors the connectivity to hosts or services located beyond directly connected interfaces or next-hops") and interface ("Examines whether the link layer is operational or not"). From Junos 23.4R1, monitoring is extended to SRG0 as well as SRG1+ and grouped (flexible path monitoring) with weights per monitoring function.
-- **Source:** Multinode High Availability Monitoring Overview, Juniper TechLibrary, https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/topic-map/mnha-monitoring-options.html, retrieved 2026-10-07. The fetch returned no CLI text; the `monitor bfd-liveliness` form in the translation map was relayed by the reviewer, not seen in the fetch.
+- **Source:** Multinode High Availability Monitoring Overview, Juniper TechLibrary, https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/topic-map/mnha-monitoring-options.html, retrieved 2026-10-07. The fetch returned no CLI text; the `monitor bfd-liveliness` form in the translation map was relayed by a reviewer, not seen in the fetch, and is listed under `## Uncertain`.
 
 ## Uncertain
 
@@ -66,3 +66,5 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 - Whether `delete chassis cluster` in configuration is an alternative to the op command: no authoritative source located.
 - Exact SRG IP-monitoring statement syntax and its flexible path `monitor-object` form: the monitoring page (E13) names the feature but the fetch showed no statements. Confirm from the Flexible path monitoring page or MNHA examples before emitting.
 - Config-sync scope: E8 says only that configuration is replicated with `commit peers-synchronize`. Which statements replicate, and whether it can overwrite node-local configuration (interfaces, routing, `chassis high-availability`, SRG settings), is not documented in what was fetched. Do not rely on it for node-local isolation; confirm in a lab.
+- `monitor bfd-liveliness ...` SRG statement: relayed by a reviewer, found in no repo source and not in the fetched monitoring page (E13). Unconfirmed; verify in lab. The skill shows it only as a candidate and never emits it.
+- Whether `family ethernet-switching` on a non-transparent (branch switching) port is outside MNHA: E10 covers transparent mode HA only; no source located.

@@ -91,9 +91,12 @@ the `srx-mnha` skill.
 Ask: "How should a node decide it is unhealthy?"
 - BFD to the upstream router (recommend where routed)
 - IP monitoring or interface monitoring (carry over the cluster's monitors)
+  - Warn the user: interface monitoring yields generated config (T8), but IP
+    monitoring yields none (T9 is `manual`; syntax unverified) and BFD
+    monitoring is a candidate to verify, not generated output.
 - Signal routes steering the upstream routing protocol
 
-Changes in output: monitor objects, BFD timers (`<PLACEHOLDER>` unless supplied),
+Changes in output: interface monitors, BFD timer placeholders in the fidelity report only (BFD is unconfirmed, not emitted; `<PLACEHOLDER>` unless supplied),
 signal-route prefixes (reserved, non-routed; never production prefixes).
 
 ### 5. ICL, ICD and HA link encryption
@@ -142,7 +145,7 @@ translation and output generation verbatim.
 ```
 | Segment / reth | Purpose | Mode | Upstream | SRG | Detection | Decision source |
 |---|---|---|---|---|---|---|
-| reth1 (trust) | Routers, OSPF | routed | per-node LAG ae1 | SRG0 | BFD | user-confirmed (round 1) |
+| reth1 (trust) | Routers, OSPF | routed | per-node LAG ae1 | SRG2 | BFD | user-confirmed (round 1) |
 | reth2 (dmz) | Static-gateway servers | default-gateway | per-node LAG ae2, vMAC ok | SRG1 | IP monitoring | user-confirmed (round 3) |
 ```
 
@@ -159,8 +162,13 @@ RG priorities as the proposal; the user confirms them.
 ```
 | SRG | Segments | Deployment type | Priority node0 / node1 | Preempt | Decision source |
 |---|---|---|---|---|---|
-| SRG1 | reth1, reth2 | switching | 200 / 100 | no | user-confirmed (round 3) |
+| SRG1 | reth2 | switching | 200 / 100 | no | user-confirmed (round 3) |
+| SRG2 | reth1 | routing | 200 / 100 | no | user-confirmed (round 3) |
 ```
+
+SRG0 (active/active L4-L7 services, no IPsec) is chosen per topic 3 and gets a
+row here only when the user opts into it; the decision-record example above
+uses SRG1 and SRG2 only.
 
 ### Global decisions
 
