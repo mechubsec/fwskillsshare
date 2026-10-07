@@ -18,10 +18,10 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | # | Construct | Locate with | Record |
 |---|---|---|---|
 | 1 | Cluster basics | `set chassis cluster reth-count`, `set chassis cluster control-link-recovery`, `set chassis cluster heartbeat-*` | reth-count, heartbeat timers |
-| 2 | Reth interfaces | `set interfaces reth<N> ...` | units, VLAN ids, addresses, addresses (the reth address is the segment gateway), zone |
-| 3 | Reth children | `set interfaces <phys> gigether-options redundant-parent reth<N>` and `ether-options redundant-parent` | physical port per node (child on node0 vs node1), speed |
+| 2 | Reth interfaces | `set interfaces reth<N> ...` | units, VLAN ids, addresses (the reth address is the segment gateway), zone |
+| 3 | Reth children | `set interfaces <phys> gigether-options redundant-parent reth<N>` and `fastether-options redundant-parent` | physical port per node (child on node0 vs node1), speed |
 | 4 | Reth LACP | `set interfaces reth<N> redundant-ether-options lacp active\|passive`, `minimum-links`, `redundancy-group <N>` | LACP mode, which RG owns the reth |
-| 5 | Redundancy groups | `set chassis cluster redundancy-group <N> node 0\|1 priority <P>` | RG id, per-node priority, preempt, gratuitous-arp-count |
+| 5 | Redundancy groups | `set chassis cluster redundancy-group <N> node 0\|1 priority <P>`, `redundancy-group <N> preempt`, `redundancy-group <N> gratuitous-arp-count <C>` | RG id, per-node priority, preempt, gratuitous-arp-count |
 | 6 | RG monitoring | `redundancy-group <N> interface-monitor <if> weight <W>`; `redundancy-group <N> ip-monitoring ...` | monitored objects, weights, thresholds, targets, retries |
 | 7 | Fabric | `set interfaces fab0\|fab1 fabric-options member-interfaces <if>` | member ports per fab |
 | 8 | Control ports | `set chassis cluster control-ports fpc <N> port <M>`; none on vSRX | control port mapping |
@@ -34,8 +34,7 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | 15 | DHCP | `set system services dhcp-local-server`, `set forwarding-options dhcp-relay`, `set access address-assignment pool` | server vs relay, interface, pools |
 | 16 | Logical / tenant systems | `set logical-systems <N>`, `set tenants <N>` | names, interfaces owned |
 | 17 | Multicast | `set protocols pim`, `igmp`, `mld`, `set routing-options multicast` | on which reth |
-| 18 | Transparent / L2 | `set security forwarding-options family ethernet-switching`, `bridge-domains`, `interfaces ... family ethernet-switching` | any L2 or transparent segment |
-| 19 | Policy-relevant HA | `set security policies ... then log`, chassis `set chassis cluster ... configuration-synchronize` | only to note; policy translation is not inventory |
+| 18 | Transparent / L2 | `family ethernet-switching` on interface units, `set vlans`, `set bridge-domains`, zones containing such interfaces | any L2 or transparent segment |
 
 ### Node groups
 

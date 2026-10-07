@@ -40,7 +40,7 @@ row for the reth.
 
 ### 2. Upstream LAG and vMAC tolerance
 
-Why: default-gateway mode moves a virtual MAC on failover. Adjacent switches
+Why (per the `srx-mnha` skill, not a TechLibrary fact): default-gateway mode moves a virtual MAC on failover. Adjacent switches
 with MAC-move limits, dynamic ARP inspection, port-security, storm control or
 EVPN/MLAG duplicate-MAC protection can block it and silently break failover.
 The `srx-mnha` skill's default-gateway section lists these checks.
@@ -93,8 +93,8 @@ uncertain and see `srx-mnha`.
 
 Ask:
 - "Dedicated ICL ports, or share revenue ports?" (dedicated LAG / shared)
-- "Certificates or pre-shared key for HA link encryption?" (PSK `<redacted>` / PKI)
-- "Will asymmetric flows occur, needing an ICD?" (no / yes / unsure)
+- "Certificates or pre-shared key for HA link encryption?" (PKI, documented from Junos 22.3R1 (E5) / pre-shared key, unsourced here: verify against TechLibrary before offering)
+- "Do you expect asymmetric flows, and do you want to evaluate an ICD? (ICD semantics are uncertain here; follow `srx-mnha`.)" (no / yes / unsure)
 
 Changes in output: ICL interface or loopback, addressing `<PLACEHOLDER>`, HA
 VPN stanza, and the former fab/control rows (replaced, not mapped).
@@ -129,14 +129,29 @@ translation and output generation verbatim.
 ```
 | Segment / reth | Purpose | Mode | Upstream | SRG | Detection | Decision source |
 |---|---|---|---|---|---|---|
-| reth1 (trust) | Routers, OSPF | routed | per-node LAG ae1 | SRG0 | BFD | user-confirmed round 1 |
-| reth2 (dmz) | Static-gateway servers | default-gateway | per-node LAG ae2, vMAC ok | SRG1 | IP monitoring | user-confirmed round 3 |
+| reth1 (trust) | Routers, OSPF | routed | per-node LAG ae1 | SRG0 | BFD | user-confirmed (round 1) |
+| reth2 (dmz) | Static-gateway servers | default-gateway | per-node LAG ae2, vMAC ok | SRG1 | IP monitoring | user-confirmed (round 3) |
 ```
 
 `Decision source` is `user-confirmed (round N)`, `inventory-default
 (unconfirmed)`, or `unresolved`. Unconfirmed or unresolved rows block
 generation.
 
-**The user confirms the decision record before any configuration is generated.**
-Present the table, ask "Confirm, or change which row?", and apply changes
-before moving to translation.
+### Global decisions
+
+Topics 5-7 are not per-segment. Record them under the table (columns above are
+unchanged):
+
+```
+| Decision | Answer | Decision source |
+|---|---|---|
+| ICL (ports or loopback, addressing) | <PLACEHOLDER> | user-confirmed (round 5) |
+| ICD | none / evaluate (uncertain) | user-confirmed (round 5) |
+| HA link encryption | PKI / other | user-confirmed (round 5) |
+| Config-sync split (common vs node-local) | <summary> | user-confirmed (round 6) |
+| Platform / release verdict | supported-by-example / uncertain | user-confirmed (round 7) |
+```
+
+**The user confirms the per-segment table and the global decisions before any
+configuration is generated.** Present both, ask "Confirm, or change which
+row?", and apply changes before moving to translation.
