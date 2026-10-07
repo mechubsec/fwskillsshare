@@ -16,7 +16,7 @@ stay uncertain.
 | `manual` | No confident mapping; the report names the open question and who decides. Generate nothing for it. |
 | `unsupported` | No MNHA equivalent. Say so; do not emit a lookalike. |
 
-Row IDs `T1..T21` are stable; the output format, runbook and worked example
+Row IDs `T1..T23` are stable; the output format, runbook and worked example
 reference them. Do not renumber; append new rows at the end.
 
 ## Syntax rules for snippets
@@ -36,7 +36,7 @@ reference them. Do not renumber; append new rows at the end.
 | T5 | RG0 (routing-engine mastership) | None: each node keeps its own RE and control plane | none | unsupported | Do not map RG0 to SRG0: SRG0 is active/active Layer 4-7 services except IPsec (E2), not RE mastership. Independent REs per E12. Routing, management and `commit` are per node (T12). |
 | T6 | RG1+ with per-node `priority` | SRG1+ with `peer-id` and `activeness-priority` | SRG column; topic 3 owner node | caveat | SRG ids follow the user decision, not the RG number. Priority values are relative only; node0 and node1 get different values. vSRX in public cloud is limited to SRG0 and SRG1 (E9). |
 | T7 | RG `preempt` | `preemption` on the SRG | SRG column; topic 3 preempt answer | caveat | Failback can blackhole traffic if ownership returns before routing converges (`srx-mnha` pitfall 8); default off unless the user confirmed. Hybrid steering stanza below. |
-| T8 | RG `interface-monitor <if> weight <W>` | SRG `monitor interface <IFD>` (flat) or `monitor monitor-object ... interface` (grid) | Detection column | caveat | Cluster weights and the 255 threshold do not translate numerically; thresholds are re-chosen with the user. Exact forms: builder `config-stages.md` "SRG1 Common Block". |
+| T8 | RG `interface-monitor <if> weight <W>` | SRG `monitor interface <IFD>` (flat) or `monitor monitor-object ... interface` (grid) | Detection column | caveat | Cluster weights and the 255 threshold do not translate numerically; thresholds are re-chosen with the user. Monitor the node-local interface that replaces each per-node child port (physical or `ae`), on its own node; a cluster monitor on `ge-0/0/3` and `ge-7/0/3` becomes one monitor per node. Exact forms: builder `config-stages.md` "SRG1 Common Block". |
 | T9 | RG `ip-monitoring` (targets, retries, weights) | SRG IP monitoring (E13), grouped as flexible path `monitor-object`s with weights and thresholds from 23.4R1; BFD monitoring is the documented neighbor-reachability alternative | Detection column | caveat | The feature exists (E13) but the exact IP-monitor statement is not verified (`## Uncertain` in vendor-evidence.md), so none is emitted. The user confirms it from Juniper's Flexible path monitoring page or the MNHA configuration examples, and cluster weights and retries are re-chosen, not copied. BFD stanza below. `activeness-probe` is not an equivalent. |
 | T10 | `fab0`/`fab1` fabric link | ICL (`peer-id ... interface`), routed and IPsec-encrypted | Global: ICL, HA link encryption | unsupported | Not equivalent: the fabric was an L2 data/session link; the ICL is a routed path that must be encrypted (E4, E5, E6). Build the ICL as new configuration; never copy fab member ports. ICD is uncertain (see `## Uncertain`). |
 | T11 | Control link/ports, `heartbeat-*`, `control-link-recovery` | None; liveness comes from the ICL `liveness-detection` | Global: ICL | unsupported | No MNHA equivalent; record in the fidelity report. Removing the control cabling is a physical runbook step. |
@@ -50,6 +50,8 @@ reference them. Do not renumber; append new rows at the end.
 | T19 | Multicast (PIM, IGMP, MLD) on a reth | No authoritative MNHA behavior located | none | manual | Uncertain; flag in the report and validate in a lab before cutover. |
 | T20 | Transparent or L2 segments (`family ethernet-switching`, bridge domains) | None | none | unsupported | MNHA does not support transparent mode HA (E10). |
 | T21 | Platform/release capability of the source model | MNHA support verdict | Global: platform/release | caveat | Supported-by-example only (22.4R1 example, E6) or uncertain; Feature Explorer follow-up required (E7). |
+| T22 | Security policies, address books, applications, and source, destination or static NAT rules (not proxy ARP) | Same statements in the common block; zone and policy names are unchanged | Config-sync split | converted | Policy logic is unchanged; verify NAT pools on a reth subnet against T15 and sessions are re-established after cutover. |
+| T23 | `chassis cluster cluster-id`, `reth-count`, other cluster-only statements | None | none | unsupported | Cluster-only (E11); delete from both node files. |
 
 ## Stanza reference
 
@@ -68,7 +70,11 @@ set chassis high-availability services-redundancy-group <SRG> virtual-ip 1 ip <V
 set chassis high-availability services-redundancy-group <SRG> virtual-ip 1 interface <IFL>
 ```
 
-`preemption` only when T7 was confirmed. Routed segments use `deployment-type routing` (which also needs `activeness-probe`, per `srx-mnha` pitfall 20); hybrid uses `hybrid`.
+`preemption` only when T7 was confirmed. Routed segments use `deployment-type routing`, which also needs this statement (commit fails without it, `srx-mnha` `srg-details.md`); aim it at a real data-segment address, never the ICL. Hybrid uses `hybrid`.
+
+```junos
+set chassis high-availability services-redundancy-group <SRG> activeness-probe dest-ip <PROBE_DST> src-ip <PROBE_SRC>
+```
 
 **T8 interface monitor (flat form):**
 
@@ -102,7 +108,7 @@ set security ike gateway <GW> external-interface lo0.<UNIT>
 set security ike gateway <GW> local-address <FLOATING_VPN_IP>
 ```
 
-Also add the prefix-list binding from the `srx-mnha` floating-loopback pattern.
+Every IKE and IPsec statement that depends on the gateway (proposals, policies, `ipsec vpn`, `st0` zone membership, and the PSK, which stays `<redacted>` and is re-entered by the operator) moves into the operator-applied block with it, so the common block never references an uncommitted gateway. Also add the prefix-list binding from the `srx-mnha` floating-loopback pattern.
 
 **T10/T11 replacement (new ICL, not a translation):** flat form from builder `config-stages.md`. `vpn-profile` placement is flat-form only; for grid it is not field-confirmed (`config-stages.md` note at line 190), so rely on a device dry run.
 
@@ -119,5 +125,5 @@ set chassis high-availability services-redundancy-group 0 peer-id <PEER_ID>
 ## Rules for the fidelity report
 
 - Every inventory row yields at least one `T#`; constructs matching none are `manual` with the reason.
-- `unsupported` rows (T5, T10, T11, T20) are listed even when nothing is generated, with their replacement action.
+- `unsupported` rows (T5, T10, T11, T20, T23) are listed even when nothing is generated, with their replacement action.
 - A `caveat` row states the behavior difference in one sentence; a `manual` row states the question and the owner.

@@ -55,7 +55,7 @@ Rules:
   cluster` (T12, E11).
 - Plus an optional third marker, `# ---- operator-applied: ipsec-srg ----`,
   at the end of a file for IPsec-SRG lines (T14, `managed-services ipsec`).
-  Every line is commented out with `# `, so a push of the file cannot apply
+  Holds the whole IPsec section (floating `lo0`, `managed-services ipsec`, IKE and IPsec proposals, policies, gateway, `ipsec vpn`, `st0` zone membership), so the common part never references an uncommitted gateway. Every line is commented out with `# `, so a push of the file cannot apply
   it:
 
   ```junos
@@ -117,7 +117,7 @@ Rules:
 
 - Every inventory row yields at least one row. A construct matching no `T#` is
   `manual` with the reason.
-- `unsupported` rows (T5, T10, T11, T20) are always listed even though nothing
+- `unsupported` rows (T5, T10, T11, T20, T23) are always listed even though nothing
   is generated.
 - Uncertain facts keep the label from
   [vendor-evidence.md](vendor-evidence.md) `## Uncertain` (platform and release

@@ -66,6 +66,11 @@ Ask, per candidate group:
 - "Which node should normally own it, and should it preempt back after recovery?" (node0 no preempt / node0 preempt / node1)
 - "Which VIPs and IPsec gateways follow this group?" (list from inventory)
 
+If one redundancy group owns reths whose segments got different modes in topic 1
+(for example routed upstream plus default-gateway hosts), propose splitting it
+into one SRG per mode, because `deployment-type` is per SRG, and say that the
+split lets ownership of the two SRGs diverge.
+
 Changes in output: SRG ids, priorities and preempt, VIP-to-SRG ownership, IPsec
 anchor SRG, and RG priority translation rows.
 
@@ -136,6 +141,18 @@ translation and output generation verbatim.
 `Decision source` is `user-confirmed (round N)`, `inventory-default
 (unconfirmed)`, or `unresolved`. Unconfirmed or unresolved rows block
 generation.
+
+### SRG ownership
+
+One row per SRG chosen in topic 3. Translation takes node priorities and
+preemption from here, not from the per-segment table. Start from the cluster's
+RG priorities as the proposal; the user confirms them.
+
+```
+| SRG | Segments | Deployment type | Priority node0 / node1 | Preempt | Decision source |
+|---|---|---|---|---|---|
+| SRG1 | reth1, reth2 | switching | 200 / 100 | no | user-confirmed (round 3) |
+```
 
 ### Global decisions
 

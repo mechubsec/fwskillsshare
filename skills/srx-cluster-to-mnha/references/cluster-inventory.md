@@ -17,7 +17,7 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 
 | # | Construct | Locate with | Record |
 |---|---|---|---|
-| 1 | Cluster basics | `set chassis cluster reth-count`, `set chassis cluster control-link-recovery`, `set chassis cluster heartbeat-*` | reth-count, heartbeat timers |
+| 1 | Cluster basics | `set chassis cluster cluster-id`, `set chassis cluster reth-count`, `set chassis cluster control-link-recovery`, `set chassis cluster heartbeat-*` | reth-count, heartbeat timers |
 | 2 | Reth interfaces | `set interfaces reth<N> ...` | units, VLAN ids, addresses (the reth address is the segment gateway), zone |
 | 3 | Reth children | `set interfaces <phys> gigether-options redundant-parent reth<N>` and `fastether-options redundant-parent` | physical port per node (child on node0 vs node1), speed |
 | 4 | Reth LACP | `set interfaces reth<N> redundant-ether-options lacp active\|passive`, `minimum-links`, `redundancy-group <N>` | LACP mode, which RG owns the reth |
@@ -35,6 +35,8 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | 16 | Logical / tenant systems | `set logical-systems <N>`, `set tenants <N>` | names, interfaces owned |
 | 17 | Multicast | `set protocols pim`, `igmp`, `mld`, `set routing-options multicast` | on which reth |
 | 18 | Transparent / L2 | `family ethernet-switching` on interface units, `set vlans`, `set bridge-domains`, zones containing such interfaces | any L2 or transparent segment |
+| 19 | Policies, address books | `set security policies`, `set security address-book`, `set applications` | zone pairs, policy names |
+| 20 | NAT rules | `set security nat source\|destination\|static` (proxy-arp is #14) | rule-sets, pools |
 
 ### Node groups
 
@@ -76,7 +78,7 @@ these columns verbatim.
 
 Column rules:
 
-- **Construct**: `reth`, `redundancy-group`, `fab`, `control-port`, `fxp0`, `zone`, `routing`, `ike-gateway`, `nat-proxy-arp`, `dhcp`, `lsys`, `tenant`, `multicast`, `l2`.
+- **Construct**: `cluster`, `reth`, `redundancy-group`, `fab`, `control-port`, `fxp0`, `zone`, `policy`, `nat`, `routing`, `ike-gateway`, `nat-proxy-arp`, `dhcp`, `lsys`, `tenant`, `multicast`, `l2`.
 - **Name**: `reth0`, `RG1`, `fab0`, `trust`, and so on.
 - **node0 / node1**: the per-node member (child port, priority, fxp0 address); `-` when not per-node.
 - **Attached services**: zone, routing protocols, IKE gateways, NAT, DHCP on that construct.
