@@ -141,7 +141,7 @@ f39ef0330bb473b29d5ad6d98f11c49dcbd2130bd08f29276b7cc4699289cb92  srx-cluster-to
 a8ae8dd4fc83340d5a08a432218f9ff3d74cf5007e216d05c87b310314826e6a  srx-cluster-to-mnha/agents/openai.yaml
 94ea12156fbedd41d66f612cc333bb643cb9193c869639218f08a23854ed3c30  srx-cluster-to-mnha/references/architect-interview.md
 096a80140521dfa82301024f47c7be6e2dc51ecc6d13142f1a4377ea2a398eac  srx-cluster-to-mnha/references/cluster-inventory.md
-ce56b4eb393ac822fe7b921fd5ca4f3332e20dfc23ef709ff78b0dbb6734d5da  srx-cluster-to-mnha/references/cutover-runbook.md
+efaee789f144c39ec9cf46327a230c4af27f760bd18db6f16692790d4867e5b7  srx-cluster-to-mnha/references/cutover-runbook.md
 fbcbdf2959912ec0c2e183b1411707e633812a7fc5fccd653d7eb455a0862b5a  srx-cluster-to-mnha/references/output-format.md
 c6a5b5fe60cc1ee63cb99ffb13d3c1abeb81080e6443214d6825c87ee566de49  srx-cluster-to-mnha/references/runtime-intake.md
 8bc39e702304292f913a8b060d694a5318d51d553e9ba753e367b683eb4f693a  srx-cluster-to-mnha/references/translation-map.md

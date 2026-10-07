@@ -109,7 +109,9 @@ enabled; `show configuration chassis high-availability`;
   revenue ports are down; the commit of the T14 block must have succeeded.
 - `show chassis high-availability services-redundancy-group <N>` for the
   IPsec SRG: shows the configuration; with no peer yet, a `HOLD` or
-  not-active state is expected.
+  not-active state is expected (per srx-mnha-builder
+  `references/verification.md`: SRG1 `HOLD` with peer `DOWN` is expected;
+  inferred here for a standalone node before the peer exists).
 
 > **Rollback box, phase 2:** node1 is out of production, so this is the
 > cheapest point. From the console:
