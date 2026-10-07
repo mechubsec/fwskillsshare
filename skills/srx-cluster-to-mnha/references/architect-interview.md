@@ -117,9 +117,11 @@ VPN stanza, and the former fab/control rows (replaced, not mapped).
 
 ### 6. Config-sync split
 
-Why: nodes keep independent configuration; common configuration can be
-replicated with `commit peers-synchronize` and logical/tenant system names must
-match (E8). Node groups from the cluster become node-local sections.
+Why: nodes keep independent configuration; MNHA can replicate configuration
+with `commit peers-synchronize` (E8); which statements it replicates and whether
+node-local statements are protected is unverified (see vendor-evidence.md
+Uncertain); this skill's output does not depend on it. Logical/tenant system
+names must match for common sync (E8). Node groups from the cluster become node-local sections.
 
 Ask: "Which configuration should be identical on both nodes?" (policy/NAT/objects common, interfaces/routing/hostname node-local, recommended / everything node-local / other)
 

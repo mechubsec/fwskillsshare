@@ -235,8 +235,9 @@ is not UP, or if cold sync is not COMPLETE.** Abort path: leave node0's data
 ports down (traffic stays on node1), first rule out the ICL zone missing
 `host-inbound-traffic protocols bfd` (pitfall 22), then re-check the ICL path;
 if unresolved inside the window, use the phase 5 rollback box. If node0 shows
-ACTIVE alone, fail the SRG back to node1 with the Phase 6 failover command
-(`peer-id` mandatory) before continuing. Uncertain: which node wins the initial
+ACTIVE alone, fail the SRG back to node1 with `request chassis
+high-availability failover services-redundancy-group <N> peer-id
+<PEER_LOCAL_ID>` (`peer-id` mandatory) before continuing. Uncertain: which node wins the initial
 election with preemption off.
 
 - Then enable node0's revenue ports in the order from the decision record.
@@ -255,9 +256,15 @@ election with preemption off.
   node-local isolation in a lab, and under `commit confirmed`.
 - Session sync: `show security flow session summary` on both nodes.
 
+**Gate B abort path.** If Gate B fails for any reason (VIP not installed, BFD
+or ICL down, two ACTIVE for any SRG, duplicate gateway MAC or ARP),
+immediately shut node0's data ports (traffic stays on node1), then follow the
+phase 5 rollback box.
+
 > **Rollback box, phase 5:** trigger: Gate A fails (two ACTIVE, `Conn State`
 > not UP, cold sync not COMPLETE) and is not fixed in the window, or Gate B
-> shows a duplicate gateway MAC. Controlled order, outage expected. (1) Shut both
+> fails for any reason (VIP not installed, BFD or ICL down, two ACTIVE for any
+> SRG, duplicate gateway MAC or ARP) after node0's data ports are shut. Controlled order, outage expected. (1) Shut both
 > nodes' revenue ports at the switches. (2) On each node console restore the
 > cluster backup (`load override <CLUSTER_BACKUP_FILE>`, or `delete` then
 > `load set <CLUSTER_BACKUP_SET>`) and `commit`. (3) Restore control and

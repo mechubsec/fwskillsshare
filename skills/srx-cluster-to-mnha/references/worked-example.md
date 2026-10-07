@@ -66,7 +66,7 @@ Open facts: platform model and Junos release are `<UNKNOWN>`; asked through runt
 | ICD | none | user-confirmed (round 5) |
 | HA link encryption | PKI | user-confirmed (round 5) |
 | NAT proxy ARP / DHCP handling | no proxy ARP in source; pool routed via BGP from the SRG2 active node; no DHCP | user-confirmed (round 1) |
-| Config-sync split (common vs node-local) | policy, NAT, zones, SRG settings common; rest node-local | user-confirmed (round 6) |
+| Config-sync split (common vs node-local) | policy, NAT, zones, SRG settings common; rest node-local (the skill's output separates common and node-local sections itself; MNHA's `commit peers-synchronize` scope is unverified, see vendor-evidence.md Uncertain) | user-confirmed (round 6) |
 | Platform / release verdict | uncertain | user-confirmed (round 7) |
 ```
 
@@ -191,8 +191,9 @@ The fixture has no `system login`, `snmp` or `syslog` stanzas outside the node g
 | <NODE1_ICL_IP> | node1 ICL local address | node1.set, runbook phase 2 | user | needed |
 | <ICL_IFD> | ICL dedicated port or LAG | both, runbook phase 2 | user | needed |
 | <DEVICE_COUNT> | `aggregated-devices ethernet device-count` for ae0 | both, runbook phase 2 | user | needed |
-| <BFD_MIN_INTERVAL> | BFD minimum interval for SRG2 detection (candidate only, syntax unconfirmed) | none emitted | user | needed |
-| <BFD_MULTIPLIER> | BFD multiplier for SRG2 detection (candidate only, syntax unconfirmed) | none emitted | user | needed |
+| <BFD_MIN_INTERVAL> | BFD minimum interval for SRG2 detection (candidate only, syntax unconfirmed) | none emitted | user | n/a until BFD syntax verified (T8 caveat) |
+| <BFD_MULTIPLIER> | BFD multiplier for SRG2 detection (candidate only, syntax unconfirmed) | none emitted | user | n/a until BFD syntax verified (T8 caveat) |
+| <SYSTEM_BASELINE> | login, root-authentication, services, snmp, syslog kept on each node (T24) | runbook phases 2, 4 | user | needed |
 | <PROBE_DST> | SRG2 activeness-probe destination | both, runbook phase 2 | user | needed |
 | <NODE0_PROBE_SRC> | node0 probe source address | node0.set, runbook phase 4 | user | needed |
 | <NODE1_PROBE_SRC> | node1 probe source address | node1.set, runbook phase 2 | user | needed |
