@@ -31,16 +31,29 @@ the user chose the other order.
   `show route summary`, `show route protocol <PROTO>` for each routing
   protocol, `show arp no-resolve`, `show security ike security-associations`,
   `show security ipsec security-associations`, `show interfaces reth<N> terse`.
-- Backups: `request system configuration rescue save` and
-  `show configuration | display set | save <CLUSTER_BACKUP_FILE>`; copy off the
-  device.
+- Backups, on **both** nodes (rescue save is per routing engine; reach node1
+  with `request routing-engine login node 1`):
+  `request system configuration rescue save`, then confirm with
+  `show system configuration rescue`.
+  Also save two copies of the configuration and copy them off the device:
+  set format `show configuration | display set | save <CLUSTER_BACKUP_SET>`
+  (restore with `delete` then `load set <CLUSTER_BACKUP_SET>`) and text format
+  `show configuration | save <CLUSTER_BACKUP_FILE>` (restore with
+  `load override <CLUSTER_BACKUP_FILE>`). Uncertain: `load override` with a
+  set-format file is not documented in vendor-evidence.md, so never use it for
+  rollback.
+- VPN outage window: the IPsec-SRG block (T14) is operator-applied. It is
+  applied on node1 in Phase 2, before traffic moves. If the reviewed block is
+  not ready by then, state the VPN outage (Phase 3 until the block is applied)
+  to the user and stakeholders now.
 - Physical/virtual plan ready for the ICL path between nodes (routed, E4) and
   for removing control and fabric cabling (T10, T11).
 - Upstream/downstream owners notified: routing neighbors must accept the new
   per-node peering (T3, T17); switches must tolerate the VIP/MAC move (T2).
 
 Verify: both nodes `primary`/`secondary`, no RG in `ineligible` or
-`disabled`, baselines captured.
+`disabled`, baselines captured, `show system configuration rescue` shows a
+rescue configuration on each node.
 
 > **Rollback box, phase 0:** nothing changed. Abort and discard files.
 
@@ -71,12 +84,16 @@ Phase 0 baseline, no traffic arriving on node1.
   command, E11).
 - Caveat (E11): the generated `node0`/`node1` groups are cluster-only. After
   the reboot node1 may fail to load its configuration; use the console and
-  `load override` with `node1.set` (the groups are not in it) rather than
+  `delete` then `load set node1.set` (the groups are not in it) rather than
   trying to edit the old config.
 - Install the IKE package if the ICL is encrypted:
   `request system software add optional://junos-ike.tgz` (E6).
-- `load override` (or `load set` after `delete`) the contents of `node1.set`,
-  `commit check`, then `commit`. Do not commit `needed` placeholders.
+- `delete`, then `load set node1.set`, `commit check`, then `commit`. Do not
+  commit `needed` placeholders. (`delete` plus `load set` is the documented-style
+  path for set files; any other load method here is uncertain.)
+- Operator-applied: uncomment, review and `load set` the IPsec-SRG block (T14)
+  from `node1.set` now, so the VPN anchor exists before traffic moves.
+  `srx-mnha-builder` will not push it.
 - Do not enable node1's revenue ports yet.
 
 Verify on node1: `show chassis cluster status` reports cluster is not
@@ -86,34 +103,42 @@ enabled; `show configuration chassis high-availability`;
 
 > **Rollback box, phase 2:** node1 is out of production, so this is the
 > cheapest point. From the console:
-> `load override <CLUSTER_BACKUP_FILE>` or `rollback rescue`, `commit`, then
-> `set chassis cluster cluster-id <CLUSTER_ID> node 1 reboot`. Reconnect
-> control and fabric cabling, re-enable child ports, confirm
-> `show chassis cluster status` shows two nodes.
+> `load override <CLUSTER_BACKUP_FILE>` (text format), or `delete` then
+> `load set <CLUSTER_BACKUP_SET>`, or `rollback rescue`; `commit`, then
+> `set chassis cluster cluster-id <CLUSTER_ID> node 1 reboot`. Control and
+> fabric cabling is still in place (removed only in Phase 4); re-enable
+> child ports and confirm `show chassis cluster status` shows two nodes.
 
 ## Phase 3 - Move traffic to node1
 
-Method follows the decision record's mode for each segment.
+Order, for every segment type (routed, default-gateway, hybrid), and never
+reversed:
 
-- Routed segments: bring up node1's revenue interfaces and routing sessions;
-  confirm neighbors hold node1's routes; then withdraw or de-prefer node0's
-  advertisements (higher metric or shut the neighbor), so the upstream picks
-  node1.
-- Default-gateway segments: shut node0's reth children at the switches and
-  enable node1's; node1 takes the VIP/gateway address (expect a MAC change and
-  gratuitous ARP, T2).
-- Hybrid: do both per segment.
-- Mind the outage window: node0 is the cluster's last member and now carries no
-  traffic; node1 is a single standalone node.
+1. Take node0's reth child ports down at the switches (and withdraw node0's
+   advertisements for routed and hybrid segments). Confirm they are down:
+   switch port status and `show interfaces reth<N> terse` on node0.
+2. Only then enable node1's revenue interfaces and routing sessions or
+   advertisements; for default-gateway and hybrid segments node1 takes the
+   VIP/gateway address (expect a MAC change and gratuitous ARP, T2).
+3. Duplicate-address check: `show arp no-resolve` on node1, and the
+   upstream/switch ARP and MAC tables, show one MAC per gateway address and no
+   address on two ports.
+
+Per-segment method follows the decision record's mode. Routed: confirm
+neighbors hold node1's routes. Hybrid: both of the above.
+Node0 is the cluster's last member and now carries no traffic; node1 is a
+single standalone node.
 
 Verify on node1: `show security flow session summary`,
 `show route summary`, `show route protocol <PROTO>`,
 `show arp no-resolve`, `show interfaces terse`, a test flow per segment from a
 host, and the IPsec SAs (`show security ipsec security-associations`) if VPN
-terminates here. Compare with the Phase 0 baseline.
+terminates here (expected up, since the T14 block was applied in Phase 2; if it
+was not, SAs are down until it is applied and this is the stated VPN outage). Compare with the Phase 0 baseline.
 
-> **Rollback box, phase 3:** re-advertise from node0 and re-enable its ports;
-> shut node1's revenue ports. Node0 is still a working cluster member
+> **Rollback box, phase 3:** reverse the order: shut node1's revenue ports and
+> advertisements, confirm down, then re-advertise from node0 and re-enable its
+> ports. Node0 is still a working cluster member
 > (running alone), so traffic returns to it. To restore the cluster, follow
 > the phase 2 rollback.
 
@@ -122,7 +147,7 @@ terminates here. Compare with the Phase 0 baseline.
 - Confirm Phase 3 verification is stable for the agreed soak time.
 - On node0 console: `set chassis cluster disable reboot` (E11, same groups
   caveat).
-- After reboot, install the IKE package, `load override` `node0.set`,
+- After reboot, install the IKE package, `delete`, then `load set node0.set`,
   `commit check`, `commit`. Revenue ports stay down until Phase 5 verification.
 - Remove or disable control and fabric cabling (T10, T11); these links have no
   MNHA role.
@@ -140,10 +165,12 @@ and `ping <NODE1_ICL_IP> size 1400 do-not-fragment count 5` both 0% loss.
 
 ## Phase 5 - Form HA
 
-- Apply the operator-only IPsec-SRG block (T14) by hand on both nodes after
-  review; `srx-mnha-builder` will not push it.
+- Apply the operator-only IPsec-SRG block (T14) on node0 by hand after review
+  (node1 has it from Phase 2); `srx-mnha-builder` will not push it.
 - Reboot per the target release's MNHA formation guidance if the chosen
-  configuration form requires it; a node can need two reboot cycles.
+  configuration form requires it. Uncertain, unsourced: a node may need two
+  reboot cycles (seen in field notes in `srx-mnha-builder`, not in Juniper
+  documentation).
 - Enable node0's revenue ports in the order from the decision record.
 
 Verify on both nodes:
@@ -161,11 +188,15 @@ Verify on both nodes:
   compare `show configuration | display set` common sections.
 - Session sync: `show security flow session summary` on both nodes.
 
-> **Rollback box, phase 5:** run `rollback rescue` and
-> `set chassis cluster cluster-id <CLUSTER_ID> node <N> reboot` on each node,
-> restore control and fabric cabling and child ports, load the cluster backup
-> (`<CLUSTER_BACKUP_FILE>`), and confirm `show chassis cluster status`. Expect
-> an outage while the cluster re-forms.
+> **Rollback box, phase 5:** controlled order, outage expected. (1) Shut both
+> nodes' revenue ports at the switches. (2) On each node console restore the
+> cluster backup (`load override <CLUSTER_BACKUP_FILE>`, or `delete` then
+> `load set <CLUSTER_BACKUP_SET>`) and `commit`. (3) Restore control and
+> fabric cabling. (4) `set chassis cluster cluster-id <CLUSTER_ID> node 0
+> reboot` on node0, wait for it to come up as cluster primary, then
+> `... node 1 reboot` on node1. (5) Confirm `show chassis cluster status`
+> shows both nodes, then re-enable node0's ports first, node1's after
+> verification. The reboot order is a recommendation, not Juniper-documented.
 
 ## Phase 6 - Failover test
 
@@ -192,5 +223,5 @@ after each failover, plus the upstream route table.
 | From phase | Return path |
 |---|---|
 | 0, 1 | Nothing configured; undo the port isolation |
-| 2, 3 | Node1: restore backup/rescue, `set chassis cluster cluster-id <CLUSTER_ID> node 1 reboot`, recable |
-| 4, 5, 6 | Both nodes: restore backup/rescue, `set chassis cluster cluster-id <CLUSTER_ID> node <N> reboot`, recable; outage expected |
+| 2, 3 | Node1: restore backup (text `load override`, or `delete` + `load set` of the set backup) or rescue, `set chassis cluster cluster-id <CLUSTER_ID> node 1 reboot`, recable |
+| 4, 5, 6 | Both nodes: follow the phase 5 rollback order; outage expected |

@@ -43,21 +43,29 @@ Rules:
 
 - **common** holds what the config-sync split (global decision, topic 6)
   marked identical on both nodes: zones, policies, NAT, address books,
-  applications, the SRG definitions that are identical apart from peer
-  reference. The block is byte-identical in both files, so it can be applied
+  applications, and SRG settings identical on both nodes. The block is byte-identical in both files, so it can be applied
   to one node and replicated with `commit peers-synchronize` (E8), or loaded
   on both.
 - **node-local** holds host-name, fxp0 and `backup-router` (T13), interface
   addresses and LAG members (T1), routing neighbors and router-ids (T17),
   `local-id`/`local-ip`/`peer-id`/`peer-ip` (T10 replacement), per-node
-  `activeness-priority` (T6), node-specific license or certificate references.
+  `activeness-priority` (T6), SRG `peer-id` references (they differ per node), node-specific license or certificate references.
 - Expand `groups node0`/`node1` into the matching file; neither file contains
   `groups node0`, `groups node1`, `apply-groups "${node}"`, or `set chassis
   cluster` (T12, E11).
-- IPsec-SRG lines (T14, `managed-services ipsec`) go in a third block at the
-  end of each file under `# ---- operator-applied: ipsec-srg ----`. That
-  block is commented out line by line with `# `, so a push of the file cannot
-  apply it, and the runbook names it as an operator step.
+- Plus an optional third marker, `# ---- operator-applied: ipsec-srg ----`,
+  at the end of a file for IPsec-SRG lines (T14, `managed-services ipsec`).
+  Every line is commented out with `# `, so a push of the file cannot apply
+  it:
+
+  ```junos
+  # ---- operator-applied: ipsec-srg ----
+  # set chassis high-availability services-redundancy-group <SRG> managed-services ipsec
+  # set security ike gateway <GW> external-interface lo0.<UNIT>
+  ```
+
+  To apply: the operator uncomments the lines, reviews them, and runs
+  `load set` (runbook Phase 2 for node1, Phase 5 for node0).
 - Secrets are `<redacted>`; never reproduce a source secret.
 - Every line traces to a `T#`; add a trailing `# T6` style comment only on
   lines where the trace is not obvious.
