@@ -35,7 +35,7 @@ metadata:
     - title: "SRX clustering: from Chassis Cluster to MultiNode High Availability"
       author: Laurent Paumelle
       url: https://community.juniper.net/blogs/laurentp/2026/02/15/srx-from-chassis-cluster-to-mnha
-      retrieved: "2026-10-07"
+      retrieved: "2026-05-14"
 ---
 
 # SRX Chassis Cluster to MNHA
@@ -87,8 +87,8 @@ reboot, delete, or failover actions.
 ## Workflow
 
 1. **Intake.** Establish the evidence (display-set configuration, cluster status), platform model, Junos release, and requested deliverables using the runtime intake above. `parsing-srx-configs` output is welcome but not required; the skill works directly on `display set`.
-2. **Cluster inventory.** Before asking design questions, extract and show the user what the cluster contains: reth interfaces with per-node child links and LACP, redundancy groups (priority, preempt, interface and IP monitoring), fab and control links, `groups node0` and `node1` with `apply-groups`, fxp0 management, per-reth services (routing protocols, IPsec gateways, NAT proxy ARP, DHCP server or relay), and anything cluster-only.
-3. **Architect interview.** Interview one topic at a time: per-segment purpose and MNHA mode, upstream LAG and switch tolerance for a virtual MAC move, SRG layout (SRG0 versus SRG1+, active/backup versus active/active, VIP and service ownership, preemption), failure detection (BFD, IP monitoring, interface monitoring, signal routes), ICL and ICD design including HA link encryption, config-sync strategy, and platform support. End with a written decision record the user confirms before any configuration is generated.
+2. **Cluster inventory** ([references/cluster-inventory.md](references/cluster-inventory.md)). Before asking design questions, extract and show the user what the cluster contains: reth interfaces with per-node child links and LACP, redundancy groups (priority, preempt, interface and IP monitoring), fab and control links, `groups node0` and `node1` with `apply-groups`, fxp0 management, per-reth services (routing protocols, IPsec gateways, NAT proxy ARP, DHCP server or relay), and anything cluster-only.
+3. **Architect interview** ([references/architect-interview.md](references/architect-interview.md)). Act as an SRX architect: one topic per round, propose then confirm, multiple-choice questions. Interview one topic at a time: per-segment purpose and MNHA mode, upstream LAG and switch tolerance for a virtual MAC move, SRG layout (SRG0 versus SRG1+, active/backup versus active/active, VIP and service ownership, preemption), failure detection (BFD, IP monitoring, interface monitoring, signal routes), ICL and ICD design including HA link encryption, config-sync strategy, and platform support. End with a written decision record the user confirms before any configuration is generated.
 4. **Translation.** Build a mapping table with one row per cluster construct, each classified converted, caveat, manual, or unsupported, using the fidelity vocabulary of `firewall-config-conversion`. IPsec VPN anchors on an SRG1+, never SRG0.
 5. **Output.** Produce `node0.set` and `node1.set` (common and node-local sections), a fidelity report, a cutover runbook (pre-checks, isolate one node, break cluster, standalone reboot, ICL up, move traffic, convert the second node, form HA, failover test) with a rollback point at every step, and verification commands.
 
