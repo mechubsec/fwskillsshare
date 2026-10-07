@@ -52,6 +52,10 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 - **Claim:** Chassis cluster is one logical chassis with one active RE, global configuration, and control/fabric links on L2; MNHA runs two independent active REs with independent configuration and routing, linked by any routed path.
 - **Source:** SRX clustering: from Chassis Cluster to MultiNode High Availability (Laurent Paumelle, Juniper Community), https://community.juniper.net/blogs/laurentp/2026/02/15/srx-from-chassis-cluster-to-mnha, retrieved 2026-05-14 (in-repo: skills/srx-mnha/references/source-srx-from-chassis-cluster-to-mnha.md); appearance in 2026-10-07 search results confirmed.
 
+### E13 — MNHA monitoring options
+- **Claim:** MNHA documents three monitoring types: BFD ("Monitors reachability to the next hop by examining the link layer along with the actual link"), IP ("Monitors the connectivity to hosts or services located beyond directly connected interfaces or next-hops") and interface ("Examines whether the link layer is operational or not"). From Junos 23.4R1, monitoring is extended to SRG0 as well as SRG1+ and grouped (flexible path monitoring) with weights per monitoring function.
+- **Source:** Multinode High Availability Monitoring Overview, Juniper TechLibrary, https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/topic-map/mnha-monitoring-options.html, retrieved 2026-10-07. The fetch returned no CLI text; the `monitor bfd-liveliness` form in the translation map was relayed by the reviewer, not seen in the fetch.
+
 ## Uncertain
 
 - Official Juniper cluster-to-MNHA migration procedure: no authoritative source located (only the community post, E12).
@@ -60,3 +64,4 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 - ICD (inter-chassis data) definition: the overview page mentions an "ICD link" once without defining it; the srx-mnha skill's community sources cover it. No TechLibrary definition located.
 - Exact list of cluster features unsupported in MNHA beyond transparent mode (E10): no authoritative source located.
 - Whether `delete chassis cluster` in configuration is an alternative to the op command: no authoritative source located.
+- Exact SRG IP-monitoring statement syntax and its flexible path `monitor-object` form: the monitoring page (E13) names the feature but the fetch showed no statements. Confirm from the Flexible path monitoring page or MNHA examples before emitting.

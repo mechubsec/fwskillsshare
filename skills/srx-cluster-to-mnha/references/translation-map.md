@@ -30,19 +30,19 @@ reference them. Do not renumber; append new rows at the end.
 | ID | Cluster construct | MNHA construct | Depends on decision | Class | Notes |
 |---|---|---|---|---|---|
 | T1 | `reth<N>` and its per-node child ports (`redundant-parent`), LACP | Node-local physical interface or node-local `ae` per node | Upstream column (per-node LAG / single link) | caveat | A local `ae` is valid only when the upstream is a real LAG to that node; reth LACP does not prove it. Reuse the example in `srx-mnha` [mnha-advanced-workflows.md#chassis-cluster-interface-migration](../../srx-mnha/references/mnha-advanced-workflows.md#chassis-cluster-interface-migration). Members and addresses are node-specific. |
-| T2 | reth IP, segment gateway for static-gateway hosts | Default-gateway mode: SRG1+ `virtual-ip` plus a per-node interface address on the same subnet | Mode = default-gateway; Upstream vMAC tolerance; SRG | caveat | Gateway MAC moves on failover, unlike a reth that kept one MAC. Adjacent switch MAC-move limits, DAI or port-security can block it (interview topic 2). Cluster `gratuitous-arp-count` has no tunable here; verify ARP behavior in the lab. |
+| T2 | reth IP, segment gateway for static-gateway hosts | Default-gateway mode: SRG1+ `virtual-ip` plus a per-node interface address on the same subnet | Mode = default-gateway; Upstream vMAC tolerance; SRG | caveat | Gateway MAC moves on failover, unlike a reth that kept one MAC. Adjacent switch MAC-move limits, DAI or port-security can block it (interview topic 2). VIP value carries a prefix length in both sources: `srx-mnha` `mnha-advanced-workflows.md` shows `ip <VIP>/<PREFIXLEN>` and `srx-mnha-builder` `config-stages.md` defines `<VIP_IP>` as "address with mask". Cluster `gratuitous-arp-count` has no tunable here; verify ARP behavior in the lab. |
 | T3 | reth IP, peering with routers | Routed mode: unique address per node on the segment, no VIP; neighbors re-peered with each node | Mode = routed | caveat | Neighbors must be reconfigured for two peers; a static-gateway host on a routed segment is stranded on failover. Where the segment mixes both, use hybrid (E1) with signal routes (T7). |
 | T4 | Zone membership of `reth<N>.<U>` | Same zone, bound to the node-local `ae`/physical unit | Segment / reth row | converted | Zone, host-inbound and screens carry over; only the interface name changes. Zone names must match on both nodes. |
 | T5 | RG0 (routing-engine mastership) | None: each node keeps its own RE and control plane | none | unsupported | Do not map RG0 to SRG0: SRG0 is active/active Layer 4-7 services except IPsec (E2), not RE mastership. Independent REs per E12. Routing, management and `commit` are per node (T12). |
 | T6 | RG1+ with per-node `priority` | SRG1+ with `peer-id` and `activeness-priority` | SRG column; topic 3 owner node | caveat | SRG ids follow the user decision, not the RG number. Priority values are relative only; node0 and node1 get different values. vSRX in public cloud is limited to SRG0 and SRG1 (E9). |
 | T7 | RG `preempt` | `preemption` on the SRG | SRG column; topic 3 preempt answer | caveat | Failback can blackhole traffic if ownership returns before routing converges (`srx-mnha` pitfall 8); default off unless the user confirmed. Hybrid steering stanza below. |
 | T8 | RG `interface-monitor <if> weight <W>` | SRG `monitor interface <IFD>` (flat) or `monitor monitor-object ... interface` (grid) | Detection column | caveat | Cluster weights and the 255 threshold do not translate numerically; thresholds are re-chosen with the user. Exact forms: builder `config-stages.md` "SRG1 Common Block". |
-| T9 | RG `ip-monitoring` (targets, retries, weights) | None confirmed: candidates are BFD on the routing protocol, or `activeness-probe dest-ip ... src-ip ...` | Detection column | manual | Repo sources show no SRG IP-monitor stanza, so none is emitted. `activeness-probe` decides activeness on loss of the peer and is not an equivalent of weighted target monitoring. User picks the substitute. |
+| T9 | RG `ip-monitoring` (targets, retries, weights) | SRG IP monitoring (E13), grouped as flexible path `monitor-object`s with weights and thresholds from 23.4R1; BFD monitoring is the documented neighbor-reachability alternative | Detection column | caveat | The feature exists (E13) but the exact IP-monitor statement is not verified (`## Uncertain` in vendor-evidence.md), so none is emitted. The user confirms it from Juniper's Flexible path monitoring page or the MNHA configuration examples, and cluster weights and retries are re-chosen, not copied. BFD stanza below. `activeness-probe` is not an equivalent. |
 | T10 | `fab0`/`fab1` fabric link | ICL (`peer-id ... interface`), routed and IPsec-encrypted | Global: ICL, HA link encryption | unsupported | Not equivalent: the fabric was an L2 data/session link; the ICL is a routed path that must be encrypted (E4, E5, E6). Build the ICL as new configuration; never copy fab member ports. ICD is uncertain (see `## Uncertain`). |
-| T11 | Control link/ports, `heartbeat-*`, `control-link-recovery` | None; liveness comes from the ICL `liveness-detection` | Global: ICL | unsupported | Manual note in the report: removing the control cabling is a physical runbook step. |
+| T11 | Control link/ports, `heartbeat-*`, `control-link-recovery` | None; liveness comes from the ICL `liveness-detection` | Global: ICL | unsupported | No MNHA equivalent; record in the fidelity report. Removing the control cabling is a physical runbook step. |
 | T12 | `groups node0`/`node1`, `apply-groups "${node}"`, `commit` of a single config | Two node-local configs: common part and node-local part, synced with `commit peers-synchronize` | Global: config-sync split | converted | Expand each group into its node's file; delete the `node0`/`node1` groups and the cluster stanza (cluster-only; may block load, E11). Common sync needs matching logical/tenant names (E8). |
 | T13 | fxp0 per-node address, `backup-router` | Same per-node fxp0 / management config | Config-sync split | converted | Stays node-local; never synced. |
-| T14 | IKE gateway, `external-interface reth<N>.<U>` | IPsec in SRG1+: floating `lo0` address, `external-interface lo0.<U>`, `managed-services ipsec` | SRG column (IPsec anchor SRG); Purpose | caveat | IPsec cannot anchor on SRG0 (E2, E3). Needs the IKE package and matching zone/routing-instance for loopback and receiving interface; IKEv1 aggressive-mode sessions are not synced. See `srx-mnha` mnha-advanced-workflows.md "IPsec with Multiple Routing Instances". |
+| T14 | IKE gateway, `external-interface reth<N>.<U>` | IPsec in SRG1+: floating `lo0` address, `external-interface lo0.<U>`, `managed-services ipsec` | SRG column (IPsec anchor SRG); Purpose | caveat | IPsec cannot anchor on SRG0 (E2, E3). Needs the IKE package and matching zone/routing-instance for loopback and receiving interface; IKEv1 aggressive-mode sessions are not synced. See `srx-mnha` mnha-advanced-workflows.md "IPsec with Multiple Routing Instances". **Not pushable via `srx-mnha-builder`**: its SKILL.md says never add `managed-services ipsec` and its `config-stages.md` errors on it; this output is hand-reviewed and operator-applied. |
 | T15 | `security nat proxy-arp interface reth<N>.<U>` | Prefer routed next-hop to the pool; otherwise per-node proxy-arp pinned to the active node | Mode; SRG | caveat | Both independent nodes answering ARP for one translated address breaks return traffic. See `srx-mnha` "NAT and Deterministic Routing". |
 | T16 | DHCP server or relay on a reth | Relay to an external server (preferred); local server only as split pools per node | Mode; Purpose | caveat | Lease databases are not assumed to sync; pools must not overlap. See `srx-mnha` "DHCP on MNHA". |
 | T17 | Routing protocols and static routes on reth | Per-node routing config; BGP/OSPF export steered by SRG signal routes in routed/hybrid | Mode; Detection | caveat | Neighbor addresses, router-ids and metrics are node-local. Signal-route stanzas below; export policies in `srx-mnha` mnha-config-patterns.md. |
@@ -76,6 +76,14 @@ set chassis high-availability services-redundancy-group <SRG> virtual-ip 1 inter
 set chassis high-availability services-redundancy-group <SRG> monitor interface <IFD>
 ```
 
+**T9 BFD monitoring (syntax as relayed from Juniper's MNHA monitoring documentation; re-verify on the target release before use, not field-tested here):**
+
+```junos
+set chassis high-availability services-redundancy-group <SRG> monitor bfd-liveliness <SRC_IP> <DST_IP> routing-instance <RI> <single-hop|multihop> <IFD>
+```
+
+No IP-monitor stanza is shown: its syntax is unverified.
+
 **T17 hybrid/routed signal routes:**
 
 ```junos
@@ -96,7 +104,7 @@ set security ike gateway <GW> local-address <FLOATING_VPN_IP>
 
 Also add the prefix-list binding from the `srx-mnha` floating-loopback pattern.
 
-**T10/T11 replacement (new ICL, not a translation):** flat form from builder `config-stages.md`.
+**T10/T11 replacement (new ICL, not a translation):** flat form from builder `config-stages.md`. `vpn-profile` placement is flat-form only; for grid it is not field-confirmed (`config-stages.md` note at line 190), so rely on a device dry run.
 
 ```junos
 set chassis high-availability local-id <LOCAL_ID> local-ip <LOCAL_ICL_IP>

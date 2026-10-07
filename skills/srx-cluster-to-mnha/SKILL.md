@@ -28,6 +28,10 @@ metadata:
       author: Juniper Networks
       url: https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/topic-map/mnha-support-for-vsrx.html
       retrieved: "2026-10-07"
+    - title: Multinode High Availability Monitoring Overview
+      author: Juniper Networks
+      url: https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/topic-map/mnha-monitoring-options.html
+      retrieved: "2026-10-07"
     - title: Disable a Chassis Cluster
       author: Juniper Networks
       url: https://www.juniper.net/documentation/us/en/software/junos/chassis-cluster-security-devices/topics/task/chassis-cluster-disabling.html
@@ -82,7 +86,7 @@ reboot, delete, or failover actions.
 - Never infer a deployment mode silently. Routing, default-gateway, or hybrid is a per-segment decision the user confirms.
 - Vendor claims need Juniper evidence or an explicit uncertain label (see [Evidence](#evidence)). Unknown platform or release support is reported as uncertain, not assumed.
 - Treat input as sensitive: ask for redacted configuration, and write secrets as `<redacted>`.
-- Live push goes to `srx-mnha-builder`; MNHA concepts and troubleshooting go to `srx-mnha`.
+- Live push goes to `srx-mnha-builder`, except IPsec-in-SRG output (`managed-services ipsec`), which that skill's stages reject: hand-review and apply it as the operator. MNHA concepts and troubleshooting go to `srx-mnha`.
 
 ## Workflow
 
@@ -94,7 +98,7 @@ reboot, delete, or failover actions.
 
 ## Handoffs
 
-- `srx-mnha-builder`: staging and pushing the generated node configs through a Junos MCP server under its approval gates.
+- `srx-mnha-builder`: staging and pushing the generated node configs through a Junos MCP server under its approval gates. It cannot push IPsec-SRG configuration (it errors on `managed-services ipsec`); that part is operator-applied.
 - `srx-mnha`: MNHA mode selection concepts, SRG and ICL behavior, and post-cutover troubleshooting.
 - `parsing-srx-configs`: normalizing a large configuration before inventory.
 - `firewall-config-conversion`: fidelity vocabulary, and conversions from other vendors to SRX first.
