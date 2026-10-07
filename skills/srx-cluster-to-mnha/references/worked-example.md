@@ -24,8 +24,7 @@ that show the pattern.
 | zone | untrust, trust, dmz | - | - | reth0.0, reth1.0, reth2.0 + st0.0 | dmz has host-inbound ike |
 | routing | bgp isp, static default | - | - | via 198.51.100.1 | AS 64512 |
 | policy | allow-web | - | - | trust to untrust | - |
-| nat | trust-to-untrust | - | - | source pool 198.51.100.10-.12 | - |
-| nat-proxy-arp | reth0.0 | - | - | 198.51.100.10-.12 | pool inside the ISP subnet |
+| nat | trust-to-untrust | - | - | source pool 203.0.113.66-.68 | pool is off every connected subnet; ISP must route it to us |
 | ike-gateway | gw-branch | - | - | external-interface reth2.0; ipsec vpn-branch on st0.0 | peer 203.0.113.50; PSK `<redacted>` |
 ```
 
@@ -35,7 +34,7 @@ Open facts: platform model and Junos release are `<UNKNOWN>`; asked through runt
 
 | Round | Topic | Proposal | Sample answer |
 |---|---|---|---|
-| 1 | Purpose and mode | reth0 has an eBGP router: routed. reth1, reth2 host static gateways: default-gateway | Confirmed. Pool reached by routed next-hop, hosts have a static gateway |
+| 1 | Purpose and mode | reth0 has an eBGP router: routed. reth1, reth2 host static gateways: default-gateway | Confirmed. No proxy ARP in source; NAT pool 203.0.113.64/29 is off-subnet, so it is routed (advertised by BGP); hosts have a static gateway |
 | 2 | Upstream and port names | Per-node LAG on reth0; single link elsewhere | Own LAG per node, switch tolerates MAC move, same port names after cluster break (`ge-0/0/3`...) |
 | 3 | SRG design | RG1 owns three modes, so split: SRG2 routed for reth0, SRG1 switching for reth1 and reth2 and the IPsec anchor | Confirmed; node0 owns both, no preempt |
 | 4 | Detection | BFD to the ISP on SRG2, interface monitor on SRG1 | Confirmed |
@@ -63,10 +62,10 @@ Open facts: platform model and Junos release are `<UNKNOWN>`; asked through runt
 ```
 | Decision | Answer | Decision source |
 |---|---|---|
-| ICL (ports or loopback, addressing) | dedicated ports, <PLACEHOLDER> | user-confirmed (round 5) |
+| ICL (ports or loopback, addressing) | dedicated ports `<ICL_IFD>`, addresses not supplied | user-confirmed (round 5) |
 | ICD | none | user-confirmed (round 5) |
 | HA link encryption | PKI | user-confirmed (round 5) |
-| NAT proxy ARP / DHCP handling | routed next-hop; no DHCP in source | user-confirmed (round 1) |
+| NAT proxy ARP / DHCP handling | no proxy ARP in source; pool routed via BGP from the SRG2 active node; no DHCP | user-confirmed (round 1) |
 | Config-sync split (common vs node-local) | policy, NAT, zones, SRG settings common; rest node-local | user-confirmed (round 6) |
 | Platform / release verdict | uncertain | user-confirmed (round 7) |
 ```
@@ -103,18 +102,40 @@ set interfaces ge-0/0/3 gigether-options 802.3ad ae0
 set interfaces ae0 unit 0 family inet address <NODE0_AE0_IP>/28
 set interfaces ge-0/0/5 unit 0 family inet address <NODE0_TRUST_IP>/24
 set protocols bgp group isp neighbor 198.51.100.1 peer-as 64496
+set protocols bgp group isp export <BGP_EXPORT_POLICY>
+set routing-options static route 0.0.0.0/0 next-hop 198.51.100.1
 set chassis high-availability local-id 1 local-ip <NODE0_ICL_IP>
 set chassis high-availability peer-id 2 peer-ip <NODE1_ICL_IP>
+set chassis high-availability peer-id 2 interface <ICL_IFD>
 set chassis high-availability services-redundancy-group 1 peer-id 2
 set chassis high-availability services-redundancy-group 1 activeness-priority 200
 set chassis high-availability services-redundancy-group 2 peer-id 2
 set chassis high-availability services-redundancy-group 2 activeness-priority 200
 set chassis high-availability services-redundancy-group 2 activeness-probe dest-ip <PROBE_DST> src-ip <NODE0_PROBE_SRC>
 # ---- operator-applied: ipsec-srg ----
+# Every IPsec line belongs here (T14); lines are commented until reviewed.
 # set interfaces lo0 unit <UNIT> family inet address <FLOATING_VPN_IP>/32
 # set chassis high-availability services-redundancy-group 1 managed-services ipsec
-# set security ike gateway gw-branch external-interface lo0.<UNIT>
+# set security ike proposal ike-prop authentication-method pre-shared-keys
+# set security ike proposal ike-prop dh-group group14
+# set security ike proposal ike-prop encryption-algorithm aes-256-cbc
+# set security ike proposal ike-prop authentication-algorithm sha-256
+# set security ike policy ike-pol mode main
+# set security ike policy ike-pol proposals ike-prop
 # set security ike policy ike-pol pre-shared-key ascii-text "<redacted>"
+# set security ike gateway gw-branch ike-policy ike-pol
+# set security ike gateway gw-branch address 203.0.113.50
+# set security ike gateway gw-branch external-interface lo0.<UNIT>
+# set security ike gateway gw-branch local-address <FLOATING_VPN_IP>
+# set security ipsec proposal ipsec-prop protocol esp
+# set security ipsec proposal ipsec-prop encryption-algorithm aes-256-cbc
+# set security ipsec proposal ipsec-prop authentication-algorithm hmac-sha-256-128
+# set security ipsec policy ipsec-pol proposals ipsec-prop
+# set security ipsec vpn vpn-branch bind-interface st0.0
+# set security ipsec vpn vpn-branch ike gateway gw-branch
+# set security ipsec vpn vpn-branch ike ipsec-policy ipsec-pol
+# set interfaces st0 unit 0 family inet
+# set security zones security-zone dmz interfaces st0.0
 ```
 
 `node1.set` carries the identical `# ---- common ----` block. Its node-local part
@@ -142,8 +163,8 @@ addresses, `local-id 2` / `peer-id 1` (and `peer-id 1` on each SRG),
 | T8 | `... redundancy-group 1 interface-monitor ge-0/0/3 weight 255` | `monitor interface ae0` (SRG2) | caveat | Weights do not translate; BFD uses the T9 stanza and is not emitted until timers are supplied |
 | T10 | `set interfaces fab0 fabric-options member-interfaces ge-0/0/2` | ICL stanzas with placeholders | unsupported | Build a routed, IPsec-encrypted ICL; do not reuse fab ports |
 | T14 | `set security ike gateway gw-branch external-interface reth2.0` | commented `ipsec-srg` block on SRG1 | caveat | Operator applies after review; branch peer 203.0.113.50 must target `<FLOATING_VPN_IP>`; PSK re-entered |
-| T15 | `set security nat proxy-arp interface reth0.0 ...` | none | caveat | Pool is advertised by BGP from the SRG2 active node; export policy `<PLACEHOLDER>` not generated |
-| T17 | `set protocols bgp group isp neighbor 198.51.100.1` | node-local BGP neighbor | caveat | Re-peer ISP with two node addresses; signal-route policy follows `srx-mnha` |
+| T17 | `set protocols bgp group isp neighbor 198.51.100.1` | node-local BGP neighbor, export `<BGP_EXPORT_POLICY>` | caveat | Re-peer ISP with two node addresses; policy must advertise pool 203.0.113.64/29 from the SRG2 active node (`srx-mnha` mnha-config-patterns.md) |
+| T17 | `set routing-options static route 0.0.0.0/0 next-hop 198.51.100.1` | node-local static default | caveat | Next hop is on the untrust LAG; confirm each node reaches 198.51.100.1 |
 | T22 | `set security policies from-zone trust to-zone untrust policy allow-web ...` | common policy, NAT pool and rule-set | converted | none |
 | T21 | platform and release | verdict uncertain | caveat | Check Feature Explorer (E7) |
 ```
@@ -155,12 +176,21 @@ Totals: 4 converted, 11 caveat, 0 manual, 3 unsupported. Open manual items: none
 ```
 | Placeholder | Meaning | Used in | Owner | Status |
 |---|---|---|---|---|
-| <NODE0_AE0_IP> / <NODE1_AE0_IP> | per-node untrust address | node-local | user | needed |
-| <NODE0_TRUST_IP> / <NODE1_TRUST_IP> | per-node trust address | node-local | user | needed |
-| <NODE0_ICL_IP> / <NODE1_ICL_IP> | ICL addresses | node-local | user | needed |
-| <PROBE_DST>, <NODE0_PROBE_SRC>, <NODE1_PROBE_SRC> | SRG2 activeness probe | node-local | user | needed |
-| <ACTIVE_SIGNAL_ROUTE> / <BACKUP_SIGNAL_ROUTE> | reserved signal prefixes | common | user | needed |
-| <FLOATING_VPN_IP>, <UNIT> | IPsec anchor on `lo0` | ipsec-srg block | user | needed |
+| <NODE0_AE0_IP> | node0 untrust address | node0.set, runbook phase 4 | user | needed |
+| <NODE1_AE0_IP> | node1 untrust address | node1.set, runbook phase 2 | user | needed |
+| <NODE0_TRUST_IP> | node0 trust address | node0.set, runbook phase 4 | user | needed |
+| <NODE1_TRUST_IP> | node1 trust address | node1.set, runbook phase 2 | user | needed |
+| <NODE0_ICL_IP> | node0 ICL local address | node0.set, runbook phase 4 | user | needed |
+| <NODE1_ICL_IP> | node1 ICL local address | node1.set, runbook phase 2 | user | needed |
+| <ICL_IFD> | ICL dedicated port or LAG | both, runbook phase 2 | user | needed |
+| <PROBE_DST> | SRG2 activeness-probe destination | both, runbook phase 2 | user | needed |
+| <NODE0_PROBE_SRC> | node0 probe source address | node0.set, runbook phase 4 | user | needed |
+| <NODE1_PROBE_SRC> | node1 probe source address | node1.set, runbook phase 2 | user | needed |
+| <ACTIVE_SIGNAL_ROUTE> | reserved active signal prefix | both, runbook phase 2 | user | needed |
+| <BACKUP_SIGNAL_ROUTE> | reserved backup signal prefix | both, runbook phase 2 | user | needed |
+| <BGP_EXPORT_POLICY> | export policy advertising the NAT pool from the active node | both, runbook phase 2 | user | needed |
+| <FLOATING_VPN_IP> | floating IPsec address on lo0 | both, ipsec-srg block (phase 2 node1, phase 5 node0) | user | needed |
+| <UNIT> | lo0 unit for the floating address | both, ipsec-srg block | user | needed |
 ```
 
 The files cannot be loaded as is while any row is `needed`.

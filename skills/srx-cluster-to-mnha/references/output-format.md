@@ -55,8 +55,10 @@ Rules:
   cluster` (T12, E11).
 - Plus an optional third marker, `# ---- operator-applied: ipsec-srg ----`,
   at the end of a file for IPsec-SRG lines (T14, `managed-services ipsec`).
-  Holds the whole IPsec section (floating `lo0`, `managed-services ipsec`, IKE and IPsec proposals, policies, gateway, `ipsec vpn`, `st0` zone membership), so the common part never references an uncommitted gateway. Every line is commented out with `# `, so a push of the file cannot apply
-  it:
+  Holds the whole IPsec section (floating `lo0`, `managed-services ipsec`,
+  IKE and IPsec proposals, policies, gateway, `ipsec vpn`, `st0` and its zone
+  membership), so the common part never references an uncommitted gateway.
+  Every line is commented out with `# `, so a push of the file cannot apply it:
 
   ```junos
   # ---- operator-applied: ipsec-srg ----

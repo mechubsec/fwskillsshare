@@ -7,6 +7,7 @@ set groups node1 system host-name srx-cl-b
 set groups node1 interfaces fxp0 unit 0 family inet address 192.0.2.11/24
 set groups node1 system backup-router 192.0.2.254 destination 10.99.0.0/16
 set apply-groups "${node}"
+# cluster-id is normally set operationally (set chassis cluster cluster-id 1 node N reboot); shown here for inventory completeness.
 set chassis cluster cluster-id 1
 set chassis cluster reth-count 3
 set chassis cluster redundancy-group 0 node 0 priority 200
@@ -53,12 +54,11 @@ set security policies from-zone trust to-zone untrust policy allow-web match sou
 set security policies from-zone trust to-zone untrust policy allow-web match destination-address any
 set security policies from-zone trust to-zone untrust policy allow-web match application junos-https
 set security policies from-zone trust to-zone untrust policy allow-web then permit
-set security nat source pool snat-pool address 198.51.100.10/32 to 198.51.100.12/32
+set security nat source pool snat-pool address 203.0.113.66/32 to 203.0.113.68/32
 set security nat source rule-set trust-to-untrust from zone trust
 set security nat source rule-set trust-to-untrust to zone untrust
 set security nat source rule-set trust-to-untrust rule snat-web match source-address 10.10.10.0/24
 set security nat source rule-set trust-to-untrust rule snat-web then source-nat pool snat-pool
-set security nat proxy-arp interface reth0.0 address 198.51.100.10/32 to 198.51.100.12/32
 set security ike proposal ike-prop authentication-method pre-shared-keys
 set security ike proposal ike-prop dh-group group14
 set security ike proposal ike-prop encryption-algorithm aes-256-cbc
