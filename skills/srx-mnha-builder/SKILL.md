@@ -41,8 +41,9 @@ pitfalls) lives in the `srx-mnha` skill. This skill is about **choosing the mode
 building the pair in a safe order**.
 
 **Scope:**
-- A new pair, built from two nodes with no chassis cluster (to convert an existing cluster, see `srx-cluster-to-mnha`) and no existing
-  `chassis high-availability`. Existing interfaces, zones and an eBGP group may be
+- A new pair, built from two nodes with no chassis cluster and no existing
+  `chassis high-availability`. To convert an existing cluster, see
+  `srx-cluster-to-mnha`. Existing interfaces, zones and an eBGP group may be
   reused if they match the pair sheet.
 - SRG0 plus one SRG1.
 - The ICL in the default routing instance, either on a dedicated link or as loopbacks

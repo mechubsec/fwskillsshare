@@ -74,7 +74,8 @@ Confirmed by the user before generation ("Confirm, or change which row?").
 
 ## 4. Generated configuration ([output-format.md](output-format.md))
 
-`node0.set` (excerpt). Port names are the same on both nodes after the cluster
+`node0.set` (excerpt, abridged; no BFD stanza is emitted because the syntax is
+unconfirmed, see the T8 BFD row). Port names are the same on both nodes after the cluster
 break, so zone bindings are common.
 
 ```junos
@@ -98,7 +99,10 @@ set chassis high-availability services-redundancy-group 2 backup-signal-route <B
 set system host-name srx-cl-a
 set interfaces fxp0 unit 0 family inet address 192.0.2.10/24
 set system backup-router 192.0.2.254 destination 10.99.0.0/16
+set chassis aggregated-devices ethernet device-count <DEVICE_COUNT>
 set interfaces ge-0/0/3 gigether-options 802.3ad ae0
+set interfaces ge-0/0/4 gigether-options 802.3ad ae0
+set interfaces ae0 aggregated-ether-options lacp active
 set interfaces ae0 unit 0 family inet address <NODE0_AE0_IP>/28
 set interfaces ge-0/0/5 unit 0 family inet address <NODE0_TRUST_IP>/24
 set protocols bgp group isp neighbor 198.51.100.1 peer-as 64496
@@ -160,7 +164,8 @@ addresses, `local-id 2` / `peer-id 1` (and `peer-id 1` on each SRG),
 | T5 | `set chassis cluster redundancy-group 0 node 0 priority 200` | none | unsupported | Per-node RE; manage each node separately |
 | T6 | `set chassis cluster redundancy-group 1 node 0 priority 200` | SRG1 and SRG2 priority 200 / 100 | caveat | RG1 split by mode, so ownership of SRG1 and SRG2 can diverge |
 | T7 | `set chassis cluster redundancy-group 1 preempt` | no `preemption` | caveat | Cluster preempted; user chose none to avoid failback blackholes |
-| T8 | `... redundancy-group 1 interface-monitor ge-0/0/3 weight 255` | `monitor interface ae0` (SRG2) | caveat | Weights do not translate; BFD uses the T9 stanza and is not emitted until timers are supplied |
+| T8 | `... redundancy-group 1 interface-monitor ge-0/0/3 weight 255` | `monitor interface ae0` (SRG2) | caveat | Weights do not translate; thresholds re-chosen with the user |
+| T8 | decision record: reth0 detection `BFD + interface` (no cluster source line) | none; BFD monitor is a candidate only | caveat | BFD timers/syntax to verify in a lab; stanza is unconfirmed (vendor-evidence `## Uncertain`) and not emitted |
 | T10 | `set interfaces fab0 fabric-options member-interfaces ge-0/0/2` | ICL stanzas with placeholders | unsupported | Build a routed, IPsec-encrypted ICL; do not reuse fab ports |
 | T14 | `set security ike gateway gw-branch external-interface reth2.0` | commented `ipsec-srg` block on SRG1 | caveat | Operator applies after review; branch peer 203.0.113.50 must target `<FLOATING_VPN_IP>`; PSK re-entered |
 | T17 | `set protocols bgp group isp neighbor 198.51.100.1` | node-local BGP neighbor, export `<BGP_EXPORT_POLICY>` | caveat | Re-peer ISP with two node addresses; policy must advertise pool 203.0.113.64/29 from the SRG2 active node (`srx-mnha` mnha-config-patterns.md) |
@@ -169,7 +174,9 @@ addresses, `local-id 2` / `peer-id 1` (and `peer-id 1` on each SRG),
 | T21 | platform and release | verdict uncertain | caveat | Check Feature Explorer (E7) |
 ```
 
-Totals: 4 converted, 11 caveat, 0 manual, 3 unsupported. Open manual items: none.
+Totals: 4 converted, 12 caveat, 0 manual, 3 unsupported. Open manual items: none.
+
+The fixture has no `system login`, `snmp` or `syslog` stanzas outside the node groups, so there is no T24 row; a real cluster with them gets one `manual` row (system baseline preserved by the runbook's targeted deletes).
 
 ## 6. Values still needed
 
@@ -183,6 +190,9 @@ Totals: 4 converted, 11 caveat, 0 manual, 3 unsupported. Open manual items: none
 | <NODE0_ICL_IP> | node0 ICL local address | node0.set, runbook phase 4 | user | needed |
 | <NODE1_ICL_IP> | node1 ICL local address | node1.set, runbook phase 2 | user | needed |
 | <ICL_IFD> | ICL dedicated port or LAG | both, runbook phase 2 | user | needed |
+| <DEVICE_COUNT> | `aggregated-devices ethernet device-count` for ae0 | both, runbook phase 2 | user | needed |
+| <BFD_MIN_INTERVAL> | BFD minimum interval for SRG2 detection (candidate only, syntax unconfirmed) | none emitted | user | needed |
+| <BFD_MULTIPLIER> | BFD multiplier for SRG2 detection (candidate only, syntax unconfirmed) | none emitted | user | needed |
 | <PROBE_DST> | SRG2 activeness-probe destination | both, runbook phase 2 | user | needed |
 | <NODE0_PROBE_SRC> | node0 probe source address | node0.set, runbook phase 4 | user | needed |
 | <NODE1_PROBE_SRC> | node1 probe source address | node1.set, runbook phase 2 | user | needed |
