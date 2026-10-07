@@ -94,12 +94,22 @@ Phase 0 baseline, no traffic arriving on node1.
 - Operator-applied: uncomment, review and `load set` the IPsec-SRG block (T14)
   from `node1.set` now, so the VPN anchor exists before traffic moves.
   `srx-mnha-builder` will not push it.
+- Then `commit check` and `commit` (or `commit confirmed <minutes>`, followed
+  by a plain `commit` once the checks below pass). A failed `commit check`
+  here is a stop-and-rollback point: do not move traffic; use the phase 2
+  rollback.
 - Do not enable node1's revenue ports yet.
 
 Verify on node1: `show chassis cluster status` reports cluster is not
 enabled; `show configuration chassis high-availability`;
 `show interfaces terse`. The ICL cannot be fully tested until node0 is converted
-(Phase 4); here confirm only that the ICL interface is up.
+(Phase 4); here confirm only that the ICL interface is up. Also:
+- `show security ike security-associations` and
+  `show security ipsec security-associations`: expect no peer SAs yet, because
+  revenue ports are down; the commit of the T14 block must have succeeded.
+- `show chassis high-availability services-redundancy-group <N>` for the
+  IPsec SRG: shows the configuration; with no peer yet, a `HOLD` or
+  not-active state is expected.
 
 > **Rollback box, phase 2:** node1 is out of production, so this is the
 > cheapest point. From the console:
@@ -129,12 +139,15 @@ neighbors hold node1's routes. Hybrid: both of the above.
 Node0 is the cluster's last member and now carries no traffic; node1 is a
 single standalone node.
 
-Verify on node1: `show security flow session summary`,
-`show route summary`, `show route protocol <PROTO>`,
-`show arp no-resolve`, `show interfaces terse`, a test flow per segment from a
-host, and the IPsec SAs (`show security ipsec security-associations`) if VPN
-terminates here (expected up, since the T14 block was applied in Phase 2; if it
-was not, SAs are down until it is applied and this is the stated VPN outage). Compare with the Phase 0 baseline.
+Verify on node1, and compare with the Phase 0 baseline:
+
+- `show security flow session summary`
+- `show route summary` and `show route protocol <PROTO>`
+- `show arp no-resolve` and `show interfaces terse`
+- a test flow per segment from a host
+- if VPN terminates here, `show security ipsec security-associations`:
+  expected up, since the T14 block was applied in Phase 2; if it was not, SAs
+  are down until it is applied and this is the stated VPN outage.
 
 > **Rollback box, phase 3:** reverse the order: shut node1's revenue ports and
 > advertisements, confirm down, then re-advertise from node0 and re-enable its
