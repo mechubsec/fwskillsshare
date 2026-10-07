@@ -34,6 +34,11 @@ Ask, per reth: "What sits on this segment?"
 - Hosts or servers with a static default gateway (recommend default-gateway with a VIP)
 - Mixed, or unsure (hybrid, or split the segment)
 
+If the inventory shows NAT proxy ARP or DHCP on the reth (T15, T16), ask here
+too, one question each: "Should the translated pool be reached by a routed
+next-hop (recommended), or answered by proxy ARP on the active node only?" and
+"Relay to an external DHCP server, or split local pools per node?"
+
 Changes in output: interface addressing (per-node address vs VIP), whether an
 SRG1+ owns a VIP on that segment, routing protocol config, and the translation
 row for the reth.
@@ -48,6 +53,7 @@ The `srx-mnha` skill's default-gateway section lists these checks.
 Ask:
 - "Does each node connect to the upstream with its own LAG, or one link?" (own LAG per node / single link / other)
 - "Can the adjacent switch accept a gateway MAC moving between ports?" (yes, verified / not checked / no, port-security or DAI is on)
+- "What will each node's ports be called once it leaves the cluster?" (same names on both nodes / differ, user lists them / not known yet). A cluster node1 usually keeps a renumbered FPC (for example `ge-7/0/x`) and drops back to the node-local number after the cluster is disabled; this is not cited here, so confirm it.
 
 Changes in output: reth LACP becomes a per-node `ae` interface; a "no" forces
 routed mode or a switch change item in the runbook.
@@ -165,6 +171,7 @@ unchanged):
 | ICL (ports or loopback, addressing) | <PLACEHOLDER> | user-confirmed (round 5) |
 | ICD | none / evaluate (uncertain) | user-confirmed (round 5) |
 | HA link encryption | PKI / other | user-confirmed (round 5) |
+| NAT proxy ARP / DHCP handling | routed next-hop / pinned proxy ARP; relay / split pools | user-confirmed (round 1) |
 | Config-sync split (common vs node-local) | <summary> | user-confirmed (round 6) |
 | Platform / release verdict | supported-by-example / uncertain | user-confirmed (round 7) |
 ```

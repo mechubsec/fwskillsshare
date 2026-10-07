@@ -1,0 +1,79 @@
+# Synthetic SRX chassis-cluster fixture (display set). RFC 5737 / RFC 1918 addresses only; secrets are <redacted>.
+# Assumption: vSRX-style cluster, node0 ports are ge-0/0/x and node1 ports are renumbered ge-7/0/x.
+set groups node0 system host-name srx-cl-a
+set groups node0 interfaces fxp0 unit 0 family inet address 192.0.2.10/24
+set groups node0 system backup-router 192.0.2.254 destination 10.99.0.0/16
+set groups node1 system host-name srx-cl-b
+set groups node1 interfaces fxp0 unit 0 family inet address 192.0.2.11/24
+set groups node1 system backup-router 192.0.2.254 destination 10.99.0.0/16
+set apply-groups "${node}"
+set chassis cluster cluster-id 1
+set chassis cluster reth-count 3
+set chassis cluster redundancy-group 0 node 0 priority 200
+set chassis cluster redundancy-group 0 node 1 priority 100
+set chassis cluster redundancy-group 1 node 0 priority 200
+set chassis cluster redundancy-group 1 node 1 priority 100
+set chassis cluster redundancy-group 1 preempt
+set chassis cluster redundancy-group 1 gratuitous-arp-count 4
+set chassis cluster redundancy-group 1 interface-monitor ge-0/0/3 weight 255
+set chassis cluster redundancy-group 1 interface-monitor ge-7/0/3 weight 255
+set interfaces fab0 fabric-options member-interfaces ge-0/0/2
+set interfaces fab1 fabric-options member-interfaces ge-7/0/2
+set interfaces ge-0/0/3 gigether-options redundant-parent reth0
+set interfaces ge-0/0/4 gigether-options redundant-parent reth0
+set interfaces ge-7/0/3 gigether-options redundant-parent reth0
+set interfaces ge-7/0/4 gigether-options redundant-parent reth0
+set interfaces ge-0/0/5 gigether-options redundant-parent reth1
+set interfaces ge-7/0/5 gigether-options redundant-parent reth1
+set interfaces ge-0/0/6 gigether-options redundant-parent reth2
+set interfaces ge-7/0/6 gigether-options redundant-parent reth2
+set interfaces reth0 redundant-ether-options redundancy-group 1
+set interfaces reth0 redundant-ether-options lacp active
+set interfaces reth0 unit 0 family inet address 198.51.100.2/28
+set interfaces reth1 redundant-ether-options redundancy-group 1
+set interfaces reth1 unit 0 family inet address 10.10.10.1/24
+set interfaces reth2 redundant-ether-options redundancy-group 1
+set interfaces reth2 unit 0 family inet address 203.0.113.1/28
+set interfaces st0 unit 0 family inet
+set routing-options autonomous-system 64512
+set routing-options static route 0.0.0.0/0 next-hop 198.51.100.1
+set protocols bgp group isp type external
+set protocols bgp group isp peer-as 64496
+set protocols bgp group isp neighbor 198.51.100.1
+set security zones security-zone untrust interfaces reth0.0
+set security zones security-zone untrust host-inbound-traffic system-services ping
+set security zones security-zone untrust host-inbound-traffic protocols bgp
+set security zones security-zone trust interfaces reth1.0
+set security zones security-zone trust host-inbound-traffic system-services ping
+set security zones security-zone dmz interfaces reth2.0
+set security zones security-zone dmz interfaces st0.0
+set security zones security-zone dmz host-inbound-traffic system-services ike
+set security address-book global address web-net 10.10.10.0/24
+set security policies from-zone trust to-zone untrust policy allow-web match source-address web-net
+set security policies from-zone trust to-zone untrust policy allow-web match destination-address any
+set security policies from-zone trust to-zone untrust policy allow-web match application junos-https
+set security policies from-zone trust to-zone untrust policy allow-web then permit
+set security nat source pool snat-pool address 198.51.100.10/32 to 198.51.100.12/32
+set security nat source rule-set trust-to-untrust from zone trust
+set security nat source rule-set trust-to-untrust to zone untrust
+set security nat source rule-set trust-to-untrust rule snat-web match source-address 10.10.10.0/24
+set security nat source rule-set trust-to-untrust rule snat-web then source-nat pool snat-pool
+set security nat proxy-arp interface reth0.0 address 198.51.100.10/32 to 198.51.100.12/32
+set security ike proposal ike-prop authentication-method pre-shared-keys
+set security ike proposal ike-prop dh-group group14
+set security ike proposal ike-prop encryption-algorithm aes-256-cbc
+set security ike proposal ike-prop authentication-algorithm sha-256
+set security ike policy ike-pol mode main
+set security ike policy ike-pol proposals ike-prop
+set security ike policy ike-pol pre-shared-key ascii-text "<redacted>"
+set security ike gateway gw-branch ike-policy ike-pol
+set security ike gateway gw-branch address 203.0.113.50
+set security ike gateway gw-branch external-interface reth2.0
+set security ike gateway gw-branch local-address 203.0.113.1
+set security ipsec proposal ipsec-prop protocol esp
+set security ipsec proposal ipsec-prop encryption-algorithm aes-256-cbc
+set security ipsec proposal ipsec-prop authentication-algorithm hmac-sha-256-128
+set security ipsec policy ipsec-pol proposals ipsec-prop
+set security ipsec vpn vpn-branch bind-interface st0.0
+set security ipsec vpn vpn-branch ike gateway gw-branch
+set security ipsec vpn vpn-branch ike ipsec-policy ipsec-pol
