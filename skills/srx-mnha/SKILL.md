@@ -1,7 +1,7 @@
 ---
 name: srx-mnha
 description: Design, configure, audit, and troubleshoot Juniper SRX Multi-Node High Availability. Use when handling routed, default-gateway, or hybrid modes, chassis-cluster migration, SRGs, ICL or ICD, session sync, BGP or BFD failover, VIPs, IPsec, NAT, proxy ARP, routing instances, or DHCP. Use focused SRX skills for non-MNHA behavior.
-version: 1.3.3
+version: 1.3.4
 author:
   - fastrevmd-lab
   - Claude
@@ -10,7 +10,7 @@ license: MIT
 metadata:
   hermes:
     tags: [srx, junos, mnha, high-availability, chassis-cluster, srg, icl, icd, bgp, bfd, ipsec, ike, nat, routing-instance, dhcp]
-    related_skills: [srx-mnha-builder, parsing-srx-configs, srx-nat, srx-policy, srx-autovpn-full-tunnel, srx-ipsec-hub-spoke]
+    related_skills: [srx-mnha-builder, srx-cluster-to-mnha, parsing-srx-configs, srx-nat, srx-policy, srx-autovpn-full-tunnel, srx-ipsec-hub-spoke]
   sources:
     - title: "DHCP on MNHA: Back to Basics"
       author: James Rathbun
@@ -62,7 +62,7 @@ metadata:
 
 Multi-Node High Availability (MNHA) is Juniper SRX high availability built around independent SRX nodes that synchronize runtime state over routed HA links. Unlike chassis cluster, MNHA nodes do not become a single logical chassis. Each node keeps its own control plane, hostname, management, routing protocols, interface addressing, and node-specific configuration. Stateful firewall/NAT/IPsec runtime objects can still synchronize so traffic can survive a path or node failover when the design keeps routing, interfaces, policy, and HA state aligned.
 
-Use MNHA as an L3-first HA design. Routing policy, BFD, link monitoring, service redundancy groups, and optional VIP behavior determine which node handles traffic. Avoid treating MNHA as a drop-in chassis-cluster clone; it solves different problems and has different failure modes. **To build a new pair step by step through a Junos MCP server, use `srx-mnha-builder`.**
+Use MNHA as an L3-first HA design. Routing policy, BFD, link monitoring, service redundancy groups, and optional VIP behavior determine which node handles traffic. Avoid treating MNHA as a drop-in chassis-cluster clone; it solves different problems and has different failure modes. **To build a new pair step by step through a Junos MCP server, use `srx-mnha-builder`. To convert an existing chassis-cluster configuration end to end (interview, per-node configs, fidelity report, cutover runbook), use `srx-cluster-to-mnha`.**
 
 ## Runtime intake
 
@@ -104,6 +104,8 @@ Key design translation:
 Always verify platform and Junos support in Juniper Pathfinder / Feature Explorer and current Juniper documentation before deployment. MNHA feature support, scale, asymmetric-flow support, multi-node support, and platform support are release-dependent.
 
 ## Chassis-Cluster to MNHA Interface Migration
+
+To convert an existing chassis-cluster configuration end to end (interview, per-node configs, fidelity report, cutover runbook), use `srx-cluster-to-mnha`.
 
 Read `references/mnha-advanced-workflows.md` before converting chassis-cluster `reth` members. The migration requires a per-node decision between local physical interfaces and a local `ae`; cluster LACP does not prove the upstream is a valid standalone-node LAG.
 

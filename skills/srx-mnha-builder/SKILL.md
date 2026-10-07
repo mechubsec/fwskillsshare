@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-builder
 description: Build a new two-node SRX/vSRX Multi-Node High Availability pair from standalone nodes over a Junos MCP server, covering routing, switching or hybrid mode, dedicated or shared ICL, pair sheet, staged configs with pre-push checks and approval gates, HA-activation reboot, formation checks and failover test. Use when standing up an MNHA pair or turning two SRXs into HA. For design or troubleshooting a running pair, use srx-mnha.
-version: 0.2.1
+version: 0.2.2
 author:
   - fastrevmd-lab
   - Claude
@@ -11,7 +11,7 @@ license: MIT
 metadata:
   hermes:
     tags: [srx, vsrx, junos, mnha, high-availability, srg, icl, bfd, bgp, signal-route, vip, ha-link-encryption, mcp, approval-gate, failover-test]
-    related_skills: [srx-mnha, srx-policy, srx-nat, parsing-srx-configs]
+    related_skills: [srx-mnha, srx-cluster-to-mnha, srx-policy, srx-nat, parsing-srx-configs]
 ---
 
 # SRX MNHA Pair Builder
@@ -41,7 +41,7 @@ pitfalls) lives in the `srx-mnha` skill. This skill is about **choosing the mode
 building the pair in a safe order**.
 
 **Scope:**
-- A new pair, built from two nodes with no chassis cluster and no existing
+- A new pair, built from two nodes with no chassis cluster (to convert an existing cluster, see `srx-cluster-to-mnha`) and no existing
   `chassis high-availability`. Existing interfaces, zones and an eBGP group may be
   reused if they match the pair sheet.
 - SRG0 plus one SRG1.
@@ -76,7 +76,7 @@ Tool mappings and server-specific behavior are in `references/mcp-server-notes.m
    them.
 2. Run `gather_device_facts` on each node. **Stop** if the models or `version` differ.
 3. Run `execute_junos_command` with `show chassis cluster status` on each node. **Stop**
-   if either node is clustered.
+   if either node is clustered. To plan converting an existing cluster, use `srx-cluster-to-mnha` first; this skill builds only from standalone nodes.
 4. Run `execute_junos_command` with `show chassis high-availability information` on each
    node. Expect *mode not configured*. If a node shows an MNHA configuration, it isn't a
    new node: stop and hand back to the user to clean it and reboot.
