@@ -126,7 +126,7 @@ in production.
 1. Clone a tagged release and run the installer:
 
 ```bash
-git clone --branch v1.10.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
+git clone --branch v1.11.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
 cd fwskillsshare
 ./install.sh
 ```
@@ -284,7 +284,7 @@ release tag (`vX.Y.Z`), never a branch or `HEAD`, and verifies every skill file
 against `skills/CHECKSUMS.sha256` before installing anything:
 
 ```bash
-git clone --branch v1.10.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
+git clone --branch v1.11.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
 cd fwskillsshare
 
 # Interactive: pick skills + target
@@ -328,7 +328,7 @@ The skills are plain directories — copy the ones you want. Pin a release tag
 rather than the default branch so you know exactly what you're copying:
 
 ```bash
-git clone --branch v1.10.0 --depth 1 git@github.com:mechubsec/fwskillsshare.git
+git clone --branch v1.11.0 --depth 1 git@github.com:mechubsec/fwskillsshare.git
 
 # All of them
 cp -r fwskillsshare/skills/* ~/.claude/skills/

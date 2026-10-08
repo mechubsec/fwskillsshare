@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased
+## 1.11.0 — Chassis cluster to MNHA conversion skill
+
+- **New skill: `srx-cluster-to-mnha`** (0.2.1, reviewed: false). Converts an existing SRX or vSRX chassis-cluster configuration into two node-local Multi-Node High Availability configurations through an SRX-architect interview (mode per segment, SRG design, failure detection, ICL/ICD, config-sync split, platform verdict), with a fidelity report (converted / caveat / manual / unsupported) and a two-part cutover runbook with gates and a rollback box per phase. Offline only: device changes go through `srx-mnha-builder`'s gates, and IPsec-SRG output is operator-applied. Requested in JNPRAutomate/fw-skills-share#1.
+- **Lab-verified** end to end on a vSRX chassis cluster (Junos 24.4R1.9, KVM): HA formed and synced, one active node per active/backup SRG throughout, about 75 s outage on the traffic move and about 1 s on a controlled failover. Findings recorded as lab evidence L1–L12, including the vSRX interface rename after leaving the cluster (names shift by one), marker-free `load set` files, the HA-activation reboot, an ICL that formed unencrypted (encryption still recommended for production), and VIPs answering with the active node's physical MAC.
+- **srx-mnha** (1.3.4) and **srx-mnha-builder** (0.2.2) hand off cluster conversions to the new skill.
+- Catalog: 33 skills, 26 reviewed.
+
+### Also in this release
 
 - **Publishing:** `evals/` is now published to the downstream distribution. The 1.10.0 note said evals are never published; they are still never installed, but `scripts/check-evals.py` ships with `scripts/` and `just lint` fails without them.
 
