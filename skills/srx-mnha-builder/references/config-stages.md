@@ -261,7 +261,7 @@ set chassis high-availability services-redundancy-group 1 virtual-ip <VIP_ID> ip
 set chassis high-availability services-redundancy-group 1 virtual-ip <VIP_ID> interface <VIP_IFL>
 ```
 
-Include only when `pair.srg1.monitor_interfaces` is non-empty and **flat model**:
+Include whenever `pair.srg1.monitor_interfaces` is non-empty, **regardless of `config_model`**, unless the user explicitly asked for the monitor-object form below (the two blocks are mutually exclusive; the pair sheet has no field for the form, so the simple form is the default and the monitor-object form is only on an explicit request):
 
 For each interface in `monitor_interfaces`:
 
@@ -269,7 +269,7 @@ For each interface in `monitor_interfaces`:
 set chassis high-availability services-redundancy-group 1 monitor interface <MONITOR_IFD>
 ```
 
-Include only when `pair.srg1.monitor_interfaces` is non-empty and the user chose the **monitor-object** form (both forms commit-check on vSRX 26.2R1.7):
+Include instead of the simple form only when `pair.srg1.monitor_interfaces` is non-empty and the user **explicitly asked** for the monitor-object form (both forms commit-check on vSRX 26.2R1.7):
 
 For each interface in `monitor_interfaces`:
 
@@ -422,7 +422,6 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 - [ ] All required fields are filled (no `<FILL>` remains in the pair sheet)
 - [ ] `config_model` is `flat` unless the user explicitly asked for the four-node-style syntax; the flat form is valid on 26.x (a 26.x `mode not configured` before reboot is the missing HA-activation reboot, not a wrong model)
 - [ ] If `grid_id` is set, it is 1-15 and unique per MNHA pair sharing an L2 domain (Juniper)
-- [ ] If deployment mode is **switching or hybrid**: SRG1 has `virtual-ip` index 1 and 2 on unique interfaces (lab-observed commit requirement on 26.2R1.7)
 - [ ] Junos release string parses correctly (format: `NN.NxRN.N`)
 
 #### ICL Configuration
@@ -435,7 +434,7 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 - [ ] If ICL transport is **shared** and `lo0.<loopback_unit>` exists in baseline: it has the correct `/32` address (not another address)
 - [ ] If ICL transport is **shared** and `lo0.<loopback_unit>` is in a zone in baseline: the zone name matches `pair.icl.zone`
 - [ ] ICL zone does not already exist in baseline (unless it's the reused zone from above)
-- [ ] If ICL is encrypted: platform supports it (not a default-mode vSRX: `ha-link-encryption` is rejected outside FIPS mode, lab-verified 2026-10-08); otherwise set `encryption.enabled: false`
+- [ ] If ICL is encrypted: platform supports it (not a default-mode vSRX: `ha-link-encryption` is rejected outside FIPS mode, lab-verified 2026-10-08). If it does not: **STOP** and ask the user to either explicitly accept an unencrypted ICL (fine when the ICL is local) or choose a supported alternative (FIPS-mode platform or a different platform), then regenerate the stages. Never set `encryption.enabled: false` on your own
 - [ ] If ICL is encrypted: the PSK is set in baseline on `security ike policy <ike_policy>` **on both nodes** (user sets this via CLI, then retakes baseline)
 - [ ] If ICL is encrypted: existing crypto objects (`ike proposal MNHA-ICL-IKE-PROP`, `ike policy <ike_policy>`, `ike gateway MNHA-ICL-IKE-GW`, `ipsec proposal MNHA-ICL-IPSEC-PROP`, `ipsec policy MNHA-ICL-IPSEC-POL`, `ipsec vpn MNHA-ICL-VPN`) in baseline match the rendered ones exactly (except the PSK line)
 - [ ] Rendered Stage 1 includes `host-inbound-traffic protocols bfd` on the ICL zone (see srx-mnha pitfall 22)
@@ -448,6 +447,7 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 - [ ] If deployment mode is **routing**: rendered Stage 2 includes `activeness-probe dest-ip` (see srx-mnha pitfall 20)
 
 #### Mode-Specific Rules
+- [ ] If deployment mode is **switching**: SRG1 has `virtual-ip` index 1 and 2 on unique interfaces. Lab-observed commit requirement on vSRX 26.2R1.7 (2026-10-08); not documented by Juniper in the pages reviewed. **Block** on 26.2R1.7; on other releases **warn only** ("may be required; commit check will tell") and let the dry run decide. Not applied to hybrid (untested)
 - [ ] If deployment mode is **routing**: no VIPs are defined (use hybrid or switching for VIPs)
 - [ ] If deployment mode is **switching or hybrid**: at least one VIP is defined
 - [ ] For each VIP: its IFL is a declared segment
