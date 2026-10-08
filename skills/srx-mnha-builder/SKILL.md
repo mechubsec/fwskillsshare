@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-builder
 description: Build a new two-node SRX/vSRX Multi-Node High Availability pair from standalone nodes over a Junos MCP server, covering routing, switching or hybrid mode, dedicated or shared ICL, pair sheet, staged configs with pre-push checks and approval gates, HA-activation reboot, formation checks and failover test. Use when standing up an MNHA pair or turning two SRXs into HA. For design or troubleshooting a running pair, use srx-mnha.
-version: 0.2.3
+version: 0.2.4
 author:
   - fastrevmd-lab
   - Claude
@@ -129,7 +129,7 @@ and MAC-move caveats (DAI, storm-control, MAC-move limits; a virtual MAC exists 
 | **Dedicated** (recommended) | Its own back-to-back link, e.g. `ge-0/0/2` ↔ `ge-0/0/2`, /30 | Link addresses in a dedicated ICL zone |
 | **Shared** | Loopback /32s reached over a data segment, used when no spare port or path exists | `lo0.<unit>` in the ICL zone, a static /32 route to the peer loopback, and HA/BFD (+IKE) host-inbound opened on the transport segment's zone |
 
-**2. Encrypted or not?** ICL encryption is **optional**: an unencrypted ICL is fine when the ICL is local (direct link or same site); it is recommended when the ICL traverses other networks, and always for shared transport. Juniper's overview says "You must encrypt the ICL using IPsec VPN", so record the choice; an unencrypted ICL formed and synced in the lab on 24.4R1.9 and 26.2R1.7. Stage 2 emits the crypto objects only when encryption is chosen. See `srx-mnha` → ICL for conceptual guidance. Two
+**2. Encrypted or not?** (Not available on a vSRX in default non-FIPS mode: commit check rejects `ha-link-encryption`; lab-verified 2026-10-08. Use an unencrypted ICL there.) ICL encryption is **optional**: an unencrypted ICL is fine when the ICL is local (direct link or same site); it is recommended when the ICL traverses other networks, and always for shared transport. Juniper's overview says "You must encrypt the ICL using IPsec VPN", so record the choice; an unencrypted ICL formed and synced in the lab on 24.4R1.9 and 26.2R1.7. Stage 2 emits the crypto objects only when encryption is chosen. See `srx-mnha` → ICL for conceptual guidance. Two
 prerequisites the skill checks but cannot set:
 - **`junos-ike` package on both nodes.** Check the `show version` output for
   "JUNOS ike". If it's missing, the user installs it

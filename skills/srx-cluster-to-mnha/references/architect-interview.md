@@ -139,7 +139,7 @@ uncertain and see `srx-mnha`.
 
 Ask:
 - "Dedicated ICL ports, or share revenue ports?" (dedicated LAG / single link / shared). Offer the freed fab NIC and, on vSRX, the freed former control NIC (`ge-0/0/0` after disable, L1) as ICL candidates; a lab or vSRX may use one link, with the E5 recommendation of more than one link stated as a caveat. A routed ICL needs addressing from the operator's IPAM and routing on that NIC; the loopback is optional on a single link (E5 recommends it).
-- "Encrypt the ICL? Recommended for production." (PKI / PSK / none). `none` is an accepted, recorded choice: it formed HA in the lab (L8), but Juniper's docs say "must" (E4); record `none (user-declined, contradicts E4 wording; works in lab L8)`. First check `show version` for the IKE package before offering encryption.
+- "Encrypt the ICL? Recommended for production." (PKI / PSK / none). `none` is an accepted, recorded choice: it formed HA in the lab (L8), but Juniper's docs say "must" (E4); record `none (user-declined, contradicts E4 wording; works in lab L8)`. First check `show version` for the IKE package and the platform before offering encryption: on a vSRX in default non-FIPS mode `ha-link-encryption` is rejected at commit check (L13), so offer `none` only.
 - If encrypting, "Certificates or pre-shared key?" (PKI, documented from Junos 22.3R1 (E5), needs a device certificate and enrolment this skill does not cover / pre-shared key, unsourced here: verify against TechLibrary before offering)
 - "Do you expect asymmetric flows, and do you want to evaluate an ICD? (ICD semantics are uncertain here; follow `srx-mnha`.)" (no / yes / unsure)
 

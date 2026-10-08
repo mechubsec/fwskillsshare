@@ -1,7 +1,7 @@
 ---
 name: srx-mnha
 description: Design, configure, audit, and troubleshoot Juniper SRX Multi-Node High Availability. Use when handling routed, default-gateway, or hybrid modes, chassis-cluster migration, SRGs, ICL or ICD, session sync, BGP or BFD failover, VIPs, IPsec, NAT, proxy ARP, routing instances, or DHCP. Use focused SRX skills for non-MNHA behavior.
-version: 1.3.6
+version: 1.3.7
 author:
   - fastrevmd-lab
   - Claude
@@ -234,7 +234,7 @@ Design guidance:
 - place ICL in a dedicated routing instance when practical
 - when using MNHA IPsec with floating loopback tunnel anchors, the ICL routing instance and the floating loopback/external-interface routing instance must align; route leaking is not a safe substitute for IKE gateway lookup
 - allow HA-related host-inbound services on the ICL zone
-- if encrypting ICL, allow IKE and use the Junos HA link encryption model
+- if encrypting ICL, allow IKE and use the Junos HA link encryption model. Juniper: "You must encrypt the ICL using IPsec VPN"; in practice encryption is optional for a local ICL. On vSRX in default non-FIPS mode (26.2R1.7 and 24.4R1.9) `ha-link-encryption` fails commit check with `'ha-link-encryption' can be configure only in FIPS mode` (lab-verified 2026-10-08; FIPS mode and the junos-ike package untested), so use an unencrypted ICL there
 - keep ICL RTT under the platform/release requirement for geo designs; the supplied sources use less than 100 ms as the design bound
 - use redundant paths where possible
 - do not assume ICL must be back-to-back; it can traverse routed infrastructure
