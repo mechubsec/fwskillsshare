@@ -72,7 +72,10 @@ def main() -> int:
                 f"{markdown.relative_to(ROOT)} uses unsupported "
                 "'show security policies hit-count global' syntax"
             )
-    readme = README.read_text(encoding="utf-8")
+    # The usage summary lives in the installation-and-usage guide; scan both.
+    readme = README.read_text(encoding="utf-8") + "\n" + (
+        ROOT / "guides" / "installation-and-usage.md"
+    ).read_text(encoding="utf-8")
     catalog = CATALOG.read_text(encoding="utf-8")
     for name, text in (("README.md", readme), ("SKILLS.md", catalog)):
         if "show security policies hit-count global" in text:

@@ -19,6 +19,7 @@ INVENTORY = ROOT / "skills" / "inventory.json"
 README = ROOT / "README.md"
 SKILLS_MD = ROOT / "SKILLS.md"
 QUALITY_MD = ROOT / "QUALITY.md"
+GUIDES_DIR = ROOT / "guides"
 
 
 def load_inventory() -> tuple[int, int, int, set[str]]:
@@ -297,6 +298,12 @@ def main() -> int:
     errors.extend(check_r_of_t_prose(readme_text, "README.md", reviewed, total))
     errors.extend(check_r_of_t_prose(quality_text, "QUALITY.md", reviewed, total))
     errors.extend(check_readme_skills_header(readme_text, total))
+    # Counts moved out of README into guides/ must stay correct there too.
+    for guide in sorted(GUIDES_DIR.glob("*.md")):
+        guide_text = guide.read_text(encoding="utf-8")
+        guide_name = f"guides/{guide.name}"
+        errors.extend(check_all_n_prose(guide_text, guide_name, total))
+        errors.extend(check_r_of_t_prose(guide_text, guide_name, reviewed, total))
     errors.extend(check_quality_table(quality_text, total, reviewed))
     errors.extend(check_exceptions_sentence(readme_text, "README.md", unreviewed_names))
     errors.extend(check_exceptions_sentence(quality_text, "QUALITY.md", unreviewed_names))
@@ -310,7 +317,7 @@ def main() -> int:
 
     print(
         f"OK: catalog counts consistent at {total} skills, {reviewed} reviewed, "
-        f"across README.md, SKILLS.md, QUALITY.md"
+        f"across README.md, guides/, SKILLS.md, QUALITY.md"
     )
     return 0
 

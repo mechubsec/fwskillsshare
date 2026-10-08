@@ -55,7 +55,7 @@ PUBLISH_FILES = (
     ".gitleaks.toml",  # downstream keeps its own security workflow; ship the config it reads
     ".gitleaks-vendor.toml",  # vendor rules extended by .gitleaks.toml
 )
-PUBLISH_DIRS = ("skills", "scripts", "evals")  # evals/: scripts/check-evals.py requires it
+PUBLISH_DIRS = ("skills", "scripts", "evals", "guides")  # evals/: scripts/check-evals.py requires it
 
 # Files the downstream keeps that must survive the sync. These are neither
 # published nor deleted -- they are preserved as-is when present in the target.
@@ -208,14 +208,14 @@ def swap_marked_block(text: str, name: str, replacement: str) -> str:
     return pattern.sub(lambda _: replacement, text)
 
 
-def transform_readme(dest: Path, repo_slug: str, skill_count: int, reviewed_count: int) -> None:
-    """Swap branded blocks for neutral ones and repoint upstream-only links."""
-    path = dest / "README.md"
-    text = path.read_text(encoding="utf-8")
-    repo_name = repo_slug.split("/")[-1]
+def rewrite_repo_references(text: str, repo_slug: str) -> str:
+    """Repoint upstream slug, clone directory and CONTRIBUTING links downstream.
 
+    Shared by README.md and guides/*.md, which carry the same clone commands.
+    """
+    repo_name = repo_slug.split("/")[-1]
     # Sweep first: clone URLs, installer URLs, issue links all point downstream.
-    # The brand blocks swapped in below deliberately reintroduce upstream credit.
+    # The brand blocks swapped in later deliberately reintroduce upstream credit.
     text = text.replace(UPSTREAM_SLUG, repo_slug)
     # The clone directory is named after the repo, so the `cd` that follows the
     # clone must follow the rewritten slug too or the quickstart fails.
@@ -223,6 +223,28 @@ def transform_readme(dest: Path, repo_slug: str, skill_count: int, reviewed_coun
     text = re.sub(
         rf"^cd {re.escape(upstream_name)}$", f"cd {repo_name}", text, flags=re.MULTILINE
     )
+    # CONTRIBUTING.md is upstream-only; point at it where it still resolves.
+    return re.sub(
+        r"\]\((?:\./|\.\./)?CONTRIBUTING\.md",
+        f"](https://github.com/{UPSTREAM_SLUG}/blob/main/CONTRIBUTING.md",
+        text,
+    )
+
+
+def transform_guides(dest: Path, repo_slug: str) -> None:
+    """Apply the README slug, `cd` and link rewrites to guides/*.md."""
+    for path in sorted((dest / "guides").glob("*.md")):
+        text = rewrite_repo_references(path.read_text(encoding="utf-8"), repo_slug)
+        path.write_text(repoint_docs_links(text), encoding="utf-8")
+
+
+def transform_readme(dest: Path, repo_slug: str, skill_count: int, reviewed_count: int) -> None:
+    """Swap branded blocks for neutral ones and repoint upstream-only links."""
+    path = dest / "README.md"
+    text = path.read_text(encoding="utf-8")
+    repo_name = repo_slug.split("/")[-1]
+
+    text = rewrite_repo_references(text, repo_slug)
 
     text = swap_marked_block(
         text, "header",
@@ -788,6 +810,7 @@ def main() -> int:
         skills = sorted(p.name for p in (staged / "skills").iterdir() if p.is_dir())
         reviewed_count = load_reviewed_count(staged)
         transform_readme(staged, args.repo_slug, len(skills), reviewed_count)
+        transform_guides(staged, args.repo_slug)
         transform_quality(staged)
         transform_changelog(staged)
         transform_contributors(staged)

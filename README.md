@@ -34,6 +34,8 @@ These skills exist to close that gap. They pin the agent to vendor syntax that's
 > **Unofficial / community project.** Not affiliated with, endorsed by, or supported by Cisco, Fortinet, Palo Alto Networks, Juniper Networks, or HPE. See [License and Provenance](#license-and-provenance) for the full notice and the trademark disclaimer.
 <!-- brand:disclaimer:end -->
 
+**Guides:** [Before you install](./guides/before-you-install.md) · [Why these skills exist](./guides/why-these-skills-exist.md) · [Installation and usage](./guides/installation-and-usage.md)
+
 ## Contents
 
 - [Before You Install](#before-you-install)
@@ -41,8 +43,7 @@ These skills exist to close that gap. They pin the agent to vendor syntax that's
 - [Why These Skills Exist](#why-these-skills-exist)
 - [Reference](#reference) — the skill catalog, by family; per-skill detail in [SKILLS.md](./SKILLS.md)
 - [Quality and Review](#quality-and-review) — summary; full history in [QUALITY.md](./QUALITY.md)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Installation and Usage](#installation-and-usage)
 - [Tips](#tips)
 - [Conversion Caveats](#conversion-caveats)
 - [Intermediate Schema](#intermediate-schema)
@@ -52,74 +53,7 @@ These skills exist to close that gap. They pin the agent to vendor syntax that's
 
 ## Before You Install
 
-These skills change how your agent behaves. Read this before you install.
-
-**A skill is instructions your agent will follow.** Every `SKILL.md` here is plain
-markdown that gets loaded into your agent's context and acted on. Installing one —
-from this repo or any other — means letting someone else's text steer a tool that
-can read your configs and, if you permit it, reach your devices. **Read the whole skill
-directory before you install it — not just `SKILL.md`.** Most of a skill is markdown
-you can read straight through, but the two Proxmox deployment skills also ship Python
-helpers under `scripts/` that the instructions tell the agent to run, and every skill
-carries an `agents/openai.yaml`. Nothing is obfuscated or generated at runtime, but
-"read the skill" has to mean the directory, not one file. Some skills also direct the
-agent at your own equipment — the deployment and operational ones run commands
-against your devices, which is the point of them, and the reason to know what you
-installed.
-
-**Treat every config you paste as untrusted input.** The parsing and audit skills
-ingest whatever you hand them, and a config file can carry text written to redirect
-the agent — in a comment, a description field, an object name. That is prompt
-injection, and nothing in this repository defends against it. Read what comes back:
-if the agent proposes something you did not ask for, or reaches for a device when
-you asked for a parse, stop.
-
-These skills default to parse / read / analyze / plan / dry-run, and anything that
-changes a device — configuration, commits, upgrades, reboots, failovers — is written
-to require explicit approval and post-change verification. That is authoring intent,
-not a sandbox. What actually constrains the agent is the permissions you give it.
-
-**Do not paste secrets you would not send to your model provider.** Firewall configs
-carry pre-shared keys, SNMP communities, RADIUS secrets, certificate material, and
-password hashes. Pasting a config into a hosted assistant discloses it to whoever
-runs that model. That may be perfectly fine — but make it a decision you took, not
-one you backed into. If the policy you are working on should not leave your control,
-you have two options:
-
-- **Sanitize first, carefully.** An anonymizer can rewrite addresses, hostnames and
-  secrets, but it has to preserve address *semantics* — a consistent, containment-
-  preserving mapping. The audits reason about real relationships: shadowed and
-  overlapping rules, supernets, `0.0.0.0/0`, host versus subnet. An anonymizer that
-  changes prefix lengths or breaks containment will hand you a clean-looking report
-  about a policy you do not have. Read the output before you paste it, too: no
-  anonymizer knows which of your zone, object, or policy names are themselves
-  sensitive.
-- **Or keep it on your own equipment.** These skills are plain markdown with no
-  runtime dependency on any particular provider, so they work with a model you host
-  yourself. Nothing here needs a hosted assistant to function.
-
-**Install only the skills you need.** A skill's body loads only when the skill is
-invoked, so what an installed-but-unused skill costs you is its description sitting
-in the discovery surface. How much that costs depends on the runtime and version —
-Codex 0.147.0 routes discovery through a dynamic selector and treats a flat
-concatenated list as a fallback, truncating metadata to fit its budget rather than
-failing — so the direct token cost is modest and not worth optimizing: all 33
-descriptions together are on the order of ten thousand characters, and
-`scripts/check-skill-packages.py` reports the current figure rather than this page
-pinning a number that goes stale. The cost that matters is **selection**: the more
-overlapping descriptions compete, the likelier your agent reaches for a near-miss
-instead of the right skill, and truncation degrades that quietly rather than
-visibly. Install the families you actually use.
-
-**Skills are copied, not linked.** The installer copies files into your skills
-directory, so they do not change when this repository does. Re-run the installer to
-pick up updates — approving the overwrite when prompted, or passing `--force`, since
-a non-interactive run (`-y`) skips a skill that is already installed and would
-otherwise leave you on a stale copy.
-
-**Verify against your own platform and release.** Behavior here is reported as
-observed on specific versions. Commit-check on your release before trusting a stanza
-in production.
+Skills are instructions your agent follows, and pasted configs are untrusted input. Read **[Before you install](./guides/before-you-install.md)** first.
 
 ## Quickstart (30-second setup)
 
@@ -143,59 +77,11 @@ checksum possible before execution.
 
 4. Done. Paste a config or name a vendor and the right skill loads itself.
 
-Prefer flags, or installing from a clone? See [Installation](#installation).
+Prefer flags, or installing from a clone? See [Installation and usage](./guides/installation-and-usage.md).
 
 ## Why These Skills Exist
 
-I built these to fix the failure modes I kept hitting when I let Claude Code, Codex, and other agents touch firewalls.
-
-### #1: The Agent Invents CLI That Won't Commit
-
-> "It Has To Work."
->
-> Ross Callon, [RFC 1925 — The Twelve Networking Truths](https://www.rfc-editor.org/rfc/rfc1925), truth (1)
-
-**The Problem.** Ask an agent for an SRX ADVPN config or a Junos 24.4R1 IKE gateway and you'll get something that *reads* perfectly and then throws a commit error — or worse, commits and silently doesn't forward. The model has seen a decade of blog posts, including the wrong ones and the ones for the wrong release.
-
-**The Fix** is playbooks pinned to syntax that's been proven on real hardware. The SRX skills carry the gotchas that only show up in production: the Junos 24.4R1+ `IKEv2 with authentication-method pre-shared-key is not allowed` commit error, the `Remote-ip 0.0.0.0/0 in traffic-selector is not supported` split, the ADVPN `No public key found` IKE_AUTH failure root-caused to the dynamic cert-gateway responder path. Disputed syntax was settled by commit-checking on a live vSRX 24.4R1, not by vibes.
-
-Reach for [`srx-policy`](./skills/srx-policy/), [`srx-nat`](./skills/srx-nat/), [`srx-mnha`](./skills/srx-mnha/), [`srx-advpn`](./skills/srx-advpn/) and friends whenever you're designing or debugging real Junos.
-
-### #2: Every Vendor Speaks A Different Dialect
-
-> "All problems in computer science can be solved by another level of indirection."
->
-> David Wheeler
-
-**The Problem.** A Cisco ACL, a FortiGate policy block, a PAN-OS `<entry>`, and an SRX `set security` line all express the same idea four incompatible ways. Ask an agent to compare or convert them and it hand-waves the parts that don't line up.
-
-**The Fix** is a shared language. The [`parsing-*`](./skills/) skills normalize every vendor into **one vendor-neutral intermediate JSON schema** — zones, objects, policies, NAT, routing, VPN, HA, the lot — with a 240+ entry canonical L7 application map and confidence scores. Once a config is in the schema, cross-vendor [audit](./skills/firewall-best-practices-audit/), [conversion](./skills/firewall-config-conversion/), and [diff](./skills/firewall-config-diff/) all operate by *meaning*, not text. Features with no equivalent are flagged, never silently dropped.
-
-This is the piece that makes the rest composable. See the [Intermediate Schema](#intermediate-schema) below.
-
-### #3: "Is It Compliant?" Gets A Confident, Unfounded Yes
-
-> "Trust, but verify."
->
-> Russian proverb
-
-**The Problem.** Point an agent at a firewall and ask if it's "PCI compliant" and it will happily tell you yes. That answer is worthless to a QSA, and dangerous to you. A firewall *supports* evidence for a control; it is never itself "certified."
-
-**The Fix** is seven compliance and STIG playbooks ([PCI](./skills/pci-ngfw-compliance/), [HIPAA](./skills/hipaa-ngfw-compliance/), [CMMC / NIST 800-171](./skills/cmmc-nist-800-171-ngfw-compliance/), [CIS](./skills/cis-controls-ngfw-compliance/), [ISO 27001](./skills/iso27001-ngfw-compliance/), [SOC 2](./skills/soc2-ngfw-compliance/), and [SRX DISA STIG](./skills/srx-disa-stig-compliance/)) that map firewall capabilities to specific control evidence, produce assessor-ready findings and gap lists, and are explicit at every turn that compliance is assessed for the *environment and program*, not conferred by the box. They tell you what evidence to collect and where the gaps are — the honest version of the answer.
-
-### #4: Rulebases Rot, And Agents Accelerate The Rot
-
-> "Complexity is the worst enemy of security."
->
-> Bruce Schneier
-
-**The Problem.** Every rulebase drifts toward `any-any`, shadowed rules, orphaned objects, and plaintext management. Agents make firewall changes faster, which means they make the rot faster too, unless something keeps them honest.
-
-**The Fix** is [`firewall-best-practices-audit`](./skills/firewall-best-practices-audit/) — overly permissive and shadowed/redundant rules, missing deny-all and logging, exposed telnet/http/SNMPv1-2c, weak IKE/IPsec crypto, device-plane hardening, unused objects — and [`firewall-config-diff`](./skills/firewall-config-diff/) for drift and HA-pair parity. Prioritized findings with severity and confidence, vendor-neutral plus source-vendor remediation. Run them before you ship a change, not after the incident.
-
-### Summary
-
-Firewall fundamentals don't get easier in the AI age — the blast radius just gets bigger. These skills are my attempt to hand the agent the discipline: verified syntax, a shared schema, honest compliance mapping, and a hygiene checklist. Use them, break them, and make them yours.
+Four failure modes of agents on firewalls — invented CLI, vendor dialects, unfounded compliance claims, rulebase rot — and the skills that answer them. See **[Why these skills exist](./guides/why-these-skills-exist.md)**.
 
 ## Reference
 
@@ -276,146 +162,9 @@ are recorded in **[QUALITY.md](./QUALITY.md)**.
 
 These are research/operational and assessment-support skills, not certified products: review their output against current vendor documentation, live device behavior, and (for compliance work) a qualified assessor before relying on it.
 
-## Installation
+## Installation and Usage
 
-### Installer (recommended)
-
-Clone a tagged release and run [`install.sh`](./install.sh) — interactively, or
-with flags for scripted/non-interactive use. The installer only accepts a
-release tag (`vX.Y.Z`), never a branch or `HEAD`, and verifies every skill file
-against `skills/CHECKSUMS.sha256` before installing anything:
-
-```bash
-git clone --branch v1.11.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
-cd fwskillsshare
-
-# Interactive: pick skills + target
-./install.sh
-```
-
-Flags:
-
-```text
---all                 Select all 33 skills
---skill NAME          Select a specific skill by name (repeatable)
---family NAME         Select a whole family: parsers | srx | tooling | compliance | deployment (repeatable)
---target WHERE        claude | codex | hermes | both | all
-                      ('both' means Claude+Hermes; default: interactive prompt, or claude with -y)
---dir PATH            Explicit install directory (overrides --target)
---ref TAG             Release tag to install from when downloading skills without a local clone
-                      (default: the tag pinned in install.sh). Must be vX.Y.Z; branches and HEAD are refused.
---list                Print the skill inventory (grouped by family) and exit
---uninstall           Remove the selected skills from the selected target(s) instead of installing
---force               Overwrite existing skill directories without prompting
--y, --yes             Non-interactive; assume defaults, no prompts
--h, --help            Show help and exit
-```
-
-Examples:
-
-```bash
-./install.sh --all --target claude              # everything, into ~/.claude/skills
-./install.sh --all --target codex               # everything, into ~/.agents/skills
-./install.sh --family parsers --family srx      # just the parsers + SRX playbooks
-./install.sh --family tooling --target all      # tooling skills into all three agents
-./install.sh --family deployment --target codex # Security Director On-Prem and ClearPass deployment skills
-./install.sh --skill sd-onprem-proxmox-deploy --target claude -y
-./install.sh --skill parsing-srx-configs --skill srx-nat -y
-./install.sh --list                             # see what's available
-```
-
-### Manual install
-
-The skills are plain directories — copy the ones you want. Pin a release tag
-rather than the default branch so you know exactly what you're copying:
-
-```bash
-git clone --branch v1.11.0 --depth 1 git@github.com:mechubsec/fwskillsshare.git
-
-# All of them
-cp -r fwskillsshare/skills/* ~/.claude/skills/
-
-# Or a single skill
-cp -r fwskillsshare/skills/srx-mnha ~/.claude/skills/
-
-# Security Director On-Prem deployment skill
-cp -r fwskillsshare/skills/sd-onprem-proxmox-deploy ~/.claude/skills/
-```
-
-For **Codex**, copy into the user skill tree. Codex normally detects changes automatically; restart it if a new skill does not appear:
-
-```bash
-mkdir -p ~/.agents/skills
-cp -r fwskillsshare/skills/* ~/.agents/skills/
-```
-
-For **Hermes**, copy into your local Hermes skills tree (usually `~/.hermes/skills/devops/`) and confirm with `hermes skills list`:
-
-```bash
-mkdir -p ~/.hermes/skills/devops
-cp -r fwskillsshare/skills/* ~/.hermes/skills/devops/
-hermes skills list | grep -E 'parsing-|srx-|firewall-|-ngfw-compliance|sd-onprem-'
-```
-
-Skills auto-trigger when they detect vendor-specific keywords, SRX operational topics, Security Director On-Prem or Proxmox deployment requests, or PCI/HIPAA/CMMC/NIST 800-171/CIS/ISO 27001/SOC 2/DISA STIG compliance language in your messages or pasted configs.
-
-### Managing context
-
-Skill *bodies* only load when a skill is invoked, but each skill's short description stays in context so the agent knows when to reach for it. If you rarely use certain skills (e.g. compliance frameworks you don't work with), you can drop just their descriptions from context while keeping them invocable, via `skillOverrides` in `~/.claude/settings.json`:
-
-```json
-{ "skillOverrides": { "soc2-ngfw-compliance": "name-only" } }
-```
-
-`"name-only"` keeps the skill listed and invocable but hides its description; `"user-invocable-only"` hides it from the model entirely (slash-command only); `"off"` hides it completely.
-
-For **Codex**, disable an installed skill without deleting it by adding its `SKILL.md` path to `~/.codex/config.toml`:
-
-```toml
-[[skills.config]]
-path = "/home/you/.agents/skills/soc2-ngfw-compliance/SKILL.md"
-enabled = false
-```
-
-## Usage
-
-### What you can do
-
-- **Parse** — Extract all objects, policies, NAT rules, and routes into structured JSON
-- **Audit** — Find unused objects, shadowed rules, overly permissive policies, missing logging
-- **Convert** — Transform configs between vendors (e.g., SRX to PAN-OS)
-- **Compare** — Diff two configs by meaning, not text
-- **Summarize** — Get a high-level overview of zones, policy counts, and security profiles
-- **Operate SRX dynamic feeds** — Configure, validate, and troubleshoot SRX dynamic-address feed servers
-- **Design SRX MPLS in flow mode** — Keep inet/inet6 in stateful flow mode for policy, NAT, and AppID while `family mpls` is packet-based
-- **Design SRX MNHA** — Reason about MNHA modes, SRGs, ICL/ICD, eBGP/BFD failover, VIPs, and DHCP caveats
-- **Operate SRX NAT** — Source/destination/static NAT, NAT64/DNS64, CGN/PBA, persistent NAT, hairpin, proxy ARP
-- **Design SRX security policy** — Enforce `security policies global` for generated greenfield, migration, and onboarding output absent an explicit opt-out; then layer AppID/AppFW, NGWF-first web filtering, SecIntel, ATP
-- **Deploy Security Director On-Prem** — Plan the Proxmox VE guest, vendor artifact extraction, four same-subnet IPs, first-boot settings, and SRX onboarding gated on proven device NTP sync
-- **Assess compliance evidence** — Map NGFW policies, NAT, zones, logging, IDS/IPS, and segmentation to PCI / HIPAA / CMMC-NIST 800-171 / CIS / ISO 27001 / SOC 2 / SRX DISA STIG evidence expectations
-
-### Examples
-
-```
-# Parse and audit
-"Here's my ASA config, parse it and show me security issues:"
-[paste running-config]
-
-# Convert between vendors
-"Convert this SRX config to Palo Alto format"
-[paste SRX config]
-
-# Read from a file instead of pasting
-"Read /path/to/running-config.txt and audit it"
-
-# SRX operational work (any of the SRX playbooks)
-"Help me troubleshoot this SRX destination NAT rule: hits increment, but the policy denies the translated web server session"
-
-# Compliance review (any of the seven compliance/STIG playbooks)
-"Review this firewall export for PCI DSS CDE segmentation evidence and recommend policy/NAT/zone description markers"
-```
-
-Each skill's own `SKILL.md` carries worked examples for its own topic.
+Installer flags, manual install, context management, example prompts, and installing with Claude Code or Codex. See **[Installation and usage](./guides/installation-and-usage.md)**.
 
 ## Tips
 
