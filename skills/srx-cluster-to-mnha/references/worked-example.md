@@ -74,11 +74,16 @@ Confirmed by the user before generation ("Confirm, or change which row?").
 
 ## 4. Generated configuration ([output-format.md](output-format.md))
 
-`node0.set` (excerpt, abridged; no BFD stanza is emitted because the syntax is
-unconfirmed, see the T8 BFD row). Port names are the same on both nodes after the cluster
-break, so zone bindings are common.
+`node0.set` is the review copy (excerpt, abridged; no BFD stanza is emitted
+because the syntax is unconfirmed, see the T8 BFD row). Port names are the same
+on both nodes after the cluster break, so zone bindings are common. This
+fixture assumes physical SRX names that stay unchanged; on vSRX every port would
+be `ge-0/0/(N+1)` (L1, see [output-format.md](output-format.md#port-names)).
+`node0.load.set` is this file with every `#` line removed (L2), and the IPsec
+lines below are written uncommented to `node0.ipsec.set`.
 
 ```junos
+# Draft output from offline analysis. Not validated on a device and not production-ready.
 # ---- common ----
 set security zones security-zone untrust interfaces ae0.0
 set security zones security-zone trust interfaces ge-0/0/5.0
