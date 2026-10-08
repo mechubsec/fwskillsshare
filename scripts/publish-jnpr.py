@@ -217,6 +217,12 @@ def transform_readme(dest: Path, repo_slug: str, skill_count: int, reviewed_coun
     # Sweep first: clone URLs, installer URLs, issue links all point downstream.
     # The brand blocks swapped in below deliberately reintroduce upstream credit.
     text = text.replace(UPSTREAM_SLUG, repo_slug)
+    # The clone directory is named after the repo, so the `cd` that follows the
+    # clone must follow the rewritten slug too or the quickstart fails.
+    upstream_name = UPSTREAM_SLUG.split("/")[-1]
+    text = re.sub(
+        rf"^cd {re.escape(upstream_name)}$", f"cd {repo_name}", text, flags=re.MULTILINE
+    )
 
     text = swap_marked_block(
         text, "header",
