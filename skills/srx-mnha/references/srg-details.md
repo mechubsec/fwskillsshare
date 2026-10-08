@@ -55,11 +55,13 @@ Look for:
 - failover readiness
 - VIP status when configured
 
-## Config Model: Flat (≤24.x) vs Grid (26.x) — RELEASE-DEPENDENT
+## Config Model: Flat Form, grid-id, and Four-Node Fields
 
-The `chassis high-availability` syntax **changed by release**. The flat `local-id local-ip` / `peer-id <ID> peer-ip` form used elsewhere in this skill and in the ≤24.x sources is **rejected on Junos 26.x**, which needs the **grid model** (`grid-id`, `local-domain-id`, `peer-domain-id … peer-id`). Symptom of the wrong model: commit fails, or `show chassis high-availability information` returns `mode not configured` even though your config is present. Confirm the model for the target release before writing config.
+The two-node form is the flat `local-id local-ip` / `peer-id <ID> peer-ip` model. It commits **and activates** on Junos 26.2R1.7 as well as 24.x (lab-verified, vSRX 26.2R1.7 on KVM, 2026-10-08: after the HA-activation reboot both nodes reached Node Status ONLINE, Conn State UP, Cold Sync COMPLETE). `show chassis high-availability information` says `mode not configured` until that reboot, on any release; earlier "26.x requires grid / rejects flat" observations were confounded with the missing reboot.
 
-The complete grid-model configuration, field-confirmed on **vSRX 26.2R1.7** (routed pair, SRG1 `deployment-type routing`, with the Node B mirror pattern), is in `mnha-grid-model-field-notes.md`. Two commit-blocking rules:
+`grid-id` is an optional chassis-level setting (range 1-15) for VMAC/VIP scale, coexisting with `local-id`/`peer-id` (Juniper MNHA preparation page, 25.4R1 change history; lab: commits on a running flat pair with no reboot warning). `local-domain-id`, `domain-size` and `peer-domain-id` are documented for four-node MNHA. Details, quotes and the lab matrix are in `mnha-grid-model-field-notes.md`.
+
+Two commit-blocking rules:
 
 - **`activeness-probe dest-ip <X> src-ip <Y>` is mandatory for `deployment-type routing`** (commit fails otherwise). `src-ip` is a **sub-field of `dest-ip`** — one statement. Aim it at a real reachable data-segment address, not the ICL.
 - **Enabling chassis-HA needs a reboot** to activate (says *mode not configured* until then); a node may take **two reboot cycles** to reach `Node Status: ONLINE`.

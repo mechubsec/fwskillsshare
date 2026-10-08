@@ -1,7 +1,7 @@
 ---
 name: srx-mnha
 description: Design, configure, audit, and troubleshoot Juniper SRX Multi-Node High Availability. Use when handling routed, default-gateway, or hybrid modes, chassis-cluster migration, SRGs, ICL or ICD, session sync, BGP or BFD failover, VIPs, IPsec, NAT, proxy ARP, routing instances, or DHCP. Use focused SRX skills for non-MNHA behavior.
-version: 1.3.5
+version: 1.3.6
 author:
   - fastrevmd-lab
   - Claude
@@ -144,7 +144,7 @@ BGP-driven core-facing side reconverged cleanly.
 
 ### Default-Gateway MNHA
 
-Default-gateway mode provides L2-like gateway behavior with VIP/vMAC semantics.
+Default-gateway mode provides L2-like gateway behavior with a floating VIP. A virtual MAC is **opt-in per VIP** (`virtual-ip <I> use-virtual-mac`); without it the VIP answers ARP with the active node's physical MAC (lab-observed, vSRX 26.2R1.7 and 24.4R1.9). See `references/mnha-grid-model-field-notes.md`.
 
 Characteristics:
 
@@ -153,6 +153,7 @@ Characteristics:
 - backup node does not install that VIP
 - failover moves the VIP and sends ARP/GARP behavior to update the L2 domain
 - requires shared L2 where the VIP is used
+- Switching mode needs `virtual-ip` index 1 **and** index 2 on the SRG, each on a unique interface (commit errors `virtual-ip index 1|2 is mandatory for switching deployment type` and `Virtual IP interfaces must be unique`). Lab-observed on vSRX 26.2R1.7, 2026-10-08; not documented in the Juniper pages reviewed and untested on 24.4, so treat as possibly release-specific.
 
 Use default-gateway mode when:
 
@@ -163,7 +164,7 @@ Use default-gateway mode when:
 L2-adjacency caveats for `deployment-type switching` / default-gateway mode:
 
 - The VIP rides on the `aeN.unit` (or physical unit) directly — no IRB/bridge-domain is introduced. The gateway is an interface VIP, not a routed SVI.
-- The gateway vMAC **moves** on failover. Adjacent switches must accept that MAC move: check **MAC-move limits**, **Dynamic ARP Inspection (DAI)**, **storm-control**, and **EVPN/MLAG duplicate-MAC protection** — any of these can suppress or block the moved vMAC and silently break failover even though the SRG shows ACTIVE.
+- If `use-virtual-mac` is configured, the gateway vMAC (or, without it, the active node's physical MAC behind the VIP) **moves** on failover. Adjacent switches must accept that MAC move: check **MAC-move limits**, **Dynamic ARP Inspection (DAI)**, **storm-control**, and **EVPN/MLAG duplicate-MAC protection** — any of these can suppress or block the moved vMAC and silently break failover even though the SRG shows ACTIVE.
 - Tie the segment's uplink to failover with SRG interface monitoring. Two
   forms commit: the bare `monitor interface <IFD>` (simple case: one or a few
   uplinks; verify on the target release that any down triggers failover
@@ -209,9 +210,9 @@ Use hybrid MNHA when:
 
 SRG0 is the default routed-MNHA group with no active/backup ownership; routing selects the forwarding node. SRG1+ provides active/backup behavior for VIPs, route signaling, failover triggers, and IPsec termination.
 
-**Important:** The config syntax changed by release. Junos ≤24.x uses the flat `local-id local-ip` / `peer-id peer-ip` model; Junos 26.x requires the **grid model** (`grid-id`, `local-domain-id`, `peer-domain-id … peer-id`) and rejects the flat form. For `deployment-type routing`, `activeness-probe dest-ip <X> src-ip <Y>` is mandatory. A reboot is required to activate chassis-HA.
+**Important:** The two-node form is the flat `local-id local-ip` / `peer-id peer-ip` model, and it works on Junos 26.2R1.7 as well as 24.x (lab-verified, vSRX 26.2R1.7 on KVM, 2026-10-08). After the config commits, `show chassis high-availability information` says *mode not configured* until the HA-activation reboot, on any release. `grid-id` (1-15) is an optional VMAC/VIP-scale setting that coexists with `local-id`/`peer-id`; `local-domain-id`/`domain-size`/`peer-domain-id` belong to four-node MNHA. See `references/mnha-grid-model-field-notes.md`. For `deployment-type routing`, `activeness-probe dest-ip <X> src-ip <Y>` is mandatory. A reboot is required to activate chassis-HA.
 
-Complete SRG0/SRG1+ operational models, configuration attributes, verification commands, and grid-model field notes are in `references/srg-details.md`.
+Complete SRG0/SRG1+ operational models, configuration attributes, verification commands, and grid-id and four-node field notes are in `references/srg-details.md`.
 
 ## ICL: Inter-Chassis Link
 
@@ -419,7 +420,7 @@ Session, IPsec, routing, VIP, and DHCP checks are listed inline in their section
 
 18. Leaving a stray static default route via an unzoned management/extra leg — black-holes transit return traffic. See Field-Confirmed Behaviors below.
 
-19. Using the flat `local-id local-ip` / `peer-id peer-ip` config on Junos 26.x. It commits but never activates (*mode not configured*); 26.x needs the grid model plus a reboot. See "Config model: flat vs grid".
+19. Forgetting the HA-activation reboot. After committing `chassis high-availability`, the device shows *mode not configured* until it reboots, on any release (lab-verified on 26.2R1.7 and 24.4). Do not conclude the flat form is wrong and switch config models; reboot first. An earlier note that 26.x "requires the grid model" was confounded with this missing reboot.
 
 20. Omitting `activeness-probe dest-ip <X> src-ip <Y>` on an SRG with `deployment-type routing` — commit fails `activeness-probe … mandatory`. `src-ip` is a sub-field of `dest-ip`, one statement.
 
@@ -439,8 +440,8 @@ above index them. Confirmed on live pairs:
   does not service SRG data traffic (`Process Packet In Backup State: NO` is
   expected, not a fault); the `high-availability` host-inbound knob commit-checks
   clean.
-- vSRX 26.2R1.7 routed pairs (grid model, eBGP + signal-route MED steering):
-  grid model + reboot required on 26.x (pitfall 19); failed cold-sync leaves both
+- vSRX 26.2R1.7 routed pairs (eBGP + signal-route MED steering; originally recorded with the four-node-style syntax, flat form later lab-verified):
+  HA-activation reboot required (pitfall 19); failed cold-sync leaves both
   nodes self-elected ACTIVE — routing failover survives, stateful sync does not
   (pitfall 22); signal-route export must include connected transit subnets
   (pitfall 21); active/active SNAT wants per-node pools + proxy-ARP addresses;
@@ -456,6 +457,6 @@ Concise `Inspired by` notes under `references/` preserve source links,
 release-specific cautions, and verification implications without reproducing
 the articles.
 
-Sections on chassis-cluster interface migration, SRG monitor-object syntax, and pitfalls 16-23 are field/QA additions beyond the five source articles; live-verified items are called out in Field-Confirmed Behaviors. The "Config model: flat vs grid" section, the routed-mode single-gateway caveat, and the vSRX-26.2 behaviors come from a 2026-07 deployment of two routed MNHA pairs on vSRX 26.2R1.7 (grid model, SRG1 deployment-type routing, eBGP + signal-route MED steering); the grid syntax is release-dependent, so verify against the target release.
+Sections on chassis-cluster interface migration, SRG monitor-object syntax, and pitfalls 16-23 are field/QA additions beyond the five source articles; live-verified items are called out in Field-Confirmed Behaviors. The "Config model" notes, the routed-mode single-gateway caveat, and the vSRX-26.2 behaviors come from a 2026-07 deployment of two routed MNHA pairs on vSRX 26.2R1.7 (SRG1 deployment-type routing, eBGP + signal-route MED steering), corrected by a 2026-10-08 two-node lab on vSRX 26.2R1.7 showing the flat form works; verify against the target release.
 
 Per user instruction, ambiguous or conflicting article details were not encoded as hard guidance. Where support depends on platform or Junos release, this skill points operators to current Juniper documentation instead of freezing a source-specific matrix.

@@ -1,16 +1,55 @@
-# MNHA grid model (Junos 26.x) and field-confirmed behaviors
+# MNHA config model, grid-id, and field-confirmed behaviors
 
-Field notes behind the SKILL.md "Config model: flat vs grid" section and the
+Field notes behind the SKILL.md "Services Redundancy Groups" config-model note and the
 Field-Confirmed Behaviors summary. Sources: a live vSRX3 24.4R1.9 hybrid pair
 ([upstream fwskillsshare issue #7](https://github.com/mechubsec/fwskillsshare/issues/7))
-and a 2026-07 deployment of two routed MNHA pairs on vSRX 26.2R1.7 (grid model,
-SRG1 `deployment-type routing`, eBGP + signal-route MED steering).
+and a 2026-07 deployment of two routed MNHA pairs on vSRX 26.2R1.7 (SRG1 `deployment-type routing`, eBGP + signal-route MED steering).
 
-## Grid model configuration (field-confirmed on vSRX 26.2R1.7)
+## Config model: flat form works; grid-id is optional
 
-Routed pair, SRG1 `deployment-type routing`. Node A shown — mirror on Node B
-with swapped IDs (`local-id 2`, `local-domain-id 2`, `peer-domain-id 1 peer-id 1`,
-swapped ICL IPs, lower `activeness-priority`):
+Lab-verified (vSRX 26.2R1.7 on KVM, 2026-10-08, two-node, disposable pair):
+
+- **R1. The flat form works on 26.2R1.7.** `local-id`/`local-ip` and `peer-id`/`peer-ip` commit (with the warning "High Availability Mode changed, please reboot"), show `chassis high-availability mode not configured` until the HA-activation reboot, and after it both nodes are Node Status ONLINE, Conn State UP, Cold Sync COMPLETE, SRG1 ACTIVE/BACKUP. No `grid-id`, `local-domain-id` or `peer-domain-id` is needed. The earlier "26.x requires the grid model" note was confounded with the missing reboot.
+- **R3. `grid-id` coexists with the flat form.** `set chassis high-availability grid-id 1` commits on a running flat pair with no reboot warning; `show chassis high-availability information` shows `Grid-id: 1` (`Grid-id: 0` when unset).
+- **R4. Virtual MAC is opt-in per VIP.** `set chassis high-availability services-redundancy-group <N> virtual-ip <I> use-virtual-mac` (CLI help: "Use virtual mac for SRG role enforcement"). Without it the VIP shows `VMAC: N/A` and answers ARP with the active node's physical NIC MAC (also seen on 24.4R1.9). With it, ARP resolves to a `00:10:db:fe:xx:xx` virtual MAC.
+- **R5. VMAC generation depends on `grid-id`.** Without it (`Grid-id: 0`) the VMAC is per VIP (VIP1 `00:10:db:fe:01:01`, VIP2 `00:10:db:fe:01:02`, legacy generation); with `grid-id 1` both VIPs on SRG1 shared one VMAC (`00:10:db:fe:02:10`).
+- **R2. Switching-mode constraint (lab-observed, 26.2R1.7):** commit fails unless SRG1 has both `virtual-ip` index 1 and index 2 ("virtual-ip index 1|2 is mandatory for switching deployment type"), and VIP interfaces must be unique per VIP ("Virtual IP interfaces must be unique"). Not tested on 24.4; may apply to other releases.
+- **R6.** An unencrypted ICL formed and synced (`Encrypted: NO`) on 26.2R1.7.
+
+### What Juniper documents (retrieved 2026-10-08)
+
+Source: [MNHA preparation](https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/concept/mnha-preparation.html), "Scaling Virtual IP Support in MNHA".
+
+- "In earlier implementations, the virtual MAC address (VMAC) was derived using the SRG identifier and VIP index. As a result, each VIP required a unique VMAC, limiting the number of VIPs to approximately 32 per SRG."
+- "With this enhancement, VMAC is generated using a combination of the following parameters: Grid identifier (grid-id), Services redundancy group identifier (SRG-ID), Virtual MAC identifier (virtual-mac-id)".
+- Syntax: `set chassis high-availability grid-id <1-15>`; per interface `set chassis high-availability services-redundancy-group <id> interface <interface> virtual-mac-id <0-15>`.
+- "Up to 15 MNHA pairs can coexist within a single Layer 2 broadcast domain."
+- "If the grid-id is not configured, the system continues to use the legacy VMAC generation method based on SRG-ID and VIP index. In this case, the VIP scale remains limited to approximately 32 per SRG."
+- Change history: 25.4R1, "You can increase the number of virtual IP (VIP) addresses per Services Redundancy Group (SRG) up to 2000 in Multinode High Availability (MNHA) switching (default gateway) mode and on the L2 side of Hybrid mode."
+- The sample configuration sets `local-id 1`, `local-id local-ip`, `grid-id 5`, `peer-id 2 peer-ip`, and `virtual-ip <n> use-virtual-mac` together, so `grid-id` sits alongside `local-id`/`peer-id`.
+- `local-domain-id <domain-id> domain-size <size>` and `peer-domain-id <domain-id> peer-id ...` appear on the [four-node MNHA page](https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/topic-map/four-node-multinode-high-availability.html), not in the two-node examples.
+
+### Flat form, routed pair (Node A; mirror on Node B)
+
+ICL lines are the lab-verified flat form; the SRG1 routing lines are from the 2026-07 routed deployment. Mirror on Node B with `local-id 2`, `peer-id 1`, swapped ICL IPs and a lower `activeness-priority`:
+
+```junos
+set chassis high-availability local-id 1 local-ip <A_ICL_IP>
+set chassis high-availability peer-id 2 peer-ip <B_ICL_IP>
+set chassis high-availability peer-id 2 interface <ICL_IFL>
+set chassis high-availability peer-id 2 liveness-detection minimum-interval 1000 multiplier 3
+set chassis high-availability services-redundancy-group 0 peer-id 2
+set chassis high-availability services-redundancy-group 1 peer-id 2
+set chassis high-availability services-redundancy-group 1 deployment-type routing
+set chassis high-availability services-redundancy-group 1 activeness-probe dest-ip <PROBE_DST> src-ip <PROBE_SRC>
+set chassis high-availability services-redundancy-group 1 activeness-priority 200
+set chassis high-availability services-redundancy-group 1 active-signal-route 169.254.200.1
+set chassis high-availability services-redundancy-group 1 backup-signal-route 169.254.200.2
+```
+
+### Four-node-style syntax (optional; not required for two nodes)
+
+This `grid-id` + `local-domain-id`/`peer-domain-id` shape was captured on vSRX 26.2R1.7 in a 2026-07 two-node deployment and committed there. It is the four-node MNHA syntax with a domain size of 1, not a replacement for the flat form (see R1). `vpn-profile` placement under `peer-domain-id` is documented by Juniper for four-node only. Node A shown:
 
 ```junos
 set chassis high-availability grid-id 1
@@ -23,11 +62,6 @@ set chassis high-availability peer-domain-id 2 peer-id 2 interface <ICL_IFL>
 set chassis high-availability peer-domain-id 2 peer-id 2 liveness-detection minimum-interval 1000 multiplier 3
 set chassis high-availability services-redundancy-group 0 peer-domain-id 2 peer-id 2
 set chassis high-availability services-redundancy-group 1 peer-domain-id 2 peer-id 2
-set chassis high-availability services-redundancy-group 1 deployment-type routing
-set chassis high-availability services-redundancy-group 1 activeness-probe dest-ip <PROBE_DST> src-ip <PROBE_SRC>
-set chassis high-availability services-redundancy-group 1 activeness-priority 200
-set chassis high-availability services-redundancy-group 1 active-signal-route 169.254.200.1
-set chassis high-availability services-redundancy-group 1 backup-signal-route 169.254.200.2
 ```
 
 - **`activeness-probe dest-ip <X> src-ip <Y>` is mandatory for `deployment-type
@@ -51,11 +85,9 @@ set chassis high-availability services-redundancy-group 1 backup-signal-route 16
 - The `host-inbound-traffic system-services high-availability` zone knob
   commit-checks clean on vSRX 24.4R1 (live-verified 2026-07).
 
-## Field-confirmed on vSRX 26.2R1.7 (two routed pairs, grid model)
+## Field-confirmed on vSRX 26.2R1.7 (two routed pairs)
 
-- **Grid model required on 26.x.** The flat `local-id local-ip` / `peer-id
-  peer-ip` form commits but never activates (*mode not configured*) until you
-  switch to `grid-id`/`local-domain-id`/`peer-domain-id` **and reboot**.
+- **HA-activation reboot required on 26.x too.** The flat form commits, then shows *mode not configured* until the reboot (see R1); it does not need the grid fields.
 - **ICL BFD is blocked unless the zone permits it as a PROTOCOL.** MNHA liveness
   is BFD, and in Junos BFD is `host-inbound-traffic protocols bfd`, **not** a
   `system-service`. A zone with `system-services high-availability` and `ping`
