@@ -210,7 +210,7 @@ Extended notes on the compliance and SRX playbooks — what they cover and when 
 Normalize a vendor config into the shared intermediate schema. Everything else composes on top.
 
 - **[parsing-cisco-configs](./skills/parsing-cisco-configs/SKILL.md)** — *(v1.1.6)* Cisco ASA & FTD (`show running-config`): access-lists, object/object-group, NAT, failover, port-to-app inference.
-- **[parsing-firepower-configs](./skills/parsing-firepower-configs/SKILL.md)** — *(v1.0.0)* Cisco Secure Firewall / Firepower (FMC & FDM JSON exports): access control policies, security zones, prefilter, intrusion & file policies, FTD NAT.
+- **[parsing-firepower-configs](./skills/parsing-firepower-configs/SKILL.md)** — *(v0.2.2, draft)* Cisco Secure Firewall / Firepower (FMC & FDM JSON exports): access control policies, security zones, prefilter, intrusion & file policies, FTD NAT.
 - **[parsing-fortinet-configs](./skills/parsing-fortinet-configs/SKILL.md)** — *(v1.1.5)* FortiGate / FortiOS (`show full-configuration`): the config/edit/set block format, VDOMs, UTM profiles, compound IPsec proposals.
 - **[parsing-palo-configs](./skills/parsing-palo-configs/SKILL.md)** — *(v1.1.5)* Palo Alto PAN-OS & Panorama: XML *or* flat set-format, vsys, app-default decomposition, device-groups.
 - **[parsing-srx-configs](./skills/parsing-srx-configs/SKILL.md)** — *(v1.4.1)* Juniper SRX / Junos: `display set` or curly-brace, address-book migration to global, `junos-*` app mapping, routing-instances.
