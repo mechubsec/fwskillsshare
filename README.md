@@ -87,7 +87,7 @@ Four failure modes of agents on firewalls — invented CLI, vendor dialects, unf
 
 **33 skills** across five families. All of them are **model-invoked** — the agent reaches for them automatically when it sees vendor keywords, an SRX operational topic, a Security Director On-Prem or ClearPass deployment request, or compliance language in your message or a pasted config. 26 of the 33 packages have completed the review record below; `clearpass-proxmox-deploy`, `csrx-proxmox-deploy`, `srx-ips`, `srx-mnha-builder`, and `srx-cluster-to-mnha` ship as drafts, while `parsing-firepower-configs` and `srx-syslog-logging` have not yet been through the two-stage review. Invoke one explicitly as `/srx-nat` in Claude Code or Hermes, or `$srx-nat` in Codex.
 
-Version numbers: v0.x = draft; v1.0.0 and later = validated at least once (homelab run or completed review).
+Version numbers: v0.x = draft; v1.0.0 and later = validated at least once (homelab run or completed review). Verified a draft? See [Skill versions and drafts](./CONTRIBUTING.md#skill-versions-and-drafts).
 
 Extended notes on the compliance and SRX playbooks — what they cover and when to reach for one — are in **[SKILLS.md](./SKILLS.md)**. Every skill also documents itself in its own `SKILL.md`, linked above.
 

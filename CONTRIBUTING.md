@@ -97,6 +97,23 @@ python3 scripts/sync-installer-inventory.py --check   # verify install.sh matche
 python3 scripts/sync-installer-inventory.py            # regenerate the installer arrays from inventory.json
 ```
 
+## Skill versions and drafts
+
+Every change to a skill bumps its `SKILL.md` `version` (patch for fixes, minor for new capability) and its `*(vX.Y.Z)*` marker in the README catalog.
+
+- **v0.x.x = draft.** Not yet validated.
+- **v1.0.0 and later = validated at least once:** a lab run on real or virtual devices, or, for skills with no device to test, a completed two-stage review.
+
+### Verified a draft skill? Please open an issue
+
+Maintainers use these reports to promote drafts to v1.0.0. Open an issue with the **Draft skill verified** template and include:
+
+- skill name and version
+- platform/model, and the Junos (or vendor OS) release
+- what you ran (the workflow or scenario)
+- the outcome
+- some evidence: redacted command output, a commit-check result, or screenshots. Never include credentials or customer data.
+
 ## Validating your change
 
 This repository has no build step, but it does have real validators — run them before opening a PR:

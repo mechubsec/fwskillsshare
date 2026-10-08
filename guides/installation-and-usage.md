@@ -170,3 +170,5 @@ exact command before you run it.
 ```
 
 Each skill's own `SKILL.md` carries worked examples for its own topic.
+
+Skills at v0.x.x are drafts. If you verified one, see [Skill versions and drafts](../CONTRIBUTING.md#skill-versions-and-drafts) and open an issue.
