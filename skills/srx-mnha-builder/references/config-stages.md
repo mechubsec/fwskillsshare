@@ -58,8 +58,8 @@ Stages are applied in order: Stage 1 (underlay), Stage 2 (HA stanza), Stage 3 (e
 | `<VIP_IFL>` | `pair.srg1.vips[].ifl` | Interface for VIP |
 | `<MONITOR_IFD>` | `pair.srg1.monitor_interfaces[]` | Physical interface to monitor |
 | `<PREEMPTION>` | `pair.srg1.preemption` | `true` or `false` |
-| `<CONFIG_MODEL>` | Resolved from `pair.config_model` and `junos_release` | `flat` or `grid` |
-| `<GRID_ID>` | `pair.grid_id` | Grid ID (grid model only), e.g. `1` |
+| `<CONFIG_MODEL>` | `pair.config_model`, default `flat` | `flat` (default) or `grid` (optional four-node-style syntax) |
+| `<GRID_ID>` | `pair.grid_id` | Optional grid-id 1-15 for VMAC/VIP scale; omit when `0`/unset |
 | `<LOCAL_AS>` | `pair.bgp.local_as` | Local AS number |
 | `<PEER_AS>` | `pair.bgp.peer_as` | Peer AS number |
 | `<BGP_GROUP>` | `pair.bgp.group` | BGP group name, e.g. `UPSTREAM` |
@@ -138,6 +138,10 @@ set security zones security-zone <SEGMENT_ZONE> host-inbound-traffic protocols b
 
 ### ICL Encryption Block (include only when `<ICL_ENCRYPTED>` is true)
 
+**Optional.** An unencrypted ICL is acceptable when the ICL is local (direct link or same site); encryption is recommended when the ICL traverses other networks. Juniper's overview says "As the ICL link transmits private data, it is important to encrypt the link. You must encrypt the ICL using IPsec VPN." (MNHA overview, Interchassis link encryption); the operator treats it as a recommendation, and an unencrypted ICL formed and synced (`Encrypted: NO`) in the lab on vSRX 24.4R1.9 and 26.2R1.7. When `<ICL_ENCRYPTED>` is false, skip this block and every `vpn-profile` line.
+
+**Gateway addressing.** Juniper's Layer 3 example ([mnha-configuration-example](https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/example/mnha-configuration-example.html)) defines `MNHA_IKE_GW` with only `ike-policy` and `version v2-only`, with no `address`, `local-address` or `external-interface`; this block mirrors it. The block is not meant to be committed alone: it is referenced by `vpn-profile` in the HA stanza below, and the ICL peer addresses come from `local-ip`/`peer-ip` there. If the device's dry run asks for gateway addressing, add `set security ike gateway MNHA-ICL-IKE-GW local-address <LOCAL_ICL_IP>`, `address <PEER_ICL_IP>` and `external-interface <ICL_IFL>` (standard IKE gateway statements, not confirmed against a Juniper MNHA ICL example); the PSK is still set by the user.
+
 **Note:** The IKE policy's pre-shared key must be set by the user on each node via CLI before the baseline is taken. It never passes through the pair sheet, chat, or MCP.
 
 ```junos
@@ -158,9 +162,17 @@ set security ipsec vpn MNHA-ICL-VPN ike gateway MNHA-ICL-IKE-GW
 set security ipsec vpn MNHA-ICL-VPN ike ipsec-policy MNHA-ICL-IPSEC-POL
 ```
 
-### Flat Model (≤24.x)
+### Flat Model (default; 24.x and 26.2R1.7)
 
-Include when `<CONFIG_MODEL>` is `flat`:
+Include when `<CONFIG_MODEL>` is `flat` (the default). Lab-verified on vSRX 26.2R1.7, 2026-10-08: the flat form commits and, after the HA-activation reboot, activates. Before that reboot, `show chassis high-availability information` says `mode not configured` on any release.
+
+Optional VMAC/VIP-scale tuning (Juniper: `grid-id` 1-15, 25.4R1; coexists with `local-id`/`peer-id`), include only when `<GRID_ID>` is set:
+
+```junos
+set chassis high-availability grid-id <GRID_ID>
+```
+
+Core ICL lines:
 
 ```junos
 set chassis high-availability local-id <LOCAL_ID> local-ip <LOCAL_ICL_IP>
@@ -183,11 +195,11 @@ set chassis high-availability services-redundancy-group 0 peer-id <PEER_ID>
 set chassis high-availability services-redundancy-group 1 peer-id <PEER_ID>
 ```
 
-### Grid Model (26.x)
+### Four-Node-Style Syntax (`config_model: grid`, optional, not required)
 
-Include when `<CONFIG_MODEL>` is `grid`:
+Include only when the user explicitly sets `<CONFIG_MODEL>` to `grid`. `local-domain-id`, `domain-size` and `peer-domain-id` are documented by Juniper for four-node MNHA; this shape also committed on a two-node vSRX 26.2R1.7 pair (unencrypted) but is not needed for two nodes.
 
-**Note:** Field-confirmed shape on vSRX 26.2R1.7 (unencrypted). `vpn-profile` placement under `peer-domain-id` is NOT field-confirmed — rely on the device dry run.
+**Note:** `vpn-profile` placement under `peer-domain-id` is NOT field-confirmed — rely on the device dry run.
 
 ```junos
 set chassis high-availability grid-id <GRID_ID>
@@ -255,7 +267,7 @@ For each interface in `monitor_interfaces`:
 set chassis high-availability services-redundancy-group 1 monitor interface <MONITOR_IFD>
 ```
 
-Include only when `pair.srg1.monitor_interfaces` is non-empty and **grid model**:
+Include only when `pair.srg1.monitor_interfaces` is non-empty and the user chose the **monitor-object** form (both forms commit-check on vSRX 26.2R1.7):
 
 For each interface in `monitor_interfaces`:
 
@@ -406,8 +418,9 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 #### Pair Sheet and Model Resolution
 - [ ] Deployment mode is `routing`, `switching`, or `hybrid` (not something else)
 - [ ] All required fields are filled (no `<FILL>` remains in the pair sheet)
-- [ ] If Junos release is 25.x, `config_model` is explicitly set to `flat` or `grid` (not `auto`)
-- [ ] If `config_model` is `flat` and Junos release is 26.x or higher, **ERROR**: flat model on 26.x never activates — use grid
+- [ ] `config_model` is `flat` unless the user explicitly asked for the four-node-style syntax; the flat form is valid on 26.x (a 26.x `mode not configured` before reboot is the missing HA-activation reboot, not a wrong model)
+- [ ] If `grid_id` is set, it is 1-15 and unique per MNHA pair sharing an L2 domain (Juniper)
+- [ ] If deployment mode is **switching or hybrid**: SRG1 has `virtual-ip` index 1 and 2 on unique interfaces (lab-observed commit requirement on 26.2R1.7)
 - [ ] Junos release string parses correctly (format: `NN.NxRN.N`)
 
 #### ICL Configuration
@@ -467,8 +480,8 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 
 ### Needs User Acknowledgment (get one-line OK before pushing)
 
-- [ ] If `config_model` is `grid` and Junos release is ≤24.x: verify release supports grid model
-- [ ] If ICL transport is **shared** and not encrypted: session state crosses a shared segment in clear text
+- [ ] If `config_model` is `grid` (four-node-style): confirm the user wants it; the flat form is the default and sufficient for two nodes
+- [ ] If ICL transport is **shared** (or the ICL traverses other networks) and not encrypted: session state crosses a shared segment in clear text
 - [ ] If deployment mode is **switching or hybrid** and no `monitor_interfaces`: VIP will not move on uplink loss
 - [ ] If deployment mode is **switching or hybrid** and no activeness-probe: consider adding one to avoid dual-active on ICL loss (see srx-mnha pitfall 8)
 - [ ] If `pair.bgp.transit_subnets` is empty (in routing/hybrid mode): return traffic to on-transit sources may black-hole (see srx-mnha pitfall 21)
@@ -484,20 +497,14 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 - [ ] If ICL transport is **shared**: HA/BFD (and IKE if encrypted) host-inbound is opened on the transport zone
 - [ ] If ICL is **encrypted**: both nodes need the `junos-ike` package (`show version` for "JUNOS ike") and the same PSK set by the user on the IKE policy before the baseline is taken
 - [ ] If ICL interface or data segment interface/zone already exists in baseline with matching config: it is reused (not replaced)
-- [ ] If deployment mode is **switching or hybrid**: adjacent switches must accept the vMAC move on failover (check MAC-move limits, Dynamic ARP Inspection, storm-control)
+- [ ] If deployment mode is **switching or hybrid**: adjacent switches must accept the gateway MAC move on failover (virtual MAC only if `use-virtual-mac` is set) (check MAC-move limits, Dynamic ARP Inspection, storm-control)
 - [ ] If baseline has `default-policy permit-all` or zone with `host-inbound 'all'`: noted (broad permissions present)
 - [ ] If no baseline was provided: baseline checks are skipped; undo files will delete every staged line (no distinction between new and reused config)
 
 ## Config Model Resolution Logic
 
-From `pair.junos_release` and `pair.config_model`:
+1. Use `pair.config_model`; if `auto` or unset, resolve to `flat` on every release (24.x and 26.2R1.7 are lab-verified).
+2. Use `grid` only when the user explicitly asks for the four-node-style syntax.
+3. `pair.grid_id` is independent of the model: when set (1-15), emit `set chassis high-availability grid-id <GRID_ID>` with the flat stanza.
 
-1. Parse major version from `junos_release` (e.g. `24.4R2.21` → `24`)
-2. If `config_model` is `auto`:
-   - Major version ≥ 26 → `grid`
-   - Major version ≤ 24 → `flat`
-   - Major version = 25 → **ERROR**: ambiguous, set `config_model` explicitly
-3. If `config_model` is `flat` and major version ≥ 26 → **ERROR**: flat model on 26.x never activates
-4. If `config_model` is `grid` and major version ≤ 24 → **WARN**: verify release support
-
-Use the resolved model to select Stage 2 HA stanza block (flat vs grid).
+Use the resolved model to select the Stage 2 HA stanza block.

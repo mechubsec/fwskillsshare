@@ -6,8 +6,8 @@
 pair:
   name: <FILL>
   junos_release: <FILL>             # from gather_device_facts, identical on both nodes
-  config_model: auto                # auto | grid | flat
-  grid_id: 1                        # grid model only
+  config_model: flat                # flat (default; works on 24.x and 26.2R1.7) | grid (four-node-style syntax, optional)
+  grid_id: 0                        # optional VMAC/VIP-scale tuning (1-15, Junos 25.4R1+); 0 = omit. Coexists with flat local-id/peer-id
   deployment_mode: <FILL>           # routing (L3) | switching (default-gateway/L2) | hybrid
   liveness: {min_interval: 1000, multiplier: 3}
 
@@ -22,7 +22,7 @@ pair:
     segment: <FILL>                 # name of the segment that carries the ICL, e.g. upstream
     loopback_unit: 1                # lo0 unit for the ICL /32
     encryption:
-      enabled: <FILL>               # true | false  (strongly recommended when transport is shared)
+      enabled: <FILL>               # true | false. Optional when the ICL is local (direct link / same site); recommended when it traverses other networks (always for shared transport)
       ike_policy: MNHA-ICL-IKE-POL  # the USER sets its pre-shared-key on both nodes via CLI - never in this sheet
 
   segments:                         # data-plane interfaces; same IFL name on both nodes

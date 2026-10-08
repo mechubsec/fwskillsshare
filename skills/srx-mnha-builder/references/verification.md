@@ -65,8 +65,9 @@ following before BFD: the same PSK on both nodes, `system-services ike` on the I
    `show bfd session extensive` shows `remote discriminator 0` and receive 0.0 pps.
    Fix: `host-inbound-traffic protocols bfd` on the ICL zone on BOTH nodes. The lint
    should have prevented this, so check whether the zone was edited by hand.
-2. **Wrong config model.** `show configuration chassis high-availability | display set`
-   on 26.x must use `grid-id` / `peer-domain-id`.
+2. **Missing HA-activation reboot, or config mismatch.** `mode not configured` persists
+   until the HA-activation reboot on any release (the flat form is valid on 26.2R1.7).
+   Check `show configuration chassis high-availability | display set` matches on both nodes.
 3. **Mirroring error.** Node0 local-id 1 / peer 2, Node1 local-id 2 / peer 1, ICL IPs
    swapped. Compare the two `stage2.set` files.
 4. **vSRX dataplane not enumerated.** `show interfaces terse` shows only fxp0 and lo0,
@@ -77,7 +78,7 @@ following before BFD: the same PSK on both nodes, `system-services ike` on the I
 
 ## VIP checks (switching / hybrid)
 - `show interfaces terse` on the ACTIVE node lists the VIP on the VIP interface; the BACKUP does not.
-- From a host on the segment: ping the VIP, then `arp -a` shows the vMAC.
+- From a host on the segment: ping the VIP, then `arp -a` shows the virtual MAC if `use-virtual-mac` is set on the VIP, otherwise the active node's physical MAC (lab-observed).
 - `show chassis high-availability services-redundancy-group 1` lists the virtual IP and monitored interfaces.
 
 ## After Stage 3 (routing)

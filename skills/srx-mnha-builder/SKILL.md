@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-builder
 description: Build a new two-node SRX/vSRX Multi-Node High Availability pair from standalone nodes over a Junos MCP server, covering routing, switching or hybrid mode, dedicated or shared ICL, pair sheet, staged configs with pre-push checks and approval gates, HA-activation reboot, formation checks and failover test. Use when standing up an MNHA pair or turning two SRXs into HA. For design or troubleshooting a running pair, use srx-mnha.
-version: 0.2.2
+version: 0.2.3
 author:
   - fastrevmd-lab
   - Claude
@@ -118,7 +118,7 @@ To help the user choose, ask:
 
 If the answers are yes / yes, the mode is hybrid. No / yes means routing. Yes / no means
 switching. See `srx-mnha` → Deployment Modes for the per-segment failover consequences
-and vMAC-move caveats (DAI, storm-control, MAC-move limits).
+and MAC-move caveats (DAI, storm-control, MAC-move limits; a virtual MAC exists only if `use-virtual-mac` is set per VIP).
 
 ### ICL questions (asked right after the mode)
 
@@ -129,8 +129,7 @@ and vMAC-move caveats (DAI, storm-control, MAC-move limits).
 | **Dedicated** (recommended) | Its own back-to-back link, e.g. `ge-0/0/2` ↔ `ge-0/0/2`, /30 | Link addresses in a dedicated ICL zone |
 | **Shared** | Loopback /32s reached over a data segment, used when no spare port or path exists | `lo0.<unit>` in the ICL zone, a static /32 route to the peer loopback, and HA/BFD (+IKE) host-inbound opened on the transport segment's zone |
 
-**2. Encrypted or not?** Recommend encryption whenever the ICL is shared or crosses
-anything the user doesn't control. See `srx-mnha` → ICL for conceptual guidance. Two
+**2. Encrypted or not?** ICL encryption is **optional**: an unencrypted ICL is fine when the ICL is local (direct link or same site); it is recommended when the ICL traverses other networks, and always for shared transport. Juniper's overview says "You must encrypt the ICL using IPsec VPN", so record the choice; an unencrypted ICL formed and synced in the lab on 24.4R1.9 and 26.2R1.7. Stage 2 emits the crypto objects only when encryption is chosen. See `srx-mnha` → ICL for conceptual guidance. Two
 prerequisites the skill checks but cannot set:
 - **`junos-ike` package on both nodes.** Check the `show version` output for
   "JUNOS ike". If it's missing, the user installs it
@@ -143,8 +142,9 @@ prerequisites the skill checks but cannot set:
   proposals, gateway, VPN, `vpn-profile`, and IKE host-inbound.
 
 Field-confirmed 2026-09-25: the encrypted-ICL stanza (`ha-link-encryption` + `peer-id …
-vpn-profile`) commit-checks on vSRX 24.4R2.21 (flat model). On the grid model (26.x) the
-`vpn-profile` placement is not confirmed, so treat the device dry run as the authority there.
+vpn-profile`) commit-checks on vSRX 24.4R2.21 (flat model). The flat form is the default on every release, including 26.2R1.7 (lab-verified 2026-10-08). The
+four-node-style `peer-domain-id` syntax is optional and its `vpn-profile` placement is not confirmed, so treat
+the device dry run as the authority there. `grid-id` (1-15) is optional VMAC/VIP-scale tuning that coexists with the flat form.
 
 ## Step 3 - Pair sheet
 
@@ -186,7 +186,7 @@ policy or a different autonomous-system number.
 Output per node:
 - `stage1.set`: underlay (ICL transport, data segments, zones, host-inbound rules)
 - `stage2.set`: ICL crypto objects (when encrypted), plus the HA stanza for the chosen mode
-  and flat or grid model
+  (flat model by default; optional `grid-id`)
 - `stage3.set`: eBGP and the export policy (routing and hybrid only)
 - matching `undo-stageN.set` files
 
