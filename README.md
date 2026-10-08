@@ -60,7 +60,7 @@ Skills are instructions your agent follows, and pasted configs are untrusted inp
 1. Clone a tagged release and run the installer:
 
 ```bash
-git clone --branch v1.11.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
+git clone --branch v1.12.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
 cd fwskillsshare
 ./install.sh
 ```
