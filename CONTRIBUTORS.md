@@ -6,7 +6,7 @@
 
 ## Contributors
 
-- **Javier Grizzuti** ([@jgrizzuti](https://github.com/jgrizzuti)) — `srx-ips` (IPS triage and custom signatures, from [#69](https://github.com/mechubsec/fwskillsshare/pull/69)/[#70](https://github.com/mechubsec/fwskillsshare/pull/70)) and `srx-mnha-builder` (MNHA pair builder, [#83](https://github.com/mechubsec/fwskillsshare/pull/83))
+- **Javier Grizzuti** ([@jgrizzuti](https://github.com/jgrizzuti)) — `srx-ips` (IPS triage and custom signatures, from upstream [#69](https://github.com/mechubsec/fwskillsshare/pull/69)/[#70](https://github.com/mechubsec/fwskillsshare/pull/70)) and `srx-mnha-builder` (MNHA pair builder, upstream [#83](https://github.com/mechubsec/fwskillsshare/pull/83))
 
 ## How to contribute
 
