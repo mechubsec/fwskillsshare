@@ -101,19 +101,21 @@ signal-route prefixes (reserved, non-routed; never production prefixes).
 
 ### 5. ICL, ICD and HA link encryption
 
-Why: the ICL is a routed path, not a dedicated L2 link, and must be encrypted
-with IPsec (E4). Binding it to a loopback with more than one physical link is
+Why: the ICL is a routed path, not a dedicated L2 link. Juniper recommends
+encrypting it with IPsec (E4); encryption is a recommended-but-optional choice
+per the operator, not yet lab-confirmed. Binding it to a loopback with more than one physical link is
 recommended; encryption needs the IKE package and IKEv2 (E5, E6). ICD (data
 link for asymmetric flows) has no TechLibrary definition located; treat as
 uncertain and see `srx-mnha`.
 
 Ask:
 - "Dedicated ICL ports, or share revenue ports?" (dedicated LAG / shared)
-- "Certificates or pre-shared key for HA link encryption?" (PKI, documented from Junos 22.3R1 (E5) / pre-shared key, unsourced here: verify against TechLibrary before offering)
+- "Encrypt the ICL? Recommended, but optional." (none / PSK / PKI; none is lab-unverified, warn that Juniper docs say "must" (E4))
+- If encrypting, "Certificates or pre-shared key?" (PKI, documented from Junos 22.3R1 (E5) / pre-shared key, unsourced here: verify against TechLibrary before offering)
 - "Do you expect asymmetric flows, and do you want to evaluate an ICD? (ICD semantics are uncertain here; follow `srx-mnha`.)" (no / yes / unsure)
 
 Changes in output: ICL interface or loopback, addressing `<PLACEHOLDER>`, HA
-VPN stanza, and the former fab/control rows (replaced, not mapped).
+VPN stanza (only if encryption is chosen), and the former fab/control rows (replaced, not mapped).
 
 ### 6. Config-sync split
 
@@ -182,7 +184,7 @@ unchanged):
 |---|---|---|
 | ICL (ports or loopback, addressing) | <PLACEHOLDER> | user-confirmed (round 5) |
 | ICD | none / evaluate (uncertain) | user-confirmed (round 5) |
-| HA link encryption | PKI / other | user-confirmed (round 5) |
+| HA link encryption | none / PSK / PKI | user-confirmed (round 5) |
 | NAT proxy ARP / DHCP handling | routed next-hop / pinned proxy ARP; relay / split pools | user-confirmed (round 1) |
 | Config-sync split (common vs node-local) | <summary> | user-confirmed (round 6) |
 | Platform / release verdict | supported-by-example / uncertain | user-confirmed (round 7) |

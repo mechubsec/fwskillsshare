@@ -38,7 +38,7 @@ reference them. Do not renumber; append new rows at the end.
 | T7 | RG `preempt` | `preemption` on the SRG | SRG column; topic 3 preempt answer | caveat | Failback can blackhole traffic if ownership returns before routing converges (`srx-mnha` pitfall 8); default off unless the user confirmed. Hybrid steering stanza below. |
 | T8 | RG `interface-monitor <if> weight <W>`; BFD detection chosen in interview topic 4 | SRG `monitor interface <IFD>` (flat) or `monitor monitor-object ... interface` (grid). BFD monitoring is a candidate only (see the BFD note below), not emitted | Detection column | caveat | Cluster weights and the 255 threshold do not translate numerically; thresholds are re-chosen with the user. Monitor the node-local interface that replaces each per-node child port (physical or `ae`), on its own node; a cluster monitor on `ge-0/0/3` and `ge-7/0/3` becomes one monitor per node. Exact forms: builder `config-stages.md` "SRG1 Common Block". |
 | T9 | RG `ip-monitoring` (targets, retries, weights) | None generated. SRG IP monitoring exists (E13), grouped as flexible path `monitor-object`s with weights and thresholds from 23.4R1 | Detection column | manual | The exact IP-monitor statement is not verified (`## Uncertain` in vendor-evidence.md), so nothing is emitted. The user confirms it from Juniper's Flexible path monitoring page or the MNHA configuration examples; cluster weights and retries are re-chosen, not copied. `activeness-probe` is not an equivalent. BFD detection is a caveat under T8, not T9. |
-| T10 | `fab0`/`fab1` fabric link | ICL (`peer-id ... interface`), routed and IPsec-encrypted | Global: ICL, HA link encryption | unsupported | Not equivalent: the fabric was an L2 data/session link; the ICL is a routed path that must be encrypted (E4, E5, E6). Build the ICL as new configuration; never copy fab member ports. ICD is uncertain (see `## Uncertain`). |
+| T10 | `fab0`/`fab1` fabric link | ICL (`peer-id ... interface`), routed; IPsec encryption recommended, optional | Global: ICL, HA link encryption | unsupported | Not equivalent: the fabric was an L2 data/session link; the ICL is a routed path; Juniper recommends IPsec encryption and the operator reports it is optional (E4, E5, E6). Build the ICL as new configuration; never copy fab member ports. ICD is uncertain (see `## Uncertain`). |
 | T11 | Control link/ports, `heartbeat-*`, `control-link-recovery` | None; liveness comes from the ICL `liveness-detection` | Global: ICL | unsupported | No MNHA equivalent; record in the fidelity report. Removing the control cabling is a physical runbook step. |
 | T12 | `groups node0`/`node1`, `apply-groups "${node}"`, `commit` of a single config | Two node-local configs: common part and node-local part; MNHA can replicate configuration with `commit peers-synchronize` (E8); which statements it replicates and whether node-local statements are protected is unverified (see Uncertain); this skill's output does not depend on it | Global: config-sync split | converted | Expand each group into its node's file; delete the `node0`/`node1` groups and the cluster stanza (cluster-only; may block load, E11). Common sync needs matching logical/tenant names (E8). |
 | T13 | fxp0 per-node address, `backup-router` | Same per-node fxp0 / management config | Config-sync split | converted | Stays node-local; never synced. |
@@ -111,7 +111,7 @@ set security ike gateway <GW> local-address <FLOATING_VPN_IP>
 
 Every IKE and IPsec statement that depends on the gateway (proposals, policies, `ipsec vpn`, `st0` zone membership, and the PSK, which stays `<redacted>` and is re-entered by the operator) moves into the operator-applied block with it, so the common block never references an uncommitted gateway. Also add the prefix-list binding from the `srx-mnha` floating-loopback pattern.
 
-**T10/T11 replacement (new ICL, not a translation):** flat form from builder `config-stages.md`. `vpn-profile` placement is flat-form only; for grid it is not field-confirmed (`config-stages.md` note at line 190), so rely on a device dry run.
+**T10/T11 replacement (new ICL, not a translation):** flat form from builder `config-stages.md`. The `vpn-profile` line is optional: emit it only when encryption is chosen (interview topic 5). `vpn-profile` placement is flat-form only; for grid it is not field-confirmed (`config-stages.md` note at line 190), so rely on a device dry run.
 
 ```junos
 set chassis high-availability local-id <LOCAL_ID> local-ip <LOCAL_ICL_IP>
@@ -119,6 +119,7 @@ set chassis high-availability peer-id <PEER_ID> peer-ip <PEER_ICL_IP>
 set chassis high-availability peer-id <PEER_ID> interface <ICL_HA_IFL>
 set chassis high-availability peer-id <PEER_ID> liveness-detection minimum-interval <LIVENESS_MIN>
 set chassis high-availability peer-id <PEER_ID> liveness-detection multiplier <LIVENESS_MULT>
+# optional: only if ICL encryption is chosen (recommended)
 set chassis high-availability peer-id <PEER_ID> vpn-profile <HA_VPN_PROFILE>
 set chassis high-availability services-redundancy-group 0 peer-id <PEER_ID>
 ```

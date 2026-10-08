@@ -16,8 +16,8 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 - **Claim:** The overview says "Typically, an IPsec termination IP (this can be a loopback for example) can be announced on SRG1+" so tunnels terminate on the active node. Together with E2 (SRG0 excludes IPsec VPN services), IPsec VPN must be anchored on an SRG1+. Overview wording is "typically ... can", so the hard requirement rests on E2's explicit SRG0 exclusion.
 - **Source:** Multinode High Availability, Juniper TechLibrary, https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/concept/mnha-overview.html, retrieved 2026-10-07; plus E2. Corroborated for AWS: "IPsec VPN tunnel anchors at the SRG1" (E9).
 
-### E4 — ICL runs over a routed path and must be IPsec-encrypted
-- **Claim:** The interchassis link runs over a routed path (one or more revenue ports), not a dedicated L2 link, and "You must encrypt the ICL using IPsec VPN."
+### E4 — ICL runs over a routed path; Juniper says encrypt it, operator reports it is optional
+- **Claim:** The interchassis link runs over a routed path (one or more revenue ports), not a dedicated L2 link. The overview glossary (verified verbatim against the raw page, 2026-10-08) says: "As the ICL link transmits private data, it is important to encrypt the link. You must encrypt the ICL using IPsec VPN." The Layer 3, default-gateway and hybrid example pages all configure `vpn-profile` on the peer-id and none marks it optional. An SRX SME operator states encryption is a recommendation, not a requirement in practice; that is operator testimony, not a Juniper statement. Treat encryption as strongly recommended and offered as a choice (none / PSK / PKI); the unencrypted ICL is lab-unverified (see `## Uncertain`).
 - **Source:** Multinode High Availability, Juniper TechLibrary, https://www.juniper.net/documentation/us/en/software/junos/high-availability/topics/concept/mnha-overview.html, retrieved 2026-10-07.
 
 ### E5 — ICL binding and encryption prerequisites
@@ -58,6 +58,7 @@ Cited facts for the chassis-cluster to MNHA conversion skill. Other references c
 
 ## Uncertain
 
+- Whether an unencrypted ICL (no `vpn-profile`) commits and works: Juniper's overview says "You must encrypt the ICL using IPsec VPN." but the operator (SRX SME) reports it is optional. The vsrx-fw01 lab test (unencrypted ICL, Junos 24.4R1.9) will confirm. Until then the generated unencrypted variant is unverified and the report must say so.
 - Official Juniper cluster-to-MNHA migration procedure: no authoritative source located (only the community post, E12).
 - Per-platform SRX minimum Junos release and which SRX models support MNHA: no authoritative page text located; Feature Explorer not fetched (E7). The 22.4R1 figure (E6) is an example prerequisite only.
 - vSRX MNHA on KVM/Proxmox (non-cloud): no authoritative source located.

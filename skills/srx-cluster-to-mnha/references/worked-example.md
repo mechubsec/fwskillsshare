@@ -166,7 +166,7 @@ addresses, `local-id 2` / `peer-id 1` (and `peer-id 1` on each SRG),
 | T7 | `set chassis cluster redundancy-group 1 preempt` | no `preemption` | caveat | Cluster preempted; user chose none to avoid failback blackholes |
 | T8 | `... redundancy-group 1 interface-monitor ge-0/0/3 weight 255` | `monitor interface ae0` (SRG2) | caveat | Weights do not translate; thresholds re-chosen with the user |
 | T8 | decision record: reth0 detection `BFD + interface` (no cluster source line) | none; BFD monitor is a candidate only | caveat | BFD timers/syntax to verify in a lab; stanza is unconfirmed (vendor-evidence `## Uncertain`) and not emitted |
-| T10 | `set interfaces fab0 fabric-options member-interfaces ge-0/0/2` | ICL stanzas with placeholders | unsupported | Build a routed, IPsec-encrypted ICL; do not reuse fab ports |
+| T10 | `set interfaces fab0 fabric-options member-interfaces ge-0/0/2` | ICL stanzas with placeholders | unsupported | Build a routed ICL (IPsec-encrypted here, recommended); do not reuse fab ports |
 | T14 | `set security ike gateway gw-branch external-interface reth2.0` | commented `ipsec-srg` block on SRG1 | caveat | Operator applies after review; branch peer 203.0.113.50 must target `<FLOATING_VPN_IP>`; PSK re-entered |
 | T17 | `set protocols bgp group isp neighbor 198.51.100.1` | node-local BGP neighbor, export `<BGP_EXPORT_POLICY>` | caveat | Re-peer ISP with two node addresses; policy must advertise pool 203.0.113.64/29 from the SRG2 active node (`srx-mnha` mnha-config-patterns.md) |
 | T17 | `set routing-options static route 0.0.0.0/0 next-hop 198.51.100.1` | node-local static default | caveat | Next hop is on the untrust LAG; confirm each node reaches 198.51.100.1 |

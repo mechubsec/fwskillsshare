@@ -95,7 +95,7 @@ Rules:
 | Placeholder | Meaning | Used in | Owner | Status |
 |---|---|---|---|---|
 | <NODE0_ICL_IP> | node0 ICL local address | node0.set, runbook phase 2 | user | needed |
-| <HA_VPN_PROFILE> | IKEv2 profile for HA link encryption (E4, E5) | both | user | needed |
+| <HA_VPN_PROFILE> | IKEv2 profile for HA link encryption (E4, E5); only if encryption is chosen | both | user | needed if encrypted |
 | <SYSTEM_BASELINE> | login, root-authentication, services, snmp, syslog kept on each node (T24) | runbook phases 2, 4 | user | needed |
 ```
 

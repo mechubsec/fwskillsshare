@@ -23,7 +23,7 @@ the user chose the other order.
   (serial or terminal server; for a vSRX, the hypervisor console). SSH over
   fxp0 or reth is lost across reboots.
 - Junos release and platform match the confirmed verdict; IKE package
-  installed if the ICL is encrypted (E5, E6).
+  installed if ICL encryption is chosen (E5, E6).
 - Cluster healthy:
   `show chassis cluster status`, `show chassis cluster interfaces`,
   `show chassis cluster information`.
@@ -86,7 +86,7 @@ Phase 0 baseline, no traffic arriving on node1.
 - Caveat (E11): the generated `node0`/`node1` groups are cluster-only. After
   the reboot node1 may fail to load its configuration; use the console and the
   targeted cleanup below rather than trying to edit the old config.
-- Install the IKE package if the ICL is encrypted:
+- Only if ICL encryption is chosen, install the IKE package:
   `request system software add optional://junos-ike.tgz` (E6).
 - Targeted cleanup, then merge. Do **not** run a bare `delete` followed by
   `load set`: the node files carry no `system login`, `root-authentication`,
@@ -222,8 +222,8 @@ and `ping <NODE1_ICL_IP> size 1400 do-not-fragment count 5` both 0% loss.
 **Gate A, with node0's data ports still down.** Run on both nodes:
 
 - `show chassis high-availability information`: `Node Status: ONLINE`, peer
-  `Conn State: UP`, `Cold Sync Status: COMPLETE`, `Encrypted: YES` when the
-  ICL is encrypted.
+  `Conn State: UP`, `Cold Sync Status: COMPLETE`, `Encrypted: YES` only if
+  ICL encryption was chosen (an unencrypted ICL is lab-unverified, E4).
 - `show chassis high-availability services-redundancy-group <N>` for SRG0 and
   every other SRG: exactly one `ACTIVE` per active/backup SRG (node1, which
   carries traffic), node0 backup or hold.
@@ -246,7 +246,7 @@ election with preemption off.
 
 - Re-run the Gate A checks. VIP `INSTALLED` only on the active node, signal
   routes where expected, and `show arp no-resolve` shows one MAC per gateway.
-- `show security ipsec security-associations ha-link-encryption`.
+- Only if ICL encryption was chosen: `show security ipsec security-associations ha-link-encryption`.
 - `show bfd session extensive` (when BFD is used).
 - Config parity, read-only: save `show configuration | display set` from each
   node and compare the common sections off the box. Do not run
