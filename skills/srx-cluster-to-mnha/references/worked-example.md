@@ -124,6 +124,8 @@ set chassis high-availability services-redundancy-group 2 activeness-probe dest-
 # ---- operator-applied: ipsec-srg ----
 # Every IPsec line belongs here (T14); lines are commented until reviewed.
 # set interfaces lo0 unit <UNIT> family inet address <FLOATING_VPN_IP>/32
+# set policy-options prefix-list <IKE_GW_PREFIX_LIST> <FLOATING_VPN_IP>/32
+# set chassis high-availability services-redundancy-group 1 prefix-list <IKE_GW_PREFIX_LIST> routing-instance <ROUTING_INSTANCE>
 # set chassis high-availability services-redundancy-group 1 managed-services ipsec
 # set security ike proposal ike-prop authentication-method pre-shared-keys
 # set security ike proposal ike-prop dh-group group14
@@ -206,6 +208,8 @@ The fixture has no `system login`, `snmp` or `syslog` stanzas outside the node g
 | <BACKUP_SIGNAL_ROUTE> | reserved backup signal prefix | both, runbook phase 2 | user | needed |
 | <BGP_EXPORT_POLICY> | export policy advertising the NAT pool from the active node | both, runbook phase 2 | user | needed |
 | <FLOATING_VPN_IP> | floating IPsec address on lo0 | both, ipsec-srg block (phase 2 node1, phase 5 node0) | user | needed |
+| <IKE_GW_PREFIX_LIST> | prefix list holding the floating address, bound to SRG1 (T14) | both, ipsec-srg block | user | needed |
+| <ROUTING_INSTANCE> | routing instance the SRG1 prefix list is bound to (`default` for the main table, assumption) | both, ipsec-srg block | user | needed |
 | <UNIT> | lo0 unit for the floating address | both, ipsec-srg block | user | needed |
 ```
 

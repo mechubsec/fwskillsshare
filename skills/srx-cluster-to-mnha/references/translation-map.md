@@ -110,6 +110,8 @@ Signal prefixes are reserved and never production prefixes; BFD timers stay `<PL
 
 ```junos
 set interfaces lo0 unit <UNIT> family inet address <FLOATING_VPN_IP>/32
+set policy-options prefix-list <IKE_GW_PREFIX_LIST> <FLOATING_VPN_IP>/32
+set chassis high-availability services-redundancy-group <SRG> prefix-list <IKE_GW_PREFIX_LIST> routing-instance <RI>
 set chassis high-availability services-redundancy-group <SRG> managed-services ipsec
 set security ike gateway <GW> external-interface lo0.<UNIT>
 set security ike gateway <GW> local-address <FLOATING_VPN_IP>

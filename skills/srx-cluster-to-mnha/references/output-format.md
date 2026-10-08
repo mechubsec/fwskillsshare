@@ -39,8 +39,7 @@ set security policies from-zone trust to-zone untrust policy allow-web then perm
 # ---- node-local ----
 set system host-name <NODE0_HOSTNAME>
 set interfaces ae1 unit 0 family inet address <NODE0_AE1_IP>/<PLEN>
-set chassis high-availability local-id 1
-set chassis high-availability local-ip <NODE0_ICL_IP>
+set chassis high-availability local-id <LOCAL_ID> local-ip <NODE0_ICL_IP>
 ```
 
 Rules:
