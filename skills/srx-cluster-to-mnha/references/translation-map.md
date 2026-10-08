@@ -16,7 +16,7 @@ stay uncertain.
 | `manual` | No confident mapping; the report names the open question and who decides. Generate nothing for it. |
 | `unsupported` | No MNHA equivalent. Say so; do not emit a lookalike. |
 
-Row IDs `T1..T29` are stable; the output format, runbook and worked example
+Row IDs `T1..T30` are stable; the output format, runbook and worked example
 reference them. Do not renumber; append new rows at the end.
 
 ## Syntax rules for snippets
@@ -50,7 +50,7 @@ reference them. Do not renumber; append new rows at the end.
 | T19 | Multicast (PIM, IGMP, MLD) on a reth | No authoritative MNHA behavior located | none | manual | Uncertain; flag in the report and validate in a lab before cutover. |
 | T20 | Transparent-mode or L2-bridge segments (bridge domains, zones holding `family ethernet-switching` units) | None | none | unsupported | MNHA does not support transparent mode HA (E10); this row covers transparent-mode or L2-bridge segments only. Plain `family ethernet-switching` access ports on a branch SRX are not shown to be covered by E10: treat those as `manual` and uncertain. |
 | T21 | Platform/release capability of the source model | MNHA support verdict | Global: platform/release | caveat | Supported-by-example only (22.4R1 example, E6) or uncertain; Feature Explorer follow-up required (E7). |
-| T22 | Security policies, address books, applications, and source, destination or static NAT rules (not proxy ARP) | Same statements in the common block; zone and policy names are unchanged | Config-sync split | converted | Policy logic is unchanged; verify NAT pools on a reth subnet against T15 and sessions are re-established after cutover. |
+| T22 | Security policies, address books, applications, and source, destination or static NAT rules (not proxy ARP) | Same statements in the common block; zone and policy names are unchanged | Config-sync split | converted | Policy logic is unchanged; verify NAT pools on a reth subnet against T15 and sessions are re-established after cutover. Rules that name a reth explicitly are T30. |
 | T23 | `chassis cluster cluster-id`, `reth-count`, other cluster-only statements | None | none | unsupported | Cluster-only (E11); delete from both node files. |
 | T24 | `system login`, `root-authentication`, `system services`, `snmp`, `system syslog` (and NTP, name-servers) outside the node groups | None generated; stays on each node | Config-sync split | manual | The node files omit these, so a bare `delete` plus `load set` would remove management access. Runbook uses targeted deletes to keep them; the operator confirms the baseline, or supplies it for a rebuilt node. Secrets are never reproduced. |
 | T25 | A reth or segment the operator retires, and monitors, zone members or references to it | None generated for the retired segment | Interview topic 1: retire | caveat | Records a deliberate `retired` outcome (the four classes have no separate one): remove its zone binding, monitors (an SRG monitor on a retired interface keeps the SRG unhealthy) and routes; list each removal. |
@@ -58,6 +58,7 @@ reference them. Do not renumber; append new rows at the end.
 | T27 | `outbound-ssh` or other management-plane onboarding in node groups (per-node device-id, MCP or netconf users) | Node-local config after expansion | Config-sync split | caveat | Re-onboarding to the management service is a runbook follow-up; per-node ids stay node-local. |
 | T28 | Licenses and security services (AppID, AAM, GeoIP, screens, PKI, dynamic-address) | Common block for config; licenses and certificates per node | Config-sync split | caveat | Each node needs its own license and certificate; verify parity after cutover. |
 | T29 | ICL zone host-inbound requirements | Zone holding the ICL allows the HA protocols (including BFD, `srx-mnha` pitfall 22) | ICL | caveat | Comes from the `srx-mnha-builder` skill; not in the cluster source. |
+| T30 | NAT rule-sets or other policy statements that name a reth explicitly (`from interface reth<N>.<U>`, `to interface reth<N>.<U>`, any interface-bound match) | Same rule with the interface remapped through T1, node-local where physical names differ between nodes | Config-sync split | caveat | The reth no longer exists, so the unchanged statement would not commit or would never match. Remap each reference; if names differ per node the rule is node-local, not common. `then source-nat interface` follows the egress interface and needs no edit. |
 
 ## Stanza reference
 

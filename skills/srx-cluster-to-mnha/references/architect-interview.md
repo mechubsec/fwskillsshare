@@ -115,7 +115,13 @@ Ask: "How should a node decide it is unhealthy?"
   - Warn the user: interface monitoring yields generated config (T8), but IP
     monitoring yields none (T9 is `manual`; syntax unverified) and BFD
     monitoring is a candidate to verify, not generated output.
-- Signal routes steering the upstream routing protocol
+- `none` (no failure detection; record Detection as `none`)
+
+Signal routes are not a detection method: they publish SRG state to the
+upstream routing protocol, they do not detect failure. Ask route steering as a
+separate follow-up: "Should the upstream routing protocol follow SRG state with
+signal routes (needed for hybrid and routed segments)?" The decision record
+keeps Detection and route steering as separate answers.
 
 Where a monitored interface belongs to a retired segment, drop the monitor (T25). Where no upstream target exists (static next hops that do not answer, a non-routing neighbor), BFD and IP monitoring have no valid target: offer interface monitoring or `none` (record Detection as `none`).
 

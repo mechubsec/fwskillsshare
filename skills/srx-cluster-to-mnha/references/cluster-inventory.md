@@ -55,7 +55,7 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | 15 | DHCP | `set system services dhcp-local-server`, `set forwarding-options dhcp-relay`, `set access address-assignment pool` | server vs relay, interface, pools |
 | 16 | Logical / tenant systems | `set logical-systems <N>`, `set tenants <N>` | names, interfaces owned |
 | 17 | Multicast | `set protocols pim`, `igmp`, `mld`, `set routing-options multicast` | on which reth |
-| 18 | Transparent / L2 | `family ethernet-switching` on interface units, `set vlans`, `set bridge-domains`, zones containing such interfaces | any L2 or transparent segment |
+| 18 | Transparent / L2 | `family ethernet-switching` on interface units, `set vlans`, `set bridge-domains`, zones containing such interfaces | transparent mode (`unsupported`) vs other L2 (`manual`, uncertain) |
 | 19 | Policies, address books | `set security policies`, `set security address-book`, `set applications` | zone pairs, or `match from-zone/to-zone` on global policies, policy names (as counted rows) |
 | 20 | NAT rules | `set security nat source\|destination\|static` (proxy-arp is #14) | rule-sets, pools |
 | 21 | System access and logging | `set system login`, `root-authentication`, `set system services`, `set snmp`, `set system syslog`, `set system ntp\|name-server` outside the node groups | users, services, snmp, syslog hosts (never secrets); these are not in the node files (T24) |
@@ -88,8 +88,11 @@ convert them silently.
   not documented here, so treat as manual and uncertain.
 - **Multicast** (PIM, IGMP, MLD) on a reth: no authoritative MNHA behavior
   located; manual and uncertain.
-- **Transparent or L2 segments**: MNHA does not support transparent mode HA
-  (E10); mark `unsupported`, not `manual`, and say so.
+- **Transparent mode**: MNHA does not support transparent mode HA (E10); mark
+  `unsupported`, not `manual`, and say so.
+- **Other L2 / `family ethernet-switching` (non-transparent)**: E10 covers
+  transparent mode only; mark `manual` and uncertain (see vendor-evidence.md
+  Uncertain, T20).
 
 ## Inventory table
 
