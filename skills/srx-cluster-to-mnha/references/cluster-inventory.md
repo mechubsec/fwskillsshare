@@ -10,6 +10,27 @@ Rules: report what the evidence shows, never guess a missing value (write
 `<UNKNOWN>` in the cell), and write secrets as `<redacted>`. If the config is
 hierarchical, convert mentally to `display set` or ask for `| display set`.
 
+**Evidence commands.** Besides the configuration, collect `show version`,
+`show chassis cluster status`, `show chassis cluster interfaces`,
+`show chassis cluster information` and `show interfaces terse`. The cluster-id
+and node ids are operational state and are not in the set configuration; take
+them from the status output, not from `set chassis cluster cluster-id`.
+
+**Large configurations.** A real cluster can be well over 1,000 lines and
+exceed a tool's output limit. Fetch by subtree (`show configuration interfaces`,
+`security zones`, `chassis`, `groups`, `protocols`, `routing-options`), and
+summarize `security policies`, `address-book`, `applications` and `nat` with
+counts instead of one row each.
+
+**Redaction hides non-secret values.** Tooling may redact more than secrets: in
+the lab a management tool masked values that follow the keyword `session`
+(`log session-init`, `log session-close`, screen `limit-session`), 57 lines in
+one config (L6). Treat any `[REDACTED]` on a non-secret leaf as lost data:
+recover the true text on the device with `| match` or `| count` (the match shows
+the real text), or omit the line from the merge load so the device keeps its
+value. Never guess it. Some outputs (`show security screen`) stay redacted, so
+list the unrecoverable ones under open facts.
+
 ## Extraction checklist
 
 Run each pattern against the config. "Per node" means resolve `groups node0` /
@@ -18,7 +39,7 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | # | Construct | Locate with | Record |
 |---|---|---|---|
 | 1 | Cluster basics | `set chassis cluster cluster-id`, `set chassis cluster reth-count`, `set chassis cluster control-link-recovery`, `set chassis cluster heartbeat-*` | reth-count, heartbeat timers |
-| 2 | Reth interfaces | `set interfaces reth<N> ...` | units, VLAN ids, addresses (the reth address is the segment gateway), zone |
+| 2 | Reth interfaces | `set interfaces reth<N> ...` | units, VLAN ids, addresses (the reth address is the segment gateway), zone. Two addresses on one reth: record both, mark which is primary or preferred, and ask which is the gateway. A reth with `family inet` and no address is `unnumbered` (record its zone and what uses it) |
 | 3 | Reth children | `set interfaces <phys> gigether-options redundant-parent reth<N>` and `fastether-options redundant-parent` | physical port per node (child on node0 vs node1), speed |
 | 4 | Reth LACP | `set interfaces reth<N> redundant-ether-options lacp active\|passive`, `minimum-links`, `redundancy-group <N>` | LACP mode, which RG owns the reth |
 | 5 | Redundancy groups | `set chassis cluster redundancy-group <N> node 0\|1 priority <P>`, `redundancy-group <N> preempt`, `redundancy-group <N> gratuitous-arp-count <C>` | RG id, per-node priority, preempt, gratuitous-arp-count |
@@ -35,9 +56,12 @@ Run each pattern against the config. "Per node" means resolve `groups node0` /
 | 16 | Logical / tenant systems | `set logical-systems <N>`, `set tenants <N>` | names, interfaces owned |
 | 17 | Multicast | `set protocols pim`, `igmp`, `mld`, `set routing-options multicast` | on which reth |
 | 18 | Transparent / L2 | `family ethernet-switching` on interface units, `set vlans`, `set bridge-domains`, zones containing such interfaces | any L2 or transparent segment |
-| 19 | Policies, address books | `set security policies`, `set security address-book`, `set applications` | zone pairs, policy names |
+| 19 | Policies, address books | `set security policies`, `set security address-book`, `set applications` | zone pairs, or `match from-zone/to-zone` on global policies, policy names (as counted rows) |
 | 20 | NAT rules | `set security nat source\|destination\|static` (proxy-arp is #14) | rule-sets, pools |
 | 21 | System access and logging | `set system login`, `root-authentication`, `set system services`, `set snmp`, `set system syslog`, `set system ntp\|name-server` outside the node groups | users, services, snmp, syslog hosts (never secrets); these are not in the node files (T24) |
+| 22 | References to reth addresses outside interfaces | `source-address`, `source-interface` under `system syslog` and `security log`, NAT `interface`, route next hops, `inet` filters, secondary addresses | each reference, since it breaks when the reth disappears and must move to a per-node address, a VIP, or be dropped |
+| 23 | Management plane in node groups | `outbound-ssh` (for example Security Director Cloud onboarding with a per-node device-id), management users, `mgmt_junos` or management-instance | per-node values; re-onboarding is a runbook follow-up |
+| 24 | Security services and `lo0` | AppID, AAM, screens, PKI, dynamic-address, licenses; `lo0` and the RG0 pseudo-interface seen in `show chassis cluster interfaces` | what must match on both nodes (licenses per node) |
 
 ### Node groups
 
@@ -69,7 +93,7 @@ convert them silently.
 
 ## Inventory table
 
-Produce exactly this table, one row per construct instance. Later phases consume
+Produce exactly this table, one row per construct instance, except policy, nat, address-book and application constructs, which are one counted row each (for example `policy | 101 global policies | - | - | zones trust, untrust | counted`). Later phases consume
 these columns verbatim.
 
 ```
@@ -79,7 +103,7 @@ these columns verbatim.
 
 Column rules:
 
-- **Construct**: `cluster`, `reth`, `redundancy-group`, `fab`, `control-port`, `fxp0`, `zone`, `policy`, `nat`, `routing`, `ike-gateway`, `nat-proxy-arp`, `dhcp`, `lsys`, `tenant`, `multicast`, `l2`, `system`.
+- **Construct**: `cluster`, `reth`, `redundancy-group`, `fab`, `control-port`, `fxp0`, `zone`, `policy`, `nat`, `routing`, `ike-gateway`, `nat-proxy-arp`, `dhcp`, `lsys`, `tenant`, `multicast`, `l2`, `system`, `service` (security services, onboarding), `lo0`.
 - **Name**: `reth0`, `RG1`, `fab0`, `trust`, and so on.
 - **node0 / node1**: the per-node member (child port, priority, fxp0 address); `-` when not per-node.
 - **Attached services**: zone, routing protocols, IKE gateways, NAT, DHCP on that construct.
@@ -95,5 +119,5 @@ Example rows (synthetic, RFC 5737):
 ```
 
 After the table, list **open facts** (anything `<UNKNOWN>`) and ask the user for
-them via the runtime intake before the interview, then move to
+them (plain text or runtime intake; the catalog has no entry for open facts, so count them against the three-question round limit only when asked through the native tool) before the interview, then move to
 [architect-interview.md](architect-interview.md).
