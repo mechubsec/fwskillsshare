@@ -139,7 +139,7 @@ aa0d51fb0dd0e3e25e69fa1fc59704aac01d4cacf755fa283e5b60461c8f289e  srx-chassis-cl
 075046f17ecf5d4b4748533eab16320a70cdaa0acd44c6b5fe2916fbae2e84c6  srx-chassis-cluster-proxmox/references/worked-example.md
 e2ca81842008445371c126fc4db63195b5fd2e0ea8484f4ab1c990d66833c449  srx-cluster-to-mnha/SKILL.md
 a8ae8dd4fc83340d5a08a432218f9ff3d74cf5007e216d05c87b310314826e6a  srx-cluster-to-mnha/agents/openai.yaml
-be6dc909f3813fe27299628c306d136c0a702ab25f8961d86c3dd0edcd004fb5  srx-cluster-to-mnha/references/architect-interview.md
+0c9f68f704978986b85567a8dcdf3943af899d6f201a861bc0612787a0e164fa  srx-cluster-to-mnha/references/architect-interview.md
 d76aea8a700091bf6afd2d94269e413051bc4485379434625c0f8138dbdfefe2  srx-cluster-to-mnha/references/cluster-inventory.md
 81d5024576d25d1624354932991ca847c083c968056e00cd19b4903783174ed5  srx-cluster-to-mnha/references/cluster-sample.set
 2052fb5f6bdce28c17296a2c2fd3b4a1cee5c6d9e3dbb1613b2679ff2430272b  srx-cluster-to-mnha/references/cutover-runbook-ha.md
