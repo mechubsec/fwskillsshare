@@ -30,7 +30,7 @@ Retrieved: 2026-06-29
 
 ## Inspiration and license boundary
 
-v1.1 additionally incorporates a community field report (fwskillsshare issues #5/#6,
+v1.1 additionally incorporates a community field report (upstream fwskillsshare issues #5/#6,
 https://github.com/mechubsec/fwskillsshare/issues/5): 24.4R1/25.4R1 commit
 constraints (ike-user-type + IKEv2 + PSK; traffic-selector 0.0.0.0/0 with a static
 gateway address) and NAT-T findings (double-NAT, host-inbound ike).

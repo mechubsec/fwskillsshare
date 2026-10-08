@@ -1,7 +1,7 @@
 ---
 name: srx-autovpn-full-tunnel
 description: Design, configure, audit, and troubleshoot Juniper SRX AutoVPN full-tunnel hub backhaul. Use when handling group-ike-id gateways, traffic selectors, ARI, shared st0, anti-recursion routes, source NAT, VPN hairpinning, NAT-T, or Junos 24.4R1+ PSK and 0.0.0.0/0 commit errors. Use ADVPN for direct spoke shortcuts.
-version: 1.1.3
+version: 1.1.4
 author:
   - fastrevmd-lab
   - Claude
@@ -33,7 +33,7 @@ metadata:
       url: https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/index.html
       retrieved: "2026-06-29"
     - title: "Field report: 12-branch vSRX3 lab, Junos 24.4R1.9 / 25.4R1.12 (commit blockers + NAT-T findings)"
-      author: community field report (fwskillsshare issues #5, #6)
+      author: community field report (upstream fwskillsshare issues #5, #6)
       url: https://github.com/mechubsec/fwskillsshare/issues/5
       retrieved: "2026-07-02"
 ---

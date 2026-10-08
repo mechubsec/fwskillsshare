@@ -1,7 +1,7 @@
 ---
 name: srx-cluster-to-mnha
 description: Convert an existing Juniper SRX or vSRX chassis-cluster configuration into two node-local Multi-Node High Availability configurations through an SRX-architect interview, with a fidelity report and a cutover runbook. Use when migrating a chassis cluster to MNHA, translating reth interfaces, redundancy groups, fab or control links, node groups, or fxp0 into SRGs, ICL, VIPs, BFD or signal routes, choosing routing, default-gateway, or hybrid mode per segment, or planning the cluster-break cutover. Offline only; to push configs use srx-mnha-builder, for MNHA design or troubleshooting use srx-mnha.
-version: 0.2.1
+version: 0.2.2
 author:
   - fastrevmd-lab
   - Claude

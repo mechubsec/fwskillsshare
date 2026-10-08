@@ -21,7 +21,7 @@ reference them. Do not renumber; append new rows at the end.
 
 ## Syntax rules for snippets
 
-- Flat `chassis high-availability` form, as used by `srx-mnha` and `srx-mnha-builder` for current releases. The release-dependent grid form (open issues mechubsec/fwskillsshare#98 and #99) is not decided here; follow `srx-mnha` `references/srg-details.md` and the builder's `references/config-stages.md` for the target release. The `services-redundancy-group` stanzas below are the same in both forms apart from the peer reference.
+- Flat `chassis high-availability` form, as used by `srx-mnha` and `srx-mnha-builder` for current releases. The release-dependent grid form (still an open question in the upstream issue tracker) is not decided here; follow `srx-mnha` `references/srg-details.md` and the builder's `references/config-stages.md` for the target release. The `services-redundancy-group` stanzas below are the same in both forms apart from the peer reference.
 - Values are `<PLACEHOLDER>` or RFC 5737/1918 addresses; unsupplied values are never invented.
 - Stanzas come from the reviewed `srx-mnha` references; any stanza without a source there is not emitted.
 

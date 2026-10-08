@@ -1,7 +1,7 @@
 ---
 name: srx-mnha
 description: Design, configure, audit, and troubleshoot Juniper SRX Multi-Node High Availability. Use when handling routed, default-gateway, or hybrid modes, chassis-cluster migration, SRGs, ICL or ICD, session sync, BGP or BFD failover, VIPs, IPsec, NAT, proxy ARP, routing instances, or DHCP. Use focused SRX skills for non-MNHA behavior.
-version: 1.3.4
+version: 1.3.5
 author:
   - fastrevmd-lab
   - Claude
@@ -434,7 +434,7 @@ Session, IPsec, routing, VIP, and DHCP checks are listed inline in their section
 Full write-ups live in `references/mnha-grid-model-field-notes.md`; the pitfalls
 above index them. Confirmed on live pairs:
 
-- vSRX3 24.4R1.9 hybrid pair ([issue #7](https://github.com/mechubsec/fwskillsshare/issues/7)):
+- vSRX3 24.4R1.9 hybrid pair ([upstream issue #7](https://github.com/mechubsec/fwskillsshare/issues/7)):
   an unzoned-leg static default black-holes transit (pitfall 18); the backup node
   does not service SRG data traffic (`Process Packet In Backup State: NO` is
   expected, not a fault); the `high-availability` host-inbound knob commit-checks

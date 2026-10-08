@@ -2,7 +2,7 @@
 
 Field notes behind the SKILL.md "Config model: flat vs grid" section and the
 Field-Confirmed Behaviors summary. Sources: a live vSRX3 24.4R1.9 hybrid pair
-([fwskillsshare issue #7](https://github.com/mechubsec/fwskillsshare/issues/7))
+([upstream fwskillsshare issue #7](https://github.com/mechubsec/fwskillsshare/issues/7))
 and a 2026-07 deployment of two routed MNHA pairs on vSRX 26.2R1.7 (grid model,
 SRG1 `deployment-type routing`, eBGP + signal-route MED steering).
 

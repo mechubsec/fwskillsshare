@@ -1,7 +1,7 @@
 ---
 name: srx-advpn
 description: Design, configure, audit, and troubleshoot Juniper SRX ADVPN spoke-to-spoke IPsec shortcuts. Use when handling suggester or partner roles, multipoint st0, OSPF p2mp, certificates, PKI, shortcut lifecycle, or “No public key found” IKE_AUTH failures. Use AutoVPN for hub backhaul and static IPsec for small fixed estates.
-version: 1.1.3
+version: 1.1.4
 author:
   - fastrevmd-lab
   - Claude
@@ -21,7 +21,7 @@ metadata:
       url: https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/index.html
       retrieved: "2026-07-02"
     - title: "Field report: 12-branch vSRX3 lab (6 AutoVPN + 6 ADVPN), Junos 24.4R1.9 / 25.4R1.12"
-      author: community field report (fwskillsshare issue #4)
+      author: community field report (upstream fwskillsshare issue #4)
       url: https://github.com/mechubsec/fwskillsshare/issues/4
       retrieved: "2026-07-02"
 ---
@@ -382,5 +382,5 @@ certificate-requirement commit error, chassis-cluster PKI gotcha, NAT-T
 double-NAT and host-inbound findings, and the open `No public key found`
 blocker are field data from a 12-branch vSRX3 lab build (Junos 24.4R1.9 /
 25.4R1.12) contributed via
-[fwskillsshare issue #4](https://github.com/mechubsec/fwskillsshare/issues/4).
+[upstream fwskillsshare issue #4](https://github.com/mechubsec/fwskillsshare/issues/4).
 See `references/field-notes-vsrx-advpn-lab.md`.

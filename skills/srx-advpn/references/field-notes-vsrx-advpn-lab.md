@@ -6,7 +6,7 @@
 - [NAT-T findings (apply to ADVPN and AutoVPN alike)](#nat-t-findings-apply-to-advpn-and-autovpn-alike)
 - [ADVPN state: PKI-enrolled, blocked at IKE cert auth](#advpn-state-pki-enrolled-blocked-at-ike-cert-auth)
 
-Source: community field report, [fwskillsshare issue #4](https://github.com/mechubsec/fwskillsshare/issues/4) (2026-07-02).
+Source: community field report, [upstream fwskillsshare issue #4](https://github.com/mechubsec/fwskillsshare/issues/4) (2026-07-02).
 Environment: vSRX3, Junos 24.4R1.9 and 25.4R1.12, hub as chassis cluster behind
 1:1 static NAT, simulated dual-ISP underlay, IKEv2.
 
