@@ -30,17 +30,18 @@ failover below needs explicit approval at that step.
   COMPLETE is a working unencrypted ICL (L8): record it as an accepted
   deviation from the encryption recommendation (E4), not a failure.
 - `show chassis high-availability services-redundancy-group <N>` for SRG0 and
-  every other SRG: exactly one `ACTIVE` per active/backup SRG (node1, which
-  carries traffic), node0 backup or hold.
+  every other SRG: exactly one `ACTIVE` per active/backup SRG (SRG1 and up;
+  node1, which carries traffic), node0 backup or hold. SRG0 is active/active by
+  design (E2) and shows `ONLINE` on both nodes; that is not split-brain.
 
-If cold sync fails, both nodes can self-elect ACTIVE (`srx-mnha` pitfall 22),
+If cold sync fails, both nodes can self-elect ACTIVE on an active/backup SRG (`srx-mnha` pitfall 22),
 which would duplicate the VIP and gateway once node0's ports come up. **Do not
-enable node0's revenue ports if two nodes show ACTIVE for an SRG, if `Conn State`
+enable node0's revenue ports if two nodes show ACTIVE for an active/backup SRG (SRG1+, never SRG0), if `Conn State`
 is not UP, or if cold sync is not COMPLETE.** Abort path: leave node0's data
 ports down (traffic stays on node1), first rule out the ICL zone missing
 `host-inbound-traffic protocols bfd` (pitfall 22), then re-check the ICL path;
 if unresolved inside the window, use the phase 5 rollback box. If node0 shows
-ACTIVE alone, fail the SRG back to node1 with `request chassis
+ACTIVE alone on an active/backup SRG, fail the SRG back to node1 with `request chassis
 high-availability failover services-redundancy-group <N> peer-id
 <PEER_LOCAL_ID>` (`peer-id` mandatory) before continuing. `<PEER_LOCAL_ID>` is
 the `local-id` of the other node (node0 has `local-id 1`, so run on node0 with
@@ -68,14 +69,14 @@ releases are uncertain.
 - Session sync: `show security flow session summary` on both nodes.
 
 **Gate B abort path.** If Gate B fails for any reason (VIP not installed, BFD
-or ICL down, two ACTIVE for any SRG, duplicate gateway MAC or ARP),
+or ICL down, two ACTIVE for any active/backup SRG (SRG1+), duplicate gateway MAC or ARP),
 immediately shut node0's data ports (traffic stays on node1), then follow the
 phase 5 rollback box.
 
-> **Rollback box, phase 5:** trigger: Gate A fails (two ACTIVE, `Conn State`
+> **Rollback box, phase 5:** trigger: Gate A fails (two ACTIVE on an active/backup SRG, `Conn State`
 > not UP, cold sync not COMPLETE) and is not fixed in the window, or Gate B
 > fails for any reason (VIP not installed, BFD or ICL down, two ACTIVE for any
-> SRG, duplicate gateway MAC or ARP) after node0's data ports are shut. Controlled order, outage expected. (1) Shut both
+> active/backup SRG (SRG1+; SRG0 is active/active by design), duplicate gateway MAC or ARP) after node0's data ports are shut. Controlled order, outage expected. (1) Shut both
 > nodes' revenue ports at the switches. (2) On each node console restore the
 > cluster backup (`load override <CLUSTER_BACKUP_FILE>`, or `delete` then
 > `load set <CLUSTER_BACKUP_SET>`) and `commit`. (3) Restore control and

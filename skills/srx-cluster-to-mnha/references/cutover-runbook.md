@@ -185,16 +185,15 @@ reports cluster is not enabled; `show configuration chassis high-availability`;
 
 ## Phase 3 - Move traffic to node1
 
-**Pre-gate (before step 1).** Phase 2 expects the IPsec SRG to sit in `HOLD`
-with no peer, but step 2 below needs node1 to own the VIP. Before moving
-anything, on node1 run
-`show chassis high-availability services-redundancy-group <N>` for every SRG
-that carries a VIP or VPN, and confirm each SRG can become active standalone
-(not `HOLD` or ineligible), or that the VIP can be installed locally. With no
-peer ever seen, an SRG sits in `HOLD` (VIPs `NOT INSTALLED`) and promoted itself
-to `ACTIVE` after about 60 s once its monitored links were up (L7). Wait up to
-about 90 s after the links are up. If any SRG is still not `ACTIVE`, abort: do not touch
-node0; use rollback box 3 (nothing has moved yet).
+**Pre-gate (before step 1): readiness only.** On node1 confirm the
+configuration is present for every SRG that carries a VIP or VPN: the
+`chassis high-availability` block, the ICL, and the VIP and signal-route
+statements (`show configuration chassis high-availability`). Do not require
+`ACTIVE` yet: Phase 2 leaves node1's monitored links down, and with no peer
+ever seen an SRG sits in `HOLD` (VIPs `NOT INSTALLED`) and promotes itself to
+`ACTIVE` after about 60 s once its monitored links are up (L7). The bounded
+`ACTIVE` check is after step 2 below. If configuration is missing, stop before
+touching node0.
 
 Order, for every segment type (routed, default-gateway, hybrid), and never
 reversed:
@@ -208,6 +207,12 @@ reversed:
    configured the VIP uses node1's physical NIC MAC, so expect a MAC change,
    L10, T2). Expected outage for the segment: about 75 s from link shut to
    `ACTIVE` in the lab (L7); tell stakeholders.
+   **Bounded ACTIVE check (L7).** Right after node1's links are up, wait up to
+   about 90 s, then run `show chassis high-availability
+   services-redundancy-group <N>` for every SRG that carries a VIP or VPN:
+   each must be `ACTIVE` with VIPs `INSTALLED`. If any SRG is still not
+   `ACTIVE`, abort: shut node1's revenue links again, restore node0's reth
+   child ports, and use rollback box 3.
 3. Duplicate-address check: `show arp no-resolve` on node1, and the
    upstream/switch ARP and MAC tables, show one MAC per gateway address and no
    address on two ports.
@@ -250,8 +255,10 @@ Verify on node1, and compare with the Phase 0 baseline:
   except any port that carries the ICL.
 - Committing `chassis high-availability` needs the HA-activation reboot here as
   well (L3): reboot node0 and confirm fxp0 and the ICL come back.
-- Remove or disable control and fabric cabling (T10, T11); these links have no
-  MNHA role.
+- Remove or disable only the control and fabric cabling that the decision
+  record leaves unused (T10, T11). Retain any former fabric or control NIC the
+  decision record assigned to the ICL (Phase 2 allows reuse); cutting it cuts
+  the HA path. The control links themselves have no MNHA role.
 
 Verify on node0: no cluster status, `show configuration chassis
 high-availability`, ICL interface up and `ping <NODE1_ICL_IP> count 5 rapid`
