@@ -78,7 +78,7 @@ following before BFD: the same PSK on both nodes, `system-services ike` on the I
 
 ## VIP checks (switching / hybrid)
 - `show interfaces terse` on the ACTIVE node lists the VIP on the VIP interface; the BACKUP does not.
-- From a host on the segment: ping the VIP, then `arp -a` shows the virtual MAC if `use-virtual-mac` is set on the VIP, otherwise the active node's physical MAC (lab-observed).
+- From a host on the segment: ping the VIP, then `arp -a` shows the virtual MAC if `use-virtual-mac` is set on the VIP, otherwise the active node's physical MAC (lab-observed). After failover the neighbor ARP table should show the new active node's physical MAC (default) or the same virtual MAC now behind the new node's switch port (`use-virtual-mac`); if not, check stale ARP caches and blocked GARP (default) or MAC-move limits, port-security and DAI (virtual MAC).
 - `show chassis high-availability services-redundancy-group 1` lists the virtual IP and monitored interfaces.
 
 ## After Stage 3 (routing)

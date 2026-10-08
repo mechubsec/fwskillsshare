@@ -1,7 +1,7 @@
 ---
 name: srx-mnha
 description: Design, configure, audit, and troubleshoot Juniper SRX Multi-Node High Availability. Use when handling routed, default-gateway, or hybrid modes, chassis-cluster migration, SRGs, ICL or ICD, session sync, BGP or BFD failover, VIPs, IPsec, NAT, proxy ARP, routing instances, or DHCP. Use focused SRX skills for non-MNHA behavior.
-version: 1.3.7
+version: 1.3.8
 author:
   - fastrevmd-lab
   - Claude
@@ -164,7 +164,9 @@ Use default-gateway mode when:
 L2-adjacency caveats for `deployment-type switching` / default-gateway mode:
 
 - The VIP rides on the `aeN.unit` (or physical unit) directly — no IRB/bridge-domain is introduced. The gateway is an interface VIP, not a routed SVI.
-- If `use-virtual-mac` is configured, the gateway vMAC (or, without it, the active node's physical MAC behind the VIP) **moves** on failover. Adjacent switches must accept that MAC move: check **MAC-move limits**, **Dynamic ARP Inspection (DAI)**, **storm-control**, and **EVPN/MLAG duplicate-MAC protection** — any of these can suppress or block the moved vMAC and silently break failover even though the SRG shows ACTIVE.
+- Two distinct failover behaviors (lab-observed, vSRX 26.2R1.7, 2026-10-08):
+  - **Default (no `use-virtual-mac`): physical-MAC ARP change.** The VIP answers ARP with the active node's physical NIC MAC; on failover the ARP mapping changes to the new active node's physical MAC via gratuitous ARP. No MAC moves between switch ports. If traffic stalls, suspect **stale ARP caches** on neighbors or **blocked or ignored GARP** (DAI, ARP suppression, GARP rate limits). Verify with the neighbor ARP tables (`arp -a`, `show arp`) before and after failover.
+  - **`use-virtual-mac`: virtual-MAC move.** A `00:10:db:fe:xx:xx` virtual MAC moves to the new active node's port. Adjacent switches must accept that move: check **MAC-move limits**, **port-security**, **Dynamic ARP Inspection (DAI)**, **storm-control**, and **EVPN/MLAG duplicate-MAC protection**; any of these can suppress or block the moved MAC and silently break failover even though the SRG shows ACTIVE. Verify with the switch MAC table on both node ports.
 - Tie the segment's uplink to failover with SRG interface monitoring. Two
   forms commit: the bare `monitor interface <IFD>` (simple case: one or a few
   uplinks; verify on the target release that any down triggers failover

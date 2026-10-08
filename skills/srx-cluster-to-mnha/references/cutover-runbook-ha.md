@@ -57,7 +57,7 @@ releases are uncertain.
 - Re-run the Gate A checks. VIP `INSTALLED` only on the active node, signal
   routes where expected, and `show arp no-resolve` shows one MAC per gateway.
   With `virtual-ip` alone, that MAC is the active node's physical NIC MAC
-  (L10); the MAC changing on failover is expected, and gratuitous ARP carries it.
+  (L10); the ARP mapping changing to the new node's physical MAC on failover is expected, and gratuitous ARP carries it (verify neighbor ARP tables). With `use-virtual-mac` a virtual MAC moves between ports instead.
 - Only if ICL encryption was chosen: `show security ipsec security-associations ha-link-encryption`.
 - `show bfd session extensive` (when BFD is used).
 - Config parity, read-only: save `show configuration | display set` from each
@@ -95,7 +95,7 @@ phase 5 rollback box.
   `request chassis high-availability failover services-redundancy-group <N>
   peer-id <PEER_LOCAL_ID>` (`peer-id` is mandatory; it took no confirmation
   prompt in the lab, L11, so the approval step is yours). Then fail back.
-  Lab result: about 1 s outage, VIP MAC moved, gratuitous ARP carried it (L10).
+  Lab result: about 1 s outage, VIP ARP mapping changed to the new node's physical MAC, gratuitous ARP carried it (L10).
 - Pass: roles swap, VIP and signal routes move, upstream route selection
   follows (`show route <PROTECTED_PREFIX>` on the upstream), sessions survive,
   ARP entries refresh.

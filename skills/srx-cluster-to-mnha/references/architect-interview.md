@@ -60,8 +60,7 @@ row for the reth.
 
 ### 2. Upstream LAG and MAC-move tolerance
 
-Why (per the `srx-mnha` skill, not a TechLibrary fact): in default-gateway mode the gateway MAC changes on failover (a virtual MAC only if `use-virtual-mac` is set on the VIP; the lab VIP without it answered with the active node's physical MAC and relied on gratuitous ARP, L10). Adjacent switches
-with MAC-move limits, dynamic ARP inspection, port-security, storm control or
+Why (per the `srx-mnha` skill, not a TechLibrary fact): two behaviors. By default the VIP answers with the active node's physical MAC and failover is a gratuitous-ARP change to the new node's physical MAC (L10; nothing moves between ports), so stale ARP caches or blocked/ignored GARP break it. With `use-virtual-mac` a virtual MAC moves to the new active node's port, so switches with MAC-move limits, port-security, dynamic ARP inspection, storm control or
 EVPN/MLAG duplicate-MAC protection can block it and silently break failover.
 The `srx-mnha` skill's default-gateway section lists these checks.
 

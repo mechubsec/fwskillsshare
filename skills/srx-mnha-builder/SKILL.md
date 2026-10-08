@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-builder
 description: Build a new two-node SRX/vSRX Multi-Node High Availability pair from standalone nodes over a Junos MCP server, covering routing, switching or hybrid mode, dedicated or shared ICL, pair sheet, staged configs with pre-push checks and approval gates, HA-activation reboot, formation checks and failover test. Use when standing up an MNHA pair or turning two SRXs into HA. For design or troubleshooting a running pair, use srx-mnha.
-version: 0.2.5
+version: 0.2.6
 author:
   - fastrevmd-lab
   - Claude
@@ -118,7 +118,7 @@ To help the user choose, ask:
 
 If the answers are yes / yes, the mode is hybrid. No / yes means routing. Yes / no means
 switching. See `srx-mnha` → Deployment Modes for the per-segment failover consequences
-and MAC-move caveats (DAI, storm-control, MAC-move limits; a virtual MAC exists only if `use-virtual-mac` is set per VIP).
+and failover-visibility caveats: without `use-virtual-mac` the VIP answers with the active node's physical MAC and failover is a gratuitous-ARP change (check stale ARP caches, blocked GARP); with it a virtual MAC moves between ports (check MAC-move limits, port-security, DAI).
 
 ### ICL questions (asked right after the mode)
 

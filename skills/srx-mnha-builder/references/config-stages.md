@@ -500,7 +500,7 @@ Walk this checklist after writing all stage files. Any **Blocking** item means s
 - [ ] If ICL transport is **shared**: HA/BFD (and IKE if encrypted) host-inbound is opened on the transport zone
 - [ ] If ICL is **encrypted**: both nodes need the `junos-ike` package (`show version` for "JUNOS ike") and the same PSK set by the user on the IKE policy before the baseline is taken
 - [ ] If ICL interface or data segment interface/zone already exists in baseline with matching config: it is reused (not replaced)
-- [ ] If deployment mode is **switching or hybrid**: adjacent switches must accept the gateway MAC move on failover (virtual MAC only if `use-virtual-mac` is set) (check MAC-move limits, Dynamic ARP Inspection, storm-control)
+- [ ] If deployment mode is **switching or hybrid**: failover visibility is understood: without `use-virtual-mac` the ARP mapping changes to the new active node's physical MAC via gratuitous ARP (neighbors must accept GARP; check stale ARP caches, DAI); with `use-virtual-mac` a virtual MAC moves between switch ports (check MAC-move limits, port-security, DAI, storm-control)
 - [ ] If baseline has `default-policy permit-all` or zone with `host-inbound 'all'`: noted (broad permissions present)
 - [ ] If no baseline was provided: baseline checks are skipped; undo files will delete every staged line (no distinction between new and reused config)
 
