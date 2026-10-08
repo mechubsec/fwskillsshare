@@ -60,7 +60,7 @@ row for the reth.
 
 ### 2. Upstream LAG and MAC-move tolerance
 
-Why (per the `srx-mnha` skill, not a TechLibrary fact): in default-gateway mode the gateway MAC changes on failover (a virtual MAC per the skill; the lab VIP answered with the active node's physical MAC and relied on gratuitous ARP, L10). Adjacent switches
+Why (per the `srx-mnha` skill, not a TechLibrary fact): in default-gateway mode the gateway MAC changes on failover (a virtual MAC only if `use-virtual-mac` is set on the VIP; the lab VIP without it answered with the active node's physical MAC and relied on gratuitous ARP, L10). Adjacent switches
 with MAC-move limits, dynamic ARP inspection, port-security, storm control or
 EVPN/MLAG duplicate-MAC protection can block it and silently break failover.
 The `srx-mnha` skill's default-gateway section lists these checks.
@@ -181,7 +181,7 @@ translation and output generation verbatim.
 | Segment / reth | Purpose | Mode | Upstream | SRG | Detection | Decision source |
 |---|---|---|---|---|---|---|
 | reth1 (trust) | Routers, OSPF | routed | per-node LAG ae1 | SRG2 | BFD | user-confirmed (round 1) |
-| reth2 (dmz) | Static-gateway servers | default-gateway | per-node LAG ae2, vMAC ok | SRG1 | IP monitoring | user-confirmed (round 3) |
+| reth2 (dmz) | Static-gateway servers | default-gateway | per-node LAG ae2, MAC move ok | SRG1 | IP monitoring | user-confirmed (round 3) |
 ```
 
 Per-node addresses, VIPs and retired segments are rows too: add a

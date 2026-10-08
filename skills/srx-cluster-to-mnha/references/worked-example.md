@@ -48,8 +48,8 @@ Open facts: platform model and Junos release are `<UNKNOWN>`; asked through runt
 | Segment / reth | Purpose | Mode | Upstream | SRG | Detection | Decision source |
 |---|---|---|---|---|---|---|
 | reth0 (untrust) | ISP router, eBGP | routed | per-node LAG ae0 | SRG2 | BFD + interface | user-confirmed (round 1) |
-| reth1 (trust) | Static-gateway hosts | default-gateway | single link, vMAC ok | SRG1 | interface | user-confirmed (round 1) |
-| reth2 (dmz) | Static-gateway servers, IPsec to branch | default-gateway | single link, vMAC ok | SRG1 (IPsec anchor) | interface | user-confirmed (round 3) |
+| reth1 (trust) | Static-gateway hosts | default-gateway | single link, MAC move ok | SRG1 | interface | user-confirmed (round 1) |
+| reth2 (dmz) | Static-gateway servers, IPsec to branch | default-gateway | single link, MAC move ok | SRG1 (IPsec anchor) | interface | user-confirmed (round 3) |
 ```
 
 ```
