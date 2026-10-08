@@ -150,7 +150,7 @@ set interfaces fab1 fabric-options member-interfaces ge-7/0/3
 **Input:**
 ```
 set security log mode stream
-set security screen ids-option untrust-screen limit-session source-ip-based [REDACTED]
+set security screen ids-option UNTRUST-SCREEN limit-session source-ip-based [REDACTED]
 set security policies from-zone trust to-zone untrust policy allow-web then log session-init [REDACTED]
 ```
 

@@ -266,7 +266,7 @@ and `ping <NODE1_ICL_IP> size 1400 do-not-fragment count 5` both 0% loss.
 
 ## Phases 5 and 6 - Form HA, failover test
 
-Continue in [cutover-runbook-ha.md](cutover-runbook-ha.md). Rollback for those phases is in the summary below.
+Continue in [cutover-runbook-ha.md](cutover-runbook-ha.md). Rollback: see the phase 5 and phase 6 rollback boxes in cutover-runbook-ha.md.
 
 ## Rollback summary
 
