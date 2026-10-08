@@ -1,7 +1,7 @@
 ---
 name: hipaa-ngfw-compliance
 description: Map firewall controls, evidence, and gaps to HIPAA Security Rule safeguards for ePHI. Use when assessing segmentation, access and audit controls, transmission security, risk management, BAA or vendor access, OCR evidence, 45 CFR 164.312, or “HIPPA.” Parse raw configs first.
-version: 0.1.3
+version: 1.0.0
 author:
   - fastrevmd-lab
   - Claude

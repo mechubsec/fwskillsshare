@@ -1,7 +1,7 @@
 ---
 name: cmmc-nist-800-171-ngfw-compliance
 description: Map firewall controls, evidence, and gaps to CMMC Level 2 and NIST SP 800-171. Use when assessing CUI boundaries, least privilege, remote access, SSP or POA&M evidence, C3PAO readiness, DFARS 252.204-7012, or requirements such as 3.1.1 and 3.13.1. Parse raw configs first.
-version: 0.1.4
+version: 1.0.0
 author:
   - fastrevmd-lab
   - Claude

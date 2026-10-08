@@ -201,7 +201,7 @@ Firewall fundamentals don't get easier in the AI age — the blast radius just g
 
 **33 skills** across five families. All of them are **model-invoked** — the agent reaches for them automatically when it sees vendor keywords, an SRX operational topic, a Security Director On-Prem or ClearPass deployment request, or compliance language in your message or a pasted config. 26 of the 33 packages have completed the review record below; `clearpass-proxmox-deploy`, `csrx-proxmox-deploy`, `srx-ips`, `srx-mnha-builder`, and `srx-cluster-to-mnha` ship as drafts, while `parsing-firepower-configs` and `srx-syslog-logging` have not yet been through the two-stage review. Invoke one explicitly as `/srx-nat` in Claude Code or Hermes, or `$srx-nat` in Codex.
 
-Version numbers: v0.x = draft; v1.0.0 and later = validated at least once in a lab.
+Version numbers: v0.x = draft; v1.0.0 and later = validated at least once (homelab run or completed review).
 
 Extended notes on the compliance and SRX playbooks — what they cover and when to reach for one — are in **[SKILLS.md](./SKILLS.md)**. Every skill also documents itself in its own `SKILL.md`, linked above.
 
@@ -210,7 +210,7 @@ Extended notes on the compliance and SRX playbooks — what they cover and when 
 Normalize a vendor config into the shared intermediate schema. Everything else composes on top.
 
 - **[parsing-cisco-configs](./skills/parsing-cisco-configs/SKILL.md)** — *(v1.1.6)* Cisco ASA & FTD (`show running-config`): access-lists, object/object-group, NAT, failover, port-to-app inference.
-- **[parsing-firepower-configs](./skills/parsing-firepower-configs/SKILL.md)** — *(v0.2.1, draft)* Cisco Secure Firewall / Firepower (FMC & FDM JSON exports): access control policies, security zones, prefilter, intrusion & file policies, FTD NAT.
+- **[parsing-firepower-configs](./skills/parsing-firepower-configs/SKILL.md)** — *(v1.0.0)* Cisco Secure Firewall / Firepower (FMC & FDM JSON exports): access control policies, security zones, prefilter, intrusion & file policies, FTD NAT.
 - **[parsing-fortinet-configs](./skills/parsing-fortinet-configs/SKILL.md)** — *(v1.1.5)* FortiGate / FortiOS (`show full-configuration`): the config/edit/set block format, VDOMs, UTM profiles, compound IPsec proposals.
 - **[parsing-palo-configs](./skills/parsing-palo-configs/SKILL.md)** — *(v1.1.5)* Palo Alto PAN-OS & Panorama: XML *or* flat set-format, vsys, app-default decomposition, device-groups.
 - **[parsing-srx-configs](./skills/parsing-srx-configs/SKILL.md)** — *(v1.4.1)* Juniper SRX / Junos: `display set` or curly-brace, address-book migration to global, `junos-*` app mapping, routing-instances.
@@ -247,12 +247,12 @@ Vendor-neutral, driven off the parsed schema.
 
 Map firewall capability to control evidence — assessor/auditor output templates, description/tag markers, honest scoping.
 
-- **[pci-ngfw-compliance](./skills/pci-ngfw-compliance/SKILL.md)** — *(v0.1.3, draft)* PCI DSS v4.0.1: CDE segmentation, Requirement 1 network security controls, six-month rule review, QSA/ROC/SAQ evidence.
-- **[hipaa-ngfw-compliance](./skills/hipaa-ngfw-compliance/SKILL.md)** — *(v0.1.3, draft)* HIPAA Security Rule (45 CFR 164.312): ePHI segmentation, access/audit controls, transmission security, BAA considerations.
-- **[cmmc-nist-800-171-ngfw-compliance](./skills/cmmc-nist-800-171-ngfw-compliance/SKILL.md)** — *(v0.1.4, draft)* CMMC Level 2 / NIST SP 800-171: CUI enclave scoping, boundary protection, SSP boundary language, POA&M-style gaps.
-- **[cis-controls-ngfw-compliance](./skills/cis-controls-ngfw-compliance/SKILL.md)** — *(v0.1.3, draft)* CIS Controls v8/v8.1: secure configuration, network infrastructure management, IG1/IG2/IG3 safeguards, audit evidence.
-- **[iso27001-ngfw-compliance](./skills/iso27001-ngfw-compliance/SKILL.md)** — *(v0.1.3, draft)* ISO/IEC 27001:2022 ISMS & Annex A (A.8.20–A.8.23), Statement of Applicability support, supplier access, corrective actions.
-- **[soc2-ngfw-compliance](./skills/soc2-ngfw-compliance/SKILL.md)** — *(v0.1.3, draft)* SOC 2 Trust Services Criteria (CC6/CC7/CC8), Type I/II examinations, operating-effectiveness samples.
+- **[pci-ngfw-compliance](./skills/pci-ngfw-compliance/SKILL.md)** — *(v1.0.0)* PCI DSS v4.0.1: CDE segmentation, Requirement 1 network security controls, six-month rule review, QSA/ROC/SAQ evidence.
+- **[hipaa-ngfw-compliance](./skills/hipaa-ngfw-compliance/SKILL.md)** — *(v1.0.0)* HIPAA Security Rule (45 CFR 164.312): ePHI segmentation, access/audit controls, transmission security, BAA considerations.
+- **[cmmc-nist-800-171-ngfw-compliance](./skills/cmmc-nist-800-171-ngfw-compliance/SKILL.md)** — *(v1.0.0)* CMMC Level 2 / NIST SP 800-171: CUI enclave scoping, boundary protection, SSP boundary language, POA&M-style gaps.
+- **[cis-controls-ngfw-compliance](./skills/cis-controls-ngfw-compliance/SKILL.md)** — *(v1.0.0)* CIS Controls v8/v8.1: secure configuration, network infrastructure management, IG1/IG2/IG3 safeguards, audit evidence.
+- **[iso27001-ngfw-compliance](./skills/iso27001-ngfw-compliance/SKILL.md)** — *(v1.0.0)* ISO/IEC 27001:2022 ISMS & Annex A (A.8.20–A.8.23), Statement of Applicability support, supplier access, corrective actions.
+- **[soc2-ngfw-compliance](./skills/soc2-ngfw-compliance/SKILL.md)** — *(v1.0.0)* SOC 2 Trust Services Criteria (CC6/CC7/CC8), Type I/II examinations, operating-effectiveness samples.
 - **[srx-disa-stig-compliance](./skills/srx-disa-stig-compliance/SKILL.md)** — *(v1.0.1)* Source-pinned DISA Y25M01 SRX NDM/ALG/IDPS/VPN rule assessment, CAT status, evidence gaps, and Junos compatibility review.
 
 ### Security management and NAC deployment

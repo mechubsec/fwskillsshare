@@ -1,7 +1,7 @@
 ---
 name: cis-controls-ngfw-compliance
 description: Map firewall controls, evidence, and gaps to CIS Controls v8/v8.1 safeguards. Use when assessing IG1/IG2/IG3, inventory, secure configuration, access, logging, threat prevention, or safeguard IDs such as 4.2 and 13.3. Excludes product-specific CIS Benchmarks.
-version: 0.1.3
+version: 1.0.0
 author:
   - fastrevmd-lab
   - Claude

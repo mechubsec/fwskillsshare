@@ -1,7 +1,7 @@
 ---
 name: pci-ngfw-compliance
 description: Map firewall controls, evidence, and gaps to PCI DSS v4.0.1. Use when assessing CDE scope, segmentation, Requirement 1, traffic restrictions, six-month rule review, logging, IDS/IPS, admin access, change control, or QSA, ROC, and SAQ evidence. Treat compliance as an environment assessment, not an NGFW certification.
-version: 0.1.3
+version: 1.0.0
 author:
   - fastrevmd-lab
   - Claude
