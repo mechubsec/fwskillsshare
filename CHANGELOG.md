@@ -272,7 +272,7 @@ carried in 1.1.0.
 
 ## 1.1.0 — parser improvements from fatcat/converter
 
-Version 1.1.0 of these skills incorporates parsing improvements identified by analyzing the [fatcat/converter](https://github.com/fatcat/converter) JavaScript parsers. The following areas were significantly enhanced based on fatcat's implementation:
+Version 1.1.0 of these skills incorporates parsing improvements identified by analyzing the fatcat/converter JavaScript parsers. The following areas were significantly enhanced based on fatcat's implementation:
 
 **All Skills:**
 - Cross-vendor L7 application mapping with 240+ canonical apps, confidence scores, and categories (web, collaboration, email, remote-access, network-mgmt, database, cloud-storage, streaming, voip, auth, tunnel, security, and more)

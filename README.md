@@ -169,7 +169,7 @@ Reach for [`srx-policy`](./skills/srx-policy/), [`srx-nat`](./skills/srx-nat/), 
 
 **The Problem.** A Cisco ACL, a FortiGate policy block, a PAN-OS `<entry>`, and an SRX `set security` line all express the same idea four incompatible ways. Ask an agent to compare or convert them and it hand-waves the parts that don't line up.
 
-**The Fix** is a shared language. The four [`parsing-*`](./skills/) skills normalize every vendor into **one vendor-neutral intermediate JSON schema** — zones, objects, policies, NAT, routing, VPN, HA, the lot — with a 240+ entry canonical L7 application map and confidence scores. Once a config is in the schema, cross-vendor [audit](./skills/firewall-best-practices-audit/), [conversion](./skills/firewall-config-conversion/), and [diff](./skills/firewall-config-diff/) all operate by *meaning*, not text. Features with no equivalent are flagged, never silently dropped.
+**The Fix** is a shared language. The [`parsing-*`](./skills/) skills normalize every vendor into **one vendor-neutral intermediate JSON schema** — zones, objects, policies, NAT, routing, VPN, HA, the lot — with a 240+ entry canonical L7 application map and confidence scores. Once a config is in the schema, cross-vendor [audit](./skills/firewall-best-practices-audit/), [conversion](./skills/firewall-config-conversion/), and [diff](./skills/firewall-config-diff/) all operate by *meaning*, not text. Features with no equivalent are flagged, never silently dropped.
 
 This is the piece that makes the rest composable. See the [Intermediate Schema](#intermediate-schema) below.
 
@@ -441,7 +441,7 @@ Each skill's own `SKILL.md` carries worked examples for its own topic.
 
 ## Intermediate Schema
 
-The four `parsing-*` skills normalize every vendor into one JSON document, which is what
+The `parsing-*` skills normalize every vendor into one JSON document, which is what
 lets audit, conversion, and diff operate by meaning rather than text. It covers zones and
 interfaces; address, service, and application objects and their groups; security policies
 with resolved apps, services, and profiles; NAT rules; routing (static routes, virtual
@@ -484,7 +484,7 @@ Manual equivalent — the skills are just directories, so remove the selected sk
 Original skill, playbook, script, and documentation text in this repository is
 licensed under the [MIT License](LICENSE).
 
-Parser improvements adopted from the [fatcat/converter](https://github.com/fatcat/converter) JavaScript parsers in v1.1.0 are itemized in [CHANGELOG.md](./CHANGELOG.md).
+Parser improvements adopted from the fatcat/converter JavaScript parsers in v1.1.0 are itemized in [CHANGELOG.md](./CHANGELOG.md).
 
 Some references are independently written “Inspired by” notes that identify Juniper,
 Cisco, Fortinet, Palo Alto Networks, community, blog, or support material which
