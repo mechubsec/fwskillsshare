@@ -1,7 +1,7 @@
 ---
 name: srx-mpls-in-flow
 description: Design, configure, audit, and troubleshoot Juniper SRX MPLS L3VPN in flow mode. Use when handling Junos 24.2R1+ family mpls with inet or inet6 flow, secure PE or CPE, VRFs, LDP, MP-BGP, l3vpn vrf-group policy, VRF-to-zone mapping, VRF-aware NAT or AppID, PowerMode or RFP, MTU, labels, or policy matching.
-version: 1.0.4
+version: 1.0.5
 author:
   - fastrevmd-lab
   - Claude
@@ -86,7 +86,8 @@ Always verify the current Junos release notes, Feature Explorer, and platform do
 - The older explicit flow mode for `family mpls` use cases on vSRX3, available from Junos 21.4 for specific PE cases, is deprecated in favor of decoupled family controls.
 - Platforms called out for the new MPLS/flow model include SRX300 series, SRX1500, SRX4100/4200, SRX1600/SRX2300/SRX4120/SRX4300, SRX4600/SRX4700 as of Junos 25.4, and vSRX.
 - As of the source articles, global packet mode is not supported on newer mid-range SRX1600/SRX2300/SRX4120/SRX4300, SRX4600/4700, and SRX5K platforms.
-- Global packet mode remains supported on SRX300 series, SRX1500, vSRX, and SRX4100/4200. If those platforms are upgraded to Junos 24.2R1 or later and need global packet-mode behavior, explicitly configure `family inet` packet mode.
+- Per the community blog source (Karel Hendrych, "SRX MPLS in flow"; Juniper's release note does not list platforms), global packet mode remains supported on SRX300 series, SRX1500, vSRX, and SRX4100/4200. Verify platform support in Juniper Feature Explorer before relying on it.
+- **Upgrade trap (24.2R1+):** before 24.2R1, `set security forwarding-options family mpls mode packet-based` also put IPv4 into packet mode. From 24.2R1 each family is set separately and IPv4/IPv6 default to flow mode. Per the 24.2R1 SRX known limitations: "to restore IPv4 to packet mode, you must configure `set security forwarding-options family inet mode packet-based`. Commit the configuration and reboot the device for the change to take effect." Do this only if packet-mode IPv4 is intended; a commit alone is not enough. Source (HTTP 200, checked 2026-10-09): https://www.juniper.net/documentation/us/en/software/junos/release-notes/24.2/junos-release-notes-24.2r1/topics/known-limitations/srx-known-limitations-24.2r1.html
 - Junos 25.4R1 adds SRX4600/SRX4700 MPLS L3VPN support and VRF-to-zone mapping support used by Part 2 of the source material.
 - On SRX4600/SRX4700, MPLS traffic is not Express Path accelerated as of 25.4R1, but the hardware PFE can load-balance toward SPU resources by hashing on inner IP/L4 headers rather than only MPLS labels.
 
@@ -428,6 +429,7 @@ Verify unidentified or pre-ID sessions are not silently bypassing intended contr
 |---|---|---|
 | `MPLS forwarding mode` is not packet based | Missing forwarding-options stanza or wrong platform/release | Configure `set security forwarding-options family mpls mode packet-based`; confirm platform/Junos support |
 | Customer traffic bypasses policy | Device is in global packet mode or traffic is not entering flow path | Check `show security flow status`; ensure inet/inet6 are flow based |
+| IPv4 traffic unexpectedly flow-processed (or bypassing flow) after upgrade to 24.2R1+ | Pre-24.2 `family mpls mode packet-based` silently set IPv4 to packet mode too; 24.2R1+ defaults inet/inet6 to flow | If packet-mode IPv4 is intended, set `family inet mode packet-based`, commit, and reboot (24.2R1 SRX known limitations); otherwise leave inet in flow |
 | VRF local interface traffic fails | Missing `vrf-table-label`, route target mismatch, interface not bound to VRF | Check VRF config and `show route table <vrf>.inet.0` |
 | VPN routes are absent | MP-BGP not established, missing `family inet-vpn`, next-hop unresolved, route-target mismatch | Check `show bgp summary`, `bgp.l3vpn.0`, `inet.3`, route targets |
 | MPLS labels absent on wire | LDP/MPLS not enabled on interface, IGP loopback reachability broken, MTU problem | Check `show ldp neighbor`, `show mpls interface`, captures, MTU |

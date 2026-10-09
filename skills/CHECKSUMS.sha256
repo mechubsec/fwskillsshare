@@ -219,7 +219,7 @@ da174e37483c5f27ac8ccb647337983982c6c7a070e849b752a8af66c5d23403  srx-mnha-build
 92e1017293de19594d24f9dd45673389c6450404daa0dcdd5a9b9e134b1b1859  srx-mnha-builder/references/pair-sheet.example.yaml
 16cb49b204dbf34fa06846e8088962a15700ef5e76ed73c2dec68387c9d95fa0  srx-mnha-builder/references/runtime-intake.md
 0ef4ed6cc3acb23d50120a47139f95288e8bd9eb6cedac31eba555f8c123f3f8  srx-mnha-builder/references/verification.md
-5da9c81be8237a19afc4a5da515acb7f223ea0c335685d1526444392b2fad0c6  srx-mpls-in-flow/SKILL.md
+b5c1f2b26aa2ea7a9d700ea6c53470e83a1032798d2e54411018538237c1c357  srx-mpls-in-flow/SKILL.md
 289ed901844233dbc9682f903a09438712596ff3e0bc505144fd20d6cd9096ce  srx-mpls-in-flow/agents/openai.yaml
 e8ac103dbdf23fc9a1e48470fce934eab8d6ccb35f7a5eb579f76b02598c7c3e  srx-mpls-in-flow/references/runtime-intake.md
 0a44f16061f6f94c2b2c8a9b1d8cec4cdd57ac04af15504b909b6b3d3f2cf779  srx-mpls-in-flow/references/source-index.md
