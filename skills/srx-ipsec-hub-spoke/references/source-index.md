@@ -16,7 +16,7 @@ Retrieved: 2026-06-29
   - Source: Juniper Junos IPsec VPN documentation
   - Topic: Route-based VPN with `bind-interface st0`, default proxy-id, and routing.
 
-- [IPsec VPN with Multiple Sites (Hub-and-Spoke) | Junos OS](https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsec-vpn-hub-and-spoke.html)
+- [IPsec VPN Overview, Understanding Hub-and-Spoke VPNs | Junos OS](https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsecvpn-overview.html#id-understanding-hub-and-spoke-vpns)
   - Source: Juniper Junos IPsec VPN documentation
   - Topic: Hub-and-spoke topology with per-spoke tunnels and hub routing.
 

@@ -1,7 +1,7 @@
 ---
 name: srx-ipsec-hub-spoke
 description: Design, configure, audit, and troubleshoot Juniper SRX static route-based IPsec hub-and-spoke. Use when handling per-spoke IKE gateways, one st0 per spoke, static routes, anti-recursion, centralized source NAT, VPN-to-untrust policy, or hub hairpinning. Use AutoVPN for changing spokes and ADVPN for direct shortcuts.
-version: 1.0.4
+version: 1.0.5
 author:
   - fastrevmd-lab
   - Claude
@@ -20,9 +20,9 @@ metadata:
       author: Juniper Networks
       url: https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-route-based-ipsec-vpns.html
       retrieved: "2026-06-29"
-    - title: IPsec VPN with Multiple Sites (Hub-and-Spoke) | Junos OS
+    - title: IPsec VPN Overview, Understanding Hub-and-Spoke VPNs | Junos OS
       author: Juniper Networks
-      url: https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsec-vpn-hub-and-spoke.html
+      url: https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsecvpn-overview.html#id-understanding-hub-and-spoke-vpns
       retrieved: "2026-06-29"
     - title: IPsec VPN User Guide | Junos OS
       author: Juniper Networks
