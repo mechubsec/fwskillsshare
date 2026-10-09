@@ -92,11 +92,12 @@ This stage establishes authenticated access to the device and confirms out-of-ba
   set system services ssh port 2222
   ```
 
-  For protocol version restriction (SSH version 2 only, recommended):
-
-  ```text
-  set system services ssh protocol-version v2
-  ```
+  Optional and redundant on supported releases: `set system services ssh protocol-version v2`.
+  Juniper's `protocol-version` reference states v2 is the default (introduced in
+  Junos 11.4) and that SSH v1 was removed on all SRX devices in 19.3R1 and
+  18.3R3, so the line changes nothing there. Do not count it as a hardening
+  control or a gap. Reference (HTTP 200, checked 2026-10-09):
+  https://www.juniper.net/documentation/en_US/junos/topics/reference/configuration-statement/protocol-version-edit-system.html
 
   **Source:** Juniper Networks, "Remote Access Overview" (Junos OS User Access and Authentication), retrieved 2026-08-20.
   URL: https://www.juniper.net/documentation/us/en/software/junos/user-access/topics/topic-map/junos-software-remote-access-overview.html
