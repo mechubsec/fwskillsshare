@@ -117,5 +117,5 @@ per-tunnel PSKs or PKI).
 
 - IPsec VPN User Guide | Junos OS
 - Route-Based IPsec VPNs | Junos OS
-- IPsec VPN with Multiple Sites (Hub-and-Spoke) | Junos OS
+- IPsec VPN Overview, Understanding Hub-and-Spoke VPNs | Junos OS (the former "IPsec VPN with Multiple Sites (Hub-and-Spoke)" page is retired; see source-index.md)
 - IPsec VPN Configuration Overview | Junos OS
