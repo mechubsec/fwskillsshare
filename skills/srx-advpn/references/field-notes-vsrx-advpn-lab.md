@@ -20,7 +20,10 @@ cleanly with full-tunnel backhaul once two commit-blockers were worked around:
    ```
    When dynamic ike-user-type is configured, IKEv2 with authentication-method pre-shared-key is not allowed
    ```
-   This also blocks `shared-ike-id`. Working PSK alternative: per-spoke IKEv2
+   This also blocks `shared-ike-id`. Lab-observed, not in Juniper documentation:
+   Juniper's IPsec VPN Configuration Overview still documents `ike-user-type
+   group-ike-id` / `shared-ike-id` for AutoVPN without this restriction
+   (https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsec-vpn-configuration-overview.html, checked 2026-10-09). Working PSK alternative: per-spoke IKEv2
    gateways on the hub, each pinned by unique `remote-identity hostname
    <spokeN>`, no `ike-user-type`. Verified with 6 spokes. Consequence for
    ADVPN: the group model requires certificate auth.

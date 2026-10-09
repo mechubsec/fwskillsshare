@@ -1,7 +1,7 @@
 ---
 name: srx-autovpn-full-tunnel
 description: Design, configure, audit, and troubleshoot Juniper SRX AutoVPN full-tunnel hub backhaul. Use when handling group-ike-id gateways, traffic selectors, ARI, shared st0, anti-recursion routes, source NAT, VPN hairpinning, NAT-T, or Junos 24.4R1+ PSK and 0.0.0.0/0 commit errors. Use ADVPN for direct spoke shortcuts.
-version: 1.1.4
+version: 1.1.5
 author:
   - fastrevmd-lab
   - Claude
@@ -164,6 +164,8 @@ carries tunnel traffic.
 >
 > The original reference lab (Junos 23.2R2) committed `group-ike-id` + PSK;
 > treat that combination as legacy-image-only.
+>
+> Lab-observed (vSRX3 24.4R1.9, 25.4R1.12), **not in Juniper documentation**: Juniper's [IPsec VPN Configuration Overview](https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsec-vpn-configuration-overview.html) still documents `ike-user-type group-ike-id` / `shared-ike-id` for AutoVPN without this restriction (page checked 2026-10-09). Treat the commit error below as device behavior, not a documented limit; re-test on your release.
 
 > **Auth: lab PSK vs. production PKI.** A single shared PSK keeps the focus on
 > mechanics but is not production practice. In production prefer
@@ -329,7 +331,7 @@ set security ike proposal AUTOVPN-IKE-PROP lifetime-seconds 86400
 set security ike policy AUTOVPN-IKE-POL proposals AUTOVPN-IKE-PROP
 set security ike policy AUTOVPN-IKE-POL pre-shared-key ascii-text "$AUTOVPN_PSK"
 # Dynamic gateway — accepts any spoke whose IKE ID is *.homelab.local
-# NOTE: on Junos 24.4R1+/25.4R1 the 'dynamic ike-user-type' line below + PSK
+# NOTE: lab-observed (not in Juniper docs): on Junos 24.4R1+/25.4R1 the 'dynamic ike-user-type' line below + PSK
 # will NOT commit — see the version-constraint callout (per-spoke gateways for
 # PSK, or certificate auth for zero-touch group-ike-id).
 set security ike gateway AUTOVPN-HUB-GW ike-policy AUTOVPN-IKE-POL
@@ -403,7 +405,7 @@ Spoke-to-spoke: `ping <other-spoke-LAN> source <spoke-LAN-gw>` — hub session s
 
 | Stage | Symptom | Common causes |
 |-------|---------|---------------|
-| Commit | `ike-user-type ... pre-shared-key is not allowed` / `Remote-ip 0.0.0.0/0 ... not supported` | 24.4R1+ constraints — per-spoke gateways (PSK) or certs (`group-ike-id`); split the spoke selector into `0.0.0.0/1` + `128.0.0.0/1` |
+| Commit | `ike-user-type ... pre-shared-key is not allowed` / `Remote-ip 0.0.0.0/0 ... not supported` | 24.4R1+ lab-observed constraints (not in Juniper docs) — per-spoke gateways (PSK) or certs (`group-ike-id`); split the spoke selector into `0.0.0.0/1` + `128.0.0.0/1` |
 | Underlay | Peers can't reach each other | Transport routing/filtering; verify `ping` between WAN IPs |
 | Phase 1 (IKE) | No IKE SA / stuck | PSK mismatch, proposal/DH mismatch, wrong IKE identity (`group-ike-id` domain), IKEv1-vs-v2 mismatch |
 | NAT-T (4500) | Hub shows tunnel UP, spoke retransmits IKE_AUTH forever | **Double NAT** (carrier PAT + hub-behind-static-NAT) drops the fragmented 4500 AUTH return — collapse to a single NAT hop (when the hub sits behind a 1:1 static NAT, don't also PAT the spokes' underlay) |
@@ -471,7 +473,7 @@ compare `srx-advpn` (see its three-way ADVPN vs AutoVPN vs Static table).
 ## Verification Checklist
 
 - [ ] `st0` units are point-to-point (no `multipoint`) — required for selectors
-- [ ] Auth path matches the image: certs for `group-ike-id`, or per-spoke gateways for PSK (24.4R1+ rejects `ike-user-type` + IKEv2 + PSK)
+- [ ] Auth path matches the image: certs for `group-ike-id`, or per-spoke gateways for PSK (lab-observed on 24.4R1+, not in Juniper documentation: `ike-user-type` + IKEv2 + PSK is rejected)
 - [ ] Hub `local-ip 0.0.0.0/0`; spoke `remote-ip` as `0.0.0.0/1` + `128.0.0.0/1`; hub `remote-ip` is the spoke summary (or wildcard with policy guardrails)
 - [ ] Hub shows one IKE SA per spoke (and two child SAs per spoke with the split selector) plus clean per-spoke `ARI-TS` `/24` routes
 - [ ] Spoke has `0.0.0.0/0 → st0.0` AND the anti-recursion `HUB_WAN/32` host route

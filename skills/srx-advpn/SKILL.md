@@ -1,7 +1,7 @@
 ---
 name: srx-advpn
 description: Design, configure, audit, and troubleshoot Juniper SRX ADVPN spoke-to-spoke IPsec shortcuts. Use when handling suggester or partner roles, multipoint st0, OSPF p2mp, certificates, PKI, shortcut lifecycle, or “No public key found” IKE_AUTH failures. Use AutoVPN for hub backhaul and static IPsec for small fixed estates.
-version: 1.1.4
+version: 1.1.5
 author:
   - fastrevmd-lab
   - Claude
@@ -68,6 +68,8 @@ overlay**, and **certificate authentication**.
 > pre-shared-key is not allowed`. ADVPN's group model therefore requires
 > RSA/ECDSA certificate auth. Plan PKI first — do not burn a day on a PSK
 > ADVPN that cannot commit.
+>
+> Lab-observed (vSRX3 24.4R1.9, 25.4R1.12), **not in Juniper documentation**: Juniper's [IPsec VPN Configuration Overview](https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsec-vpn-configuration-overview.html) still documents `ike-user-type group-ike-id` / `shared-ike-id` for AutoVPN without this restriction (page checked 2026-10-09). Treat the commit error below as device behavior, not a documented limit; re-test on your release.
 
 ## Runtime intake
 
@@ -273,7 +275,7 @@ from the hub once the shortcut carries it).
 
 | Stage | Symptom | Cause / fix |
 |-------|---------|-------------|
-| Commit | `IKEv2 with authentication-method pre-shared-key is not allowed` | PSK + `dynamic ike-user-type` is rejected (24.4R1/25.4R1) — use certificate auth; there is no PSK ADVPN on these images |
+| Commit | `IKEv2 with authentication-method pre-shared-key is not allowed` | PSK + `dynamic ike-user-type` is rejected (lab-observed 24.4R1/25.4R1, not in Juniper documentation) — use certificate auth; there is no PSK ADVPN on these images |
 | IKE_AUTH | Hub logs `ikev2_reply_cb_public_key: Error: No public key found` → `N(AUTHENTICATION_FAILED)` to every spoke | **Root-caused on vSRX3**: the *dynamic* `distinguished-name` / `group-ike-id` gateway responder path never hands the peer CERT to pkid. Use per-spoke static-address cert gateways on the hub. See below. |
 | NAT-T | IKE_SA_INIT (500) completes; 4500 IKE_AUTH retransmits forever, responder side shows UP | Double NAT in the underlay (carrier PAT + hub-behind-static-NAT) drops the 4500 return — collapse to a single NAT hop |
 | NAT-T | Same 4500-retransmit symptom, single NAT | Initiator's `untrust` zone missing `host-inbound-traffic system-services ike` |

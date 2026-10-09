@@ -34,6 +34,11 @@ v1.1 additionally incorporates a community field report (upstream fwskillsshare 
 https://github.com/mechubsec/fwskillsshare/issues/5): 24.4R1/25.4R1 commit
 constraints (ike-user-type + IKEv2 + PSK; traffic-selector 0.0.0.0/0 with a static
 gateway address) and NAT-T findings (double-NAT, host-inbound ike).
+The ike-user-type + IKEv2 + PSK rejection is lab-observed and not in Juniper documentation:
+Juniper's IPsec VPN Configuration Overview still documents `ike-user-type group-ike-id` /
+`shared-ike-id` for AutoVPN without it
+(https://www.juniper.net/documentation/us/en/software/junos/vpn-ipsec/topics/topic-map/security-ipsec-vpn-configuration-overview.html,
+HTTP 200, checked 2026-10-09).
 
 The public lab carries no explicit license file. It inspired the topology and
 test questions, but the repository is not bundled or relicensed here. The skill
