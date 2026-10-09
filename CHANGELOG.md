@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.12.1 — Documentation accuracy fixes
+
+Fixes from a documentation-accuracy review against Juniper/HPE sources (#100–#105, #111). No device syntax or safety gate changed.
+
+- **srx-initial-setup** (1.4.2): `set system services ssh protocol-version v2` is marked redundant (v2 is the default since 11.4; v1 was removed on SRX in 19.3R1/18.3R3) and is not counted as hardening.
+- **srx-mpls-in-flow** (1.0.5): after upgrading to 24.2R1+, set `family inet mode packet-based`, commit, **and reboot**; before 24.2R1, `family mpls mode packet-based` also put IPv4 in packet mode. The global packet-mode platform list is attributed to its community source.
+- **srx-ipsec-hub-spoke** (1.0.5): the retired hub-and-spoke page is replaced with the "Understanding Hub-and-Spoke VPNs" section of Juniper's IPsec VPN overview.
+- **srx-policy** (1.3.2): dead Junos Space and J-Web source links updated; NextGen Web Filtering adds HTTP/2 support in Junos 26.2.
+- **srx-ips** (0.1.3, draft): the HPE Threat Labs IPS signature link is kept with a note that it was verified in a browser and blocks automated fetches.
+- **srx-advpn**, **srx-autovpn-full-tunnel** (1.1.5): the 24.4R1+ rejection of `ike-user-type` with IKEv2 and PSK is labelled lab-observed and not in Juniper documentation.
+
 ## 1.12.0 — MNHA flat form on 26.x, optional ICL encryption, versioning policy
 
 - **srx-mnha** (1.3.8), **srx-mnha-builder** (0.2.6), **srx-cluster-to-mnha** (1.0.1): corrected with lab evidence from a vSRX 26.2R1.7 pair and the vSRX 24.4R1.9 pair (#98, #99). The flat `local-id`/`peer-id` form commits and activates on 26.2R1.7 after the HA-activation reboot; the earlier "26.x requires the grid model" note came from a missing reboot. `grid-id` is optional VMAC/VIP-scale tuning that coexists with the flat form; `local-domain-id`/`domain-size` belong to four-node MNHA. A virtual MAC is opt-in per VIP (`use-virtual-mac`); without it failover is an ARP update to the new active node's physical MAC. Switching mode on 26.2R1.7 required `virtual-ip` index 1 and 2 on unique interfaces (lab-observed).

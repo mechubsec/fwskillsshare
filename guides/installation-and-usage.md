@@ -18,7 +18,7 @@ release tag (`vX.Y.Z`), never a branch or `HEAD`, and verifies every skill file
 against `skills/CHECKSUMS.sha256` before installing anything:
 
 ```bash
-git clone --branch v1.12.0 --depth 1 https://github.com/mechubsec/fwskillsshare.git
+git clone --branch v1.12.1 --depth 1 https://github.com/mechubsec/fwskillsshare.git
 cd fwskillsshare
 
 # Interactive: pick skills + target
@@ -62,7 +62,7 @@ The skills are plain directories — copy the ones you want. Pin a release tag
 rather than the default branch so you know exactly what you're copying:
 
 ```bash
-git clone --branch v1.12.0 --depth 1 git@github.com:mechubsec/fwskillsshare.git
+git clone --branch v1.12.1 --depth 1 git@github.com:mechubsec/fwskillsshare.git
 
 # All of them
 cp -r fwskillsshare/skills/* ~/.claude/skills/
@@ -122,7 +122,7 @@ Only then should it run `./install.sh --skill <name> ...` (repeatable) or `./ins
 Example prompt to paste:
 
 ```text
-Install fwskillsshare from the v1.12.0 release clone in this directory.
+Install fwskillsshare from the v1.12.1 release clone in this directory.
 Before running ./install.sh, use your interactive question tool
 (AskUserQuestion in Claude Code, request_user_input in Codex) to ask me:
 first the target (claude, codex, or hermes), then which families, then which

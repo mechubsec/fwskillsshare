@@ -111,10 +111,10 @@ GITHUB_REPO="mechubsec/fwskillsshare"
 # Never point this at a branch or HEAD -- validate_ref() below refuses anything
 # that isn't a vX.Y.Z tag, so a moving ref can't slip in via this default either.
 #
-# NOTE: When cutting a new release, update this to the release tag (e.g. v1.12.0).
+# NOTE: When cutting a new release, update this to the release tag (e.g. v1.12.1).
 # The checksum manifest (skills/CHECKSUMS.sha256) was added after v1.7.0, so
 # this must point to a tag that includes the manifest.
-GITHUB_REF_DEFAULT="v1.12.0"
+GITHUB_REF_DEFAULT="v1.12.1"
 GITHUB_REF="$GITHUB_REF_DEFAULT"
 CLAUDE_SKILLS_DIR="${HOME}/.claude/skills"
 CODEX_SKILLS_DIR="${HOME}/.agents/skills"
