@@ -1,7 +1,7 @@
 ---
 name: srx-ips
 description: Manage SRX IPS (Junos IDP) lifecycle through a Junos MCP server - triage detections, propose monitor-to-enforce changes, design and validate custom signatures for findings the predefined database does not cover. Reads IDP policy and logs, reports what fired and each rule's action, stages changes behind approval gates, checks coverage read-only, chooses context/direction/pattern, validates syntax without activating. Use when reviewing IDP logs, investigating suspicious traffic, deciding which no-action rules to enforce, when a scanner finding needs IDP detection, or when extending IDP coverage. Not for attack database updates or IDP license maintenance.
-version: 0.1.2
+version: 0.1.3
 author:
   - fastrevmd-lab
   - Claude
@@ -46,7 +46,7 @@ metadata:
     - title: "IDP custom attack DFA pattern syntax"
       url: https://www.juniper.net/documentation/en_US/junos/topics/reference/general/security-idp-custom-attack-object-dfa-pattern.html
     - title: "HPE Threat Labs IPS signature database"
-      url: https://www.hpe.com/h41379/threatlabs/ips-signatures
+      note: "Link removed 2026-10-09: https://www.hpe.com/h41379/threatlabs/ips-signatures could not be verified (connection reset on repeated attempts, HTTP/1.1 and HTTP/2); formerly threatlabs.juniper.net, which redirects (301) to https://www.hpe.com/us/en/hpe-labs/threat-labs.html, itself unreachable from here. Locate the signature search from that Threat Labs page."
     - title: "MCP server capabilities reference"
       local: references/mcp-server-notes.md
       note: "Capability mapping for Junos MCP servers; verify against your server and version"
