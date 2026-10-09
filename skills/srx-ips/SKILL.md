@@ -46,7 +46,8 @@ metadata:
     - title: "IDP custom attack DFA pattern syntax"
       url: https://www.juniper.net/documentation/en_US/junos/topics/reference/general/security-idp-custom-attack-object-dfa-pattern.html
     - title: "HPE Threat Labs IPS signature database"
-      note: "Link removed 2026-10-09: https://www.hpe.com/h41379/threatlabs/ips-signatures could not be verified (connection reset on repeated attempts, HTTP/1.1 and HTTP/2); formerly threatlabs.juniper.net, which redirects (301) to https://www.hpe.com/us/en/hpe-labs/threat-labs.html, itself unreachable from here. Locate the signature search from that Threat Labs page."
+      url: https://www.hpe.com/h41379/threatlabs/ips-signatures
+      note: "Verified by the maintainer in a browser 2026-10-09; the site blocks automated fetches (connection resets), so link checkers may report it as unreachable."
     - title: "MCP server capabilities reference"
       local: references/mcp-server-notes.md
       note: "Capability mapping for Junos MCP servers; verify against your server and version"
