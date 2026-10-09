@@ -240,14 +240,14 @@ b8dbfd503ac4f3a1a9add3391e98ea04f8afc188220bdac5b5b6e1fdfa424147  srx-nat/refere
 be094fe23fa5eb5b6ca7d2fdc8f6c94d1270ea1344abdd2e2089a6513f5c0648  srx-nat/references/source-srx4600-cgn-configuration-breakdown.md
 6cd070490a2a4317dd5414f4753e5e715d131f7f3495067e3ec2e76daacf9ec0  srx-nat/references/source-troubleshoot-destination-nat.md
 1c52127dfc831c1686e03409ae7102bb6e5a6b6c6a7a2f4c77c20d491769525a  srx-nat/references/source-troubleshoot-source-nat.md
-81adc490950b6262ebd5d51e2cb6da01d5062aa2ed5f96551f68610477fba80c  srx-policy/SKILL.md
+f151e4fd46a3a2de01aa400187f0019fff56c2129d2226199181bb1fca0da9a1  srx-policy/SKILL.md
 55815f380bfa710b9d4555b6a6b0bcc409f3c49386d991f71a7b303ac061d805  srx-policy/agents/openai.yaml
 ec8bd3a7a4401ac0e37ccfb9a8b27b40d695d43a6c5c9e0047ab81c701de6e12  srx-policy/references/migration-workflow.md
 df802853a2450ab5974a9e7252cf30dfaef08a964bfea99212c61cc54f937889  srx-policy/references/ngwf-vs-ewf-research.md
 3a87e010e946812cc01e76f8e342564b21ee5495672f3d330bb27df4b35dab88  srx-policy/references/platform-and-licensing.md
 cbce952a3bb4c6b754bba08a575f34d2ba626b7ef8af90fea5c0fe86dc054cd4  srx-policy/references/runtime-intake.md
 69d6b9112becbd1b121b55a5eab4fdcc58d8e379d75704d72a6f68147aa465b8  srx-policy/references/service-discovery.md
-f1fe64c843a934100ed9dc048e5c1a37dde9f4bdc42aed4847a3619594cba6c6  srx-policy/references/source-add-a-web-filtering-profile-j-web-for-srx-series-23-2.md
+e737aec812e5f6b75abe4fc1f10c8e33b0637bcd637212f477538a38b885e612  srx-policy/references/source-add-a-web-filtering-profile-j-web-for-srx-series-23-2.md
 3b2fc2b5b8064136ac70ab61bf7b1483fd0bde959df7789ffd31bf454bbb5298  srx-policy/references/source-configure-application-firewalling-on-a-juniper-srx.md
 ffb87d3ad3036d0ef6140b4ba4c0a72a457b6e0532200a6f94510ba4429d6bde  srx-policy/references/source-configuring-security-policies-junos-os.md
 5eae6ebb986aab4cb820dd850e04aecf37a621acae987f84e49559cf077fc7d1  srx-policy/references/source-getting-started-with-atp-appliance-and-the-srx-series.md
@@ -262,7 +262,7 @@ b5730a110f49c24b08943c75eab490c450a722920b16947022c0b7db9d85c131  srx-policy/ref
 f3451756a61897a09fb104d33a091b3f5798c176b175abcadd462526418b6249  srx-policy/references/source-security-global-policies.md
 86d2610e75d4468cfa593d93fd0230a99880c8892cb5ad61121b0f0a87281f30  srx-policy/references/source-security-policy-applications-and-application-sets-junos-os.md
 06d21ee3e1f76a32da66be91488fbd748e9b127ed7fa9ca784f6b127b402af7a  srx-policy/references/source-srx-configuring-next-generation-web-filtering-on-srx-devices.md
-69ad204edb0cefafdddfabef189a8f9fd478c8980be0d7edc9247e665272f575  srx-policy/references/source-understanding-application-firewall-policies.md
+f6289989b10095c39b5df6daf066a89a1a6200f745d91c650ab44e786330970a  srx-policy/references/source-understanding-application-firewall-policies.md
 99d4308bdf7cc080fe5b6b388403e47116c9a4fccc9a48bde0a2512388ef8098  srx-policy/references/web-filtering-ngwf-ewf-patterns.md
 315125f6bed369de80638f5115ba5479e7d6cbe7b67e07b943cd6d6d52a171b1  srx-policy/references/zone-pair-to-global-example.md
 ffdf9e175268575f50144d4e459e916d762f1375534e8771cfeca38b06e142a6  srx-syslog-logging/SKILL.md

@@ -1,7 +1,7 @@
 ---
 name: srx-policy
 description: Design, migrate, configure, audit, and troubleshoot Juniper SRX security policy on Junos 23.x+, including Branch SRX300/SRX400 platforms. Use when handling global or zone policy, address and application objects, AppID, AppFW, NGWF, EWF, SecIntel, ATP, logging, rule order, hit counts, default deny, or cross-VLAN mDNS and SSDP boundaries.
-version: 1.3.1
+version: 1.3.2
 author:
   - fastrevmd-lab
   - Claude
@@ -290,7 +290,7 @@ Decision rule:
 3. Existing Junos estate already using EWF: keep EWF only for continuity, then plan EWF-to-NGWF migration after validating license, platform support, policy names, category mapping, cloud reachability, and maintenance window.
 4. Older Junos releases or unsupported platforms: use EWF/local/redirect only as required by supportability.
 
-Full NGWF and EWF configuration patterns, the SSL initiation profile, verification commands, and the EWF-to-NGWF migration commands/pitfalls are in `references/web-filtering-ngwf-ewf-patterns.md`. Key facts: NGWF starts in 23.4R1, uses the Juniper NGWF cloud with on-box caching, and is attached via `then permit application-services utm-policy`. Migration is asynchronous — schedule downtime and do not rename policies mid-migration.
+Full NGWF and EWF configuration patterns, the SSL initiation profile, verification commands, and the EWF-to-NGWF migration commands/pitfalls are in `references/web-filtering-ngwf-ewf-patterns.md`. Key facts: NGWF starts in 23.4R1 (Juniper Feature Explorer feature 8341 adds: "Starting in Junos OS 26.2, Juniper NextGen Web Filtering also includes support for HTTP/2"; https://apps.juniper.net/feature-explorer/feature/8341, checked 2026-10-09), uses the Juniper NGWF cloud with on-box caching, and is attached via `then permit application-services utm-policy`. Migration is asynchronous — schedule downtime and do not rename policies mid-migration.
 
 Use conservative fallback behavior. If the cloud/reputation service is unavailable, decide deliberately whether to fail open (`permit` / `log-and-permit`) or fail closed (`block`) for the `default` fallback leaf, and set the granular fallback leaves (`server-connectivity`, `timeout`, `too-many-requests`) per traffic-class requirements rather than as a uniform global setting. Leaf-value note: `fallback-settings default log-and-permit` commits on current images (verified on vSRX 24.4R1 for both `ng-juniper` and `juniper-enhanced`); some older guidance restricts the `default` leaf to `permit`/`block` — validate on your target release.
 

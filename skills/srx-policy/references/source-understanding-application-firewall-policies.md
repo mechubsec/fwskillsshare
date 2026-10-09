@@ -1,10 +1,10 @@
 # Inspired by: Understanding Application Firewall Policies
 
 Source: Juniper Security Director documentation
-URL: https://www.juniper.net/documentation/us/en/software/nm-apps24.1/junos-space-security-director/topics/concept/junos-space-application-firewall-policies-overview.html
-Retrieved: 2026-05-15
+URL: https://www.juniper.net/documentation/us/en/software/nm-apps24.1/junos-space-security-director/topics/task/junos-space-application-firewall-policy-creating.html
+Retrieved: 2026-10-09 (HTTP 200; "Creating Application Firewall Policies")
 
-The page was unavailable during retrieval. This original note records only concepts
+The original concept-page URL (`.../topics/concept/junos-space-application-firewall-policies-overview.html`) now returns HTTP 404 (archived; no current equivalent located), so the URL above is the nearest current Junos Space task page. This original note records only concepts
 corroborated by current Junos policy guidance; it does not reconstruct the page.
 
 ## Design takeaways
