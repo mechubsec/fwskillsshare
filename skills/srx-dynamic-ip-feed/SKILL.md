@@ -1,7 +1,7 @@
 ---
 name: srx-dynamic-ip-feed
-description: Configure, audit, and troubleshoot Juniper SRX dynamic IP objects from HTTPS feeds. Use when handling feed archives, dynamic-address mapping, certificate validation, basic auth, mTLS, session scanning, routing-instance reachability, Recovery Mode after reboot, show security dynamic-address, ipfd logs, or feed and TLS failures. Use srx-policy for SecIntel feeds.
-version: 1.0.5
+description: Configure, audit, and troubleshoot Juniper SRX dynamic IP objects from HTTPS feeds. Use when handling feed archives, dynamic-address mapping, certificate validation, basic auth, mTLS, session scanning, routing-instance reachability, Recovery Mode after reboot, show security dynamic-address, ipfd logs, feed and TLS failures, or keeping feeds when Security Director manages policy. Use srx-policy for SecIntel feeds.
+version: 1.1.0
 author:
   - fastrevmd-lab
   - Claude
@@ -31,6 +31,7 @@ metadata:
 - [Lab-Grade HTTPS Feed Server](#lab-grade-https-feed-server)
 - [Production TLS and Authentication](#production-tls-and-authentication)
 - [Applying Dynamic Objects in Security Policies](#applying-dynamic-objects-in-security-policies)
+- [Coexisting with Security Director](#coexisting-with-security-director)
 - [Session Scan Tunable](#session-scan-tunable)
 - [Routing Instance Reachability](#routing-instance-reachability)
 - [Verification Commands](#verification-commands)
@@ -202,6 +203,52 @@ set security policies from-zone trust to-zone untrust policy permit-dynamic-good
 
 Policy ordering still matters. Put deny/reject blocklist policies above broader permit policies when the blocklist must take precedence.
 
+## Coexisting with Security Director
+
+Security Director Cloud and Security Director On-Prem do not model `security dynamic-address`. When SD owns the policy, a dynamic address added in the main configuration is flagged as out-of-band and removed on the next deploy. Workaround (field-reported; not yet lab-validated in this repository): keep the feed and the policy's dynamic-address match inside configuration groups. SD reads the main configuration, not inherited group content, so it neither sees nor removes them.
+
+1. Define the feed and the dynamic address in a group:
+
+```junos
+set groups DYNAMIC security dynamic-address feed-server FEED-SRV url https://feeds.example.net
+set groups DYNAMIC security dynamic-address feed-server FEED-SRV feed-name SOAR-BLOCK path feed/soar-block.txt
+set groups DYNAMIC security dynamic-address feed-server FEED-SRV feed-name SOAR-BLOCK update-interval 60
+set groups DYNAMIC security dynamic-address feed-server FEED-SRV feed-name SOAR-BLOCK hold-interval 86400
+set groups DYNAMIC security dynamic-address address-name DA-SOAR-BLOCK profile feed-name SOAR-BLOCK
+set apply-groups DYNAMIC
+```
+
+2. In SD, give the policy a placeholder address so the rule is complete without the feed. Use an address that can never carry traffic, such as `192.0.2.1/32` (RFC 5737 TEST-NET-1), because the placeholder stays in the match:
+
+```junos
+set security address-book global address PLACEHOLDER 192.0.2.1/32
+set security policies from-zone trust to-zone untrust policy BLOCK-SOAR match source-address any
+set security policies from-zone trust to-zone untrust policy BLOCK-SOAR match destination-address PLACEHOLDER
+set security policies from-zone trust to-zone untrust policy BLOCK-SOAR match application any
+set security policies from-zone trust to-zone untrust policy BLOCK-SOAR then deny
+```
+
+3. Add only the dynamic-address match to that policy through a second group. Junos merges it with the SD-owned match list:
+
+```junos
+set groups POLICY security policies from-zone trust to-zone untrust policy BLOCK-SOAR match destination-address DA-SOAR-BLOCK
+set apply-groups POLICY
+```
+
+Verify after commit:
+
+```junos
+show security policies | display set | display inheritance | match BLOCK-SOAR
+show security policies detail policy-name BLOCK-SOAR
+```
+
+The detail output must list both `DA-SOAR-BLOCK: <entry count>` and `PLACEHOLDER(global): 192.0.2.1/32` under destination addresses. A plain `show security policies | display set` omits `DA-SOAR-BLOCK`, which is exactly why SD leaves it alone. SD may then report "Device config changed" with a Resolve prompt; resolving showed no conflict and kept the dynamic address in the reported case. Confirm that on your SD release before relying on it.
+
+Constraints:
+
+- The group's policy name and zone pair must match the SD rule exactly. If SD renames, moves or deletes the rule, the group no longer merges into it and instead tries to create an incomplete policy, so the commit fails. Re-check the group after every SD policy change.
+- Audits, diffs and parsers that read plain `show configuration` miss the dynamic match. Collect `| display inheritance` when this pattern is in use.
+
 ## Session Scan Tunable
 
 SRX can reconcile existing sessions when addresses are added to dynamic feeds. Enable:
@@ -326,6 +373,8 @@ Read `references/feed-update-test.md` when validating that feed changes propagat
 8. **Leaking feed-server credentials.** SRX basic auth passwords and private keys should not be pasted into chat/logs/tickets. Use redaction and credential-handling practices.
 
 9. **Treating an interactive commit as reboot-safety proof.** A non-default feed-server routing-table pin can commit and operate normally but still trigger Recovery Mode at the next boot. Prefer default-instance reachability and omit the pin.
+
+10. **Adding a dynamic address in the main config on an SD-managed device.** The next Security Director deploy removes it. Keep the feed and the policy match in configuration groups; see [Coexisting with Security Director](#coexisting-with-security-director).
 
 ## Verification Checklist
 
