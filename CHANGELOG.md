@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **srx-dynamic-ip-feed** (1.1.0): keep dynamic-address feeds on Security Director-managed SRXs by defining the feed and the policy's dynamic-address match in configuration groups behind a placeholder address. Field-reported; not lab-validated here.
+
 ## 1.12.1 — Documentation accuracy fixes
 
 Fixes from a documentation-accuracy review against Juniper/HPE sources (#100–#105, #111). No device syntax or safety gate changed.
