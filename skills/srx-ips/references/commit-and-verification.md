@@ -21,7 +21,13 @@ Every commit here follows the repository write policy:
    fires. If the tool cannot do a confirmed commit, say so, and get
    approval that explicitly accepts a manual rollback plan (`rollback 1` then
    `commit`) before pushing.
-4. **Verified on vSRX 26.2R1.7, 2026-09-23:** `commit confirmed` works correctly
+4. **Inside the confirm window, run only read-only commands on that device.** On
+   Junos a `commit check` or `commit` confirms the pending commit, so a dry run
+   or another push there silently cancels the rollback (see
+   `references/mcp-server-notes.md`). If `confirm_commit` reports nothing
+   pending, the change has already rolled back: re-check before saying it is
+   live.
+5. **Verified on vSRX 26.2R1.7, 2026-09-23:** `commit confirmed` works correctly
    with IDP configured. The device auto-rolled back a 1-minute confirmed commit
    cleanly and logged `UI_COMMIT_NOT_CONFIRMED`. **Operational timing:** the
    rollback fires roughly 30–45 seconds AFTER the nominal window expires, not on
@@ -60,6 +66,7 @@ each node.
 - [ ] One combined proposal with exact lines, blast radius, and rollback
 - [ ] Explicit approval received for the push
 - [ ] Commit used a rollback window, or the lack of one was approved
+- [ ] No dry run, commit check, or other push on the device while its commit was pending
 - [ ] `policy-commit-status` shows the new policy loaded, per node
 - [ ] Before-and-after log evidence shows the new action
 

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **srx-dynamic-ip-feed** (1.1.0): keep dynamic-address feeds on Security Director-managed SRXs by defining the feed and the policy's dynamic-address match in configuration groups behind a placeholder address. Field-reported; not lab-validated here.
+- **srx-ips** (0.1.4), **srx-mnha-builder** (0.2.7), **srx-mnha-ipsec-builder** (0.1.1): commit confirmed is now in Juniper's own junos-mcp-server — [Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34), merged 2026-11-02, on `main` but in no tagged release yet — so the "junos-mcp-server with commit confirmed" column points to Juniper instead of a third-party fork. All three skills now say that on Junos a `commit check` or `commit` inside a confirm window **confirms the pending commit**: while one is pending on a device, run only read-only commands there (no dry run, commit check or other push). This matters most for srx-mnha-ipsec-builder's self-restoring uplink test, which a stray check would have left permanently disabled. The merged server refuses such calls with `Error: a commit confirmed is pending on <router>…`, and `confirm_commit` reports `No pending commit confirmed` when the change has already rolled back; both messages are documented. Lab-verified on vSRX 24.4R2.21 (2026-10-05): a dry run inside a 3-minute window made the change permanent on the unguarded server; with the merged guard the dry run was refused and the rollback timer stayed intact.
 
 ## 1.12.1 — Documentation accuracy fixes
 
