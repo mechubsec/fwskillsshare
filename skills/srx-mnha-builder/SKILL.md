@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-builder
 description: Build a new two-node SRX/vSRX Multi-Node High Availability pair from standalone nodes over a Junos MCP server, covering routing, switching or hybrid mode, dedicated or shared ICL, pair sheet, staged configs with pre-push checks and approval gates, HA-activation reboot, formation checks and failover test. Use when standing up an MNHA pair or turning two SRXs into HA. For design or troubleshooting a running pair, use srx-mnha.
-version: 0.2.6
+version: 0.2.7
 author:
   - fastrevmd-lab
   - Claude
@@ -240,6 +240,11 @@ an undo would remove.
 3. If verification fails: with a confirmed commit still pending, do not confirm, let it
    roll back, wait past the window with margin and check the diff against the baseline;
    otherwise run `undo-stage1`. Diagnose before going on.
+
+While a stage is pending on a node, run only read-only checks there: no dry run or other
+push, because a commit check confirms the pending commit (see
+`references/mcp-server-notes.md`). If `confirm_commit` reports nothing pending, the stage
+has already rolled back.
 
 ## Step 8 - Stage 2: HA stanza
 

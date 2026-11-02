@@ -18,14 +18,15 @@ Decide from the tool list the server exposes, not from its name.
 - **Juniper junos-mcp-server (v1.1.1)**: none of the commit-confirmed tools. No commit
   confirmed.
 - **junos-mcp-server with commit confirmed**: exposes `confirm_commit`, and
-  `load_and_commit_config` takes `confirm_timeout_mins`. This is the third-party
-  [`jgrizzuti/junos-mcp-server`](https://github.com/jgrizzuti/junos-mcp-server) fork,
-  unreviewed by Mechub, proposed upstream as
-  [Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34).
+  `load_and_commit_config` takes `confirm_timeout_mins`. This is Juniper's own `main`
+  since [Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34)
+  merged on 2026-11-02; no tagged release includes it yet (v1.1.1 is the latest tag).
+  The [`jgrizzuti/junos-mcp-server`](https://github.com/jgrizzuti/junos-mcp-server) fork
+  it was developed in now matches upstream `main`.
 
 ## Capability mapping
 
-| Capability | rust-junosmcp | Juniper junos-mcp-server (v1.1.1) | junos-mcp-server with commit confirmed (third-party fork) |
+| Capability | rust-junosmcp | Juniper junos-mcp-server (v1.1.1) | junos-mcp-server with commit confirmed (Juniper `main` since #34) |
 |---|---|---|---|
 | **Read baseline** | `execute_junos_command` with `show configuration \| display set` | same | same |
 | **Op commands** | `execute_junos_command`; `execute_junos_command_batch` for both hub nodes | `execute_junos_command`, once per router | `execute_junos_command`; `execute_junos_command_batch` for both hub nodes |
@@ -36,6 +37,22 @@ Decide from the tool list the server exposes, not from its name.
 
 Notes:
 
+- **A commit check confirms a pending commit, on every server.** On Junos, a `commit
+  check` or `commit` issued while a `commit confirmed` is pending confirms it and cancels
+  the automatic rollback, without adding a commit entry. While a commit is pending on a
+  device, run only read-only commands there: no dry run, commit check, or other push.
+  This matters most for the self-restoring uplink test, which is never meant to be
+  confirmed. A pending commit shows `rollback pending` on entry 0 of `show system
+  commit`. Verified on vSRX 24.4R2.21, 2026-10-05: a dry run inside a 3-minute window
+  made the change permanent while reporting that nothing was committed.
+- **junos-mcp-server with commit confirmed refuses those calls itself.**
+  `load_and_commit_config` and `render_and_apply_j2_template`, dry run included, return
+  `Error: a commit confirmed is pending on <router>…` instead of loading anything: confirm
+  the pending change, or let it roll back. The other servers are not verified to refuse,
+  so the skill must hold the rule there.
+- **`confirm_commit` with nothing pending** returns `Error: No pending commit confirmed on
+  <router>; nothing to confirm`, usually because the window expired and the change rolled
+  back. Re-check before treating the change as live.
 - **Do not confirm by re-sending the same config** on junos-mcp-server with commit
   confirmed: with no diff it commits nothing, and the rollback still fires. Use
   `confirm_commit`.

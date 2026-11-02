@@ -108,6 +108,8 @@ commit confirmed 2
 # Never confirm this commit: confirming it would leave the active hub's uplink
 # disabled. Let it roll back, or restore early with rollback 1 + commit.
 # (through junos-mcp-server: confirm_timeout_mins: 2 on the config tool; do not call confirm_commit)
+# Until it rolls back, no commit check, dry run or other commit on this node:
+# Junos treats any of them as confirming the pending commit.
 
 # restore early
 rollback 1

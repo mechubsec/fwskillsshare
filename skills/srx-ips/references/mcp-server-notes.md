@@ -31,6 +31,20 @@ Identify the server from its tool list, not its name: `confirm_commit` (with
 commit confirmed; `commit_check_config` and `create_junos_change_set` mark
 rust-junosmcp; neither marks Juniper v1.1.1.
 
+### A commit check confirms a pending commit (every server)
+
+On Junos, a `commit check` or `commit` issued while a `commit confirmed` is
+pending **confirms it** and cancels the automatic rollback, without adding a
+commit entry. A dry run is therefore not side-effect-free inside a confirm
+window. **Verified on vSRX 24.4R2.21, 2026-10-05:** a dry run inside a 3-minute
+window made the change permanent while reporting that nothing was committed.
+
+Between a confirmed commit and its confirm, run only read-only commands on that
+device: no dry run, commit check, or other push. A pending commit shows
+`rollback pending` on entry 0 of `show system commit`. junos-mcp-server with
+commit confirmed enforces this itself (see below); the other servers are not
+verified to, so the skill must.
+
 ## Juniper junos-mcp-server
 
 **Version checked:** tag **v1.1.1**
@@ -112,10 +126,13 @@ usually the whole story — adjust the value and retry.
 
 ## junos-mcp-server with commit confirmed
 
-**Version checked:** `main` at `094c320`
-**Repository:** <https://github.com/jgrizzuti/junos-mcp-server> (fork of
-Juniper's server; proposed upstream as
-[Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34))
+**Version checked:** Juniper `main` at `2fb721a`, which includes
+[Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34)
+(merged 2026-11-02). No tagged release includes it yet: v1.1.1 is the latest
+tag and has none of this, so identify the server by its tool list.
+**Repository:** <https://github.com/Juniper/junos-mcp-server> (the
+[`jgrizzuti/junos-mcp-server`](https://github.com/jgrizzuti/junos-mcp-server)
+fork it was developed in now matches upstream `main`)
 
 Ten tools: Juniper's nine plus `confirm_commit`. Everything in the Juniper
 section above still applies, except the commit behavior:
@@ -130,12 +147,25 @@ section above still applies, except the commit behavior:
   confirm by re-sending `load_and_commit_config`: with no diff it returns "No
   configuration changes detected" and commits nothing, so the rollback still
   fires.
+- **Refuses while a commit confirmed is pending.** `load_and_commit_config` and
+  `render_and_apply_j2_template`, dry run included, return `Error: a commit
+  confirmed is pending on <router>…` instead of loading anything. Confirm the
+  pending change with `confirm_commit` once it is verified, or let it roll back;
+  do not work around the refusal.
+- `confirm_commit` returns `Error: No pending commit confirmed on <router>;
+  nothing to confirm` when nothing is pending, usually because the window
+  expired and the change already rolled back. Re-check the configuration; never
+  report the change as live.
+- A confirmed commit's result ends with `⏳ Commit is pending confirmation: …`.
 
 **Verified on vSRX 24.4R2.21, 2026-10-02:** a `dry_run` left no commit; a
 2-minute confirmed commit that was not confirmed rolled back automatically about
 45 seconds after the window (`by root via other`), matching the timing recorded
-in `SKILL.md`; a 2-minute confirmed commit followed by `confirm_commit` was still
-present after the window.
+in `commit-and-verification.md`; a 2-minute confirmed commit followed by
+`confirm_commit` was still present after the window. **2026-10-05:** with a
+commit confirmed pending, a `dry_run` was refused and `rollback pending` stayed
+intact; `confirm_commit` then confirmed it, and a second `confirm_commit`
+reported nothing pending.
 
 ## rust-junosmcp
 
