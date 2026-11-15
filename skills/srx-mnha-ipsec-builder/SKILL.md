@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-ipsec-builder
 description: Build a route-based IPsec VPN from an SRX MNHA hub, anchored on a floating loopback, to a spoke SRX over a Junos MCP server, with checked configs, commit-confirmed pushes, cutover and failover tests. Use when building, tuning or testing IPsec to an MNHA hub, or asking about process-packet-on-backup, managed-services ipsec, RT_IPSEC_REPLAY after failover, or IPsec convergence on MNHA. To build the pair use srx-mnha-builder; for design or troubleshooting use srx-mnha.
-version: 0.1.1
+version: 0.1.2
 author:
   - fastrevmd-lab
   - Claude
