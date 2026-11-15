@@ -236,7 +236,7 @@ e8ac103dbdf23fc9a1e48470fce934eab8d6ccb35f7a5eb579f76b02598c7c3e  srx-mpls-in-fl
 0a44f16061f6f94c2b2c8a9b1d8cec4cdd57ac04af15504b909b6b3d3f2cf779  srx-mpls-in-flow/references/source-index.md
 353a76b17a1c5d769fd7afcc58e6e6ef84ff958b990672b44bc9fac8772a9f61  srx-mpls-in-flow/references/source-srx-mpls-in-flow-part-1.md
 1ed946171838435bebe5b86082676dc36a37365dfe4461a1b16a7328b8c7cd09  srx-mpls-in-flow/references/source-srx-mpls-in-flow-part-2.md
-3bc74586d8c2656994588e97323cb24b2ffbe8f064b980f75dae0c2cedf99cbb  srx-nat/SKILL.md
+f787e28c96aeb3dfb2c10d423218462faf3cc2819ba703bdd911a04e460a9dc1  srx-nat/SKILL.md
 ba4da3a6cc15f57f76c680c9170acdd8dbe8a68eb9d23e75b8d23e2698e016ee  srx-nat/agents/openai.yaml
 d3cd0f74a30b3353f960559f6b464d97aa16f79b9901892cd912a9c0a5d78b4f  srx-nat/references/advanced-nat.md
 13651d4a11e201019272adfb0a93fe7b2a0bccfb2c4a127415ce29752c84c608  srx-nat/references/runtime-intake.md
