@@ -159,7 +159,8 @@ Design rules:
 - Put persistent NAT / gaming / special application rules above normal CGN rules.
 - Put specific host/server rules above subnet or `any` rules.
 - Use distinct rule-set names that encode direction, such as `TRUST_TO_UNTRUST`, `DNAT_IN`, or `HAIRPIN`.
-- One source rule-set per context. A second rule-set with the same from/to as an existing one (for example another `from zone trust` / `to zone untrust`) fails `commit check` with only `configuration check-out failed`. Read `show configuration security nat` first, and add rules to the existing rule-set instead, above any broader rule.
+- One source rule-set per context. A second rule-set with the same from/to as an existing one (for example another `from zone trust` / `to zone untrust`) fails `commit check` with only `configuration check-out failed`. Read `show configuration security nat` first, and add rules to the existing rule-set instead, above any broader rule:
+  `insert security nat source rule-set <rule-set> rule <new-rule> before rule <broader-rule>`.
 - After reordering, generate traffic and check translation hits rather than assuming the intended rule is used.
 
 ## Basic Source NAT Patterns
