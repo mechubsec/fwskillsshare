@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **srx-policy** (1.3.3): custom application port ranges are one `low-high` value (`destination-port 8080-8090`); `8080 to 8090` is NAT pool syntax and fails `commit check`. Found by the nightly reposbot commit check.
 - **srx-dynamic-ip-feed** (1.1.0): keep dynamic-address feeds on Security Director-managed SRXs by defining the feed and the policy's dynamic-address match in configuration groups behind a placeholder address. Field-reported; not lab-validated here.
 
 ## 1.12.1 — Documentation accuracy fixes
