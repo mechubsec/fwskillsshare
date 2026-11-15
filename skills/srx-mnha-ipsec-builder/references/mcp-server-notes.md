@@ -13,8 +13,7 @@ Decide from the tool list the server exposes, not from its name.
 
 ## Identify the server
 
-- **rust-junosmcp** (Mechub, listed first): exposes `commit_check_config` and
-  `create_junos_change_set`.
+- **rust-junosmcp**: exposes `commit_check_config` and `create_junos_change_set`.
 - **Juniper junos-mcp-server (v1.1.1)**: none of the commit-confirmed tools. No commit
   confirmed.
 - **junos-mcp-server with commit confirmed**: exposes `confirm_commit`, and
