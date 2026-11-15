@@ -1,7 +1,7 @@
 ---
 name: srx-policy
 description: Design, migrate, configure, audit, and troubleshoot Juniper SRX security policy on Junos 23.x+, including Branch SRX300/SRX400 platforms. Use when handling global or zone policy, address and application objects, AppID, AppFW, NGWF, EWF, SecIntel, ATP, logging, rule order, hit counts, default deny, or cross-VLAN mDNS and SSDP boundaries.
-version: 1.3.2
+version: 1.3.3
 author:
   - fastrevmd-lab
   - Claude
@@ -227,6 +227,7 @@ set applications application-set APP-WEB application APP-TCP-8443
 Guidance:
 
 - Prefer application sets that represent business intent: `APP-USER-WEB`, `APP-DNS`, `APP-ADMIN-SSH`.
+- A port range is one `low-high` value: `set applications application APP-TCP-8080-8090 destination-port 8080-8090`. `destination-port 8080 to 8090` is a syntax error; `to` is NAT pool address-range syntax, not application syntax.
 - Do not blindly translate every vendor service object into an individual Junos application if a predefined Junos application already exists.
 - Use `show applications` to verify predefined application names.
 - For application-identification / AppFW dynamic applications, verify AppID packages and signatures before policy activation.
