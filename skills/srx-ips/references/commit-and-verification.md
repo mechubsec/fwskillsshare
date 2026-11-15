@@ -25,8 +25,8 @@ Every commit here follows the repository write policy:
    Junos a `commit check` or `commit` confirms the pending commit, so a dry run
    or another push there silently cancels the rollback (see
    `references/mcp-server-notes.md`). If `confirm_commit` reports nothing
-   pending, the change has already rolled back: re-check before saying it is
-   live.
+   pending, the change either rolled back or was already confirmed: compare the
+   configuration with the baseline before reporting which.
 5. **Verified on vSRX 26.2R1.7, 2026-09-23:** `commit confirmed` works correctly
    with IDP configured. The device auto-rolled back a 1-minute confirmed commit
    cleanly and logged `UI_COMMIT_NOT_CONFIRMED`. **Operational timing:** the

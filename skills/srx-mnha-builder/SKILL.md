@@ -244,7 +244,7 @@ an undo would remove.
 While a stage is pending on a node, run only read-only checks there: no dry run or other
 push, because a commit check confirms the pending commit (see
 `references/mcp-server-notes.md`). If `confirm_commit` reports nothing pending, the stage
-has already rolled back.
+either rolled back or was already confirmed; diff against the baseline to tell which.
 
 ## Step 8 - Stage 2: HA stanza
 

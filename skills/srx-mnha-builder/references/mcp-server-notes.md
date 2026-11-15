@@ -133,8 +133,9 @@ above still applies, except:
   anything. Confirm the pending stage with `confirm_commit` once it is verified, or let it
   roll back; do not work around the refusal.
 - `confirm_commit` returns `Error: No pending commit confirmed on <router>; nothing to
-  confirm` when nothing is pending, usually because the window expired and the stage
-  already rolled back. Check the diff against the baseline; never treat the stage as live.
+  confirm` when nothing is pending: the window expired and the stage rolled back, or it was
+  already confirmed (a lost reply, another session, or a `commit check`). Check the diff
+  against the baseline to tell which before going on.
 - A confirmed commit's result ends with `⏳ Commit is pending confirmation: …`.
 - `execute_junos_command_batch` and `execute_junos_pfe_command` are available.
 

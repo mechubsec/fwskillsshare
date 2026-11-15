@@ -153,9 +153,10 @@ section above still applies, except the commit behavior:
   pending change with `confirm_commit` once it is verified, or let it roll back;
   do not work around the refusal.
 - `confirm_commit` returns `Error: No pending commit confirmed on <router>;
-  nothing to confirm` when nothing is pending, usually because the window
-  expired and the change already rolled back. Re-check the configuration; never
-  report the change as live.
+  nothing to confirm` when nothing is pending: the window expired and the
+  change rolled back, or it was already confirmed (a lost reply, another
+  session, or a `commit check`). Compare the configuration with the baseline
+  before reporting either.
 - A confirmed commit's result ends with `⏳ Commit is pending confirmation: …`.
 
 **Verified on vSRX 24.4R2.21, 2026-10-02:** a `dry_run` left no commit; a
