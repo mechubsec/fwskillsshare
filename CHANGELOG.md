@@ -1,12 +1,16 @@
 # Changelog
 
-## Unreleased
+## 1.13.0 — SRX MNHA IPsec hub builder (draft)
 
-- **srx-ips** (0.1.5, draft): shows the security-policy binding (`application-services idp-policy`), says `match application default` belongs only in IDP rules, and names the `Please install the Signature Database` commit-check error. Verified on vSRX 26.2R1.7; found by the nightly reposbot commit check.
-- **srx-nat** (1.1.4): a from/to context holds one source rule-set; a second one fails `commit check` with only `configuration check-out failed`, so add rules to the existing rule-set. Verified on vSRX 26.2R1.7; found by the nightly reposbot commit check.
-- **srx-policy** (1.3.3): custom application port ranges are one `low-high` value (`destination-port 8080-8090`); `8080 to 8090` is NAT pool syntax and fails `commit check`. Found by the nightly reposbot commit check.
+One new draft skill, dynamic-address feeds that survive Security Director, a warning that a commit check confirms a pending commit, and three syntax gaps found by the nightly reposbot commit check (#113–#117).
+
+- **New skill: `srx-mnha-ipsec-builder`** (0.1.1, draft; contributed by jgrizzuti). Builds one route-based IPsec tunnel from a formed MNHA pair, anchored on a floating loopback in SRG1+ with `managed-services ipsec`, to a spoke SRX over a Junos MCP server, with eBGP/BFD over the tunnel and floating statics. Every push, cutover and failover step needs explicit approval, with a dry run, undo files and commit confirmed. Field basis: vSRX 24.4, flat MNHA model; no 26.x run. eBGP over a synced tunnel is outside Juniper's documented pattern and is marked experimental.
 - **srx-dynamic-ip-feed** (1.1.0): keep dynamic-address feeds on Security Director-managed SRXs by defining the feed and the policy's dynamic-address match in configuration groups behind a placeholder address. Field-reported; not lab-validated here.
 - **srx-ips** (0.1.4), **srx-mnha-builder** (0.2.7), **srx-mnha-ipsec-builder** (0.1.1): commit confirmed is now in Juniper's own junos-mcp-server — [Juniper/junos-mcp-server#34](https://github.com/Juniper/junos-mcp-server/pull/34), merged 2026-11-02, on `main` but in no tagged release yet — so the "junos-mcp-server with commit confirmed" column points to Juniper instead of a third-party fork. All three skills now say that on Junos a `commit check` or `commit` inside a confirm window **confirms the pending commit**: while one is pending on a device, run only read-only commands there (no dry run, commit check or other push). This matters most for srx-mnha-ipsec-builder's self-restoring uplink test, which a stray check would have left permanently disabled. The merged server refuses such calls with `Error: a commit confirmed is pending on <router>…`, and `confirm_commit` reports `No pending commit confirmed` when nothing is pending, which means the change either rolled back or was already confirmed; both messages are documented, with a baseline comparison to tell which. Lab-verified on vSRX 24.4R2.21 (2026-10-05): a dry run inside a 3-minute window made the change permanent on the unguarded server; with the merged guard the dry run was refused and the rollback timer stayed intact.
+- **srx-policy** (1.3.3): custom application port ranges are one `low-high` value (`destination-port 8080-8090`); `8080 to 8090` is NAT pool syntax and fails `commit check`. Found by the nightly reposbot commit check.
+- **srx-nat** (1.1.4): a from/to context holds one source rule-set; a second one fails `commit check` with only `configuration check-out failed`, so add rules to the existing rule-set. Verified on vSRX 26.2R1.7; found by the nightly reposbot commit check.
+- **srx-ips** (0.1.5, draft): shows the security-policy binding (`application-services idp-policy`), says `match application default` belongs only in IDP rules, and names the `Please install the Signature Database` commit-check error. Verified on vSRX 26.2R1.7; found by the nightly reposbot commit check.
+- Catalog: 34 skills.
 
 ## 1.12.1 — Documentation accuracy fixes
 
