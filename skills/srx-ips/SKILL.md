@@ -1,7 +1,7 @@
 ---
 name: srx-ips
 description: Manage SRX IPS (Junos IDP) lifecycle through a Junos MCP server - triage detections, propose monitor-to-enforce changes, design and validate custom signatures for findings the predefined database does not cover. Reads IDP policy and logs, reports what fired and each rule's action, stages changes behind approval gates, checks coverage read-only, chooses context/direction/pattern, validates syntax without activating. Use when reviewing IDP logs, investigating suspicious traffic, deciding which no-action rules to enforce, when a scanner finding needs IDP detection, or when extending IDP coverage. Not for attack database updates or IDP license maintenance.
-version: 0.1.4
+version: 0.1.5
 author:
   - fastrevmd-lab
   - Claude
@@ -154,6 +154,18 @@ Also confirm the idp-policy is actually attached through
 `application-services` on the security policies carrying the traffic. A
 missing binding means **nothing** is inspected, which looks identical to "no
 attacks".
+
+```junos
+set security policies global policy <policy> match application any
+set security policies global policy <policy> then permit application-services idp-policy <idp-policy>
+```
+
+`match application default` is valid only inside an IDP rule; in the security
+policy it fails `commit check` with `application or application-set must be
+defined`. A device without the IDP signature database fails any `commit check`
+that references predefined attacks with `Please install the Signature
+Database`. That is a content gap for `srx-license-signature-maintenance`, not
+a syntax error.
 
 ## Step 2 — Pull logs, small and attributable
 
