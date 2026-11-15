@@ -1,7 +1,7 @@
 ---
 name: srx-mnha-ipsec-builder
 description: Build a route-based IPsec VPN from an SRX MNHA hub, anchored on a floating loopback, to a spoke SRX over a Junos MCP server, with checked configs, commit-confirmed pushes, cutover and failover tests. Use when building, tuning or testing IPsec to an MNHA hub, or asking about process-packet-on-backup, managed-services ipsec, RT_IPSEC_REPLAY after failover, or IPsec convergence on MNHA. To build the pair use srx-mnha-builder; for design or troubleshooting use srx-mnha.
-version: 0.1.0
+version: 0.1.1
 author:
   - fastrevmd-lab
   - Claude
@@ -206,7 +206,9 @@ output.
   file written in `spoke.set`.
 - Unplanned: disable the underlay uplink on the ACTIVE hub node with
   `confirm_timeout_mins: 2` (it restores itself). Never confirm that commit. Check that
-  the commit time falls inside the stream window.
+  the commit time falls inside the stream window. Until it has rolled back, run only
+  read-only commands on that node: a dry run, commit check or other push there would
+  confirm it and leave the uplink disabled.
 - Before failing back, wait until the recovered node's BGP is Established upstream.
 - Recommended extra: a forced child-SA rekey under load with the flag on (idle flaps at
   rekey were seen and are not explained).
@@ -223,6 +225,9 @@ files in the report.
 - Every push uses commit confirmed where the server supports it; confirm only after the
   checks pass. After any timeout or disconnect, read `show system commit` before
   retrying: a call can complete on the device while its reply is lost.
+- While a commit confirmed is pending on a device, run only read-only commands there. On
+  Junos a dry run, commit check or commit confirms it (see
+  `references/mcp-server-notes.md`).
 - Never touch `fxp0`, `system services`, logins or `mgmt_junos`. Never handle the
   pre-shared key.
 - Baseline files contain secrets unless the server account reads them as SECRET-DATA.
